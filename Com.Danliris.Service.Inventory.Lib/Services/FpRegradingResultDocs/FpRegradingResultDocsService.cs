@@ -56,7 +56,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services
                 detail.ProductId = viewModel.Product.Id;
                 detail.ProductCode = viewModel.Product.Code;
                 detail.ProductName = viewModel.Product.Name;
-                //detail.Quantity = data.Quantity;
+                detail.Quantity = data.Quantity;
                 detail.Length = data.Length;
                 detail.Remark = data.Remark;
                 detail.Grade = data.Grade;
@@ -111,6 +111,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services
                 //detail.Product.Quantity = data.Quantity;
                 //detail.Quantity = data.Quantity;
                 detail.Remark = data.Remark;
+                detail.Quantity = data.Quantity;
                 detail.Length = data.Length;
                 //detail.GradeBefore = data.GradeBefore;
                 detail.Grade = data.Grade;
@@ -134,13 +135,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Services
 
             List<string> SelectedFields = new List<string>()
                 {
-                    "Id", "Code","_CreatedUtc", "Bon", "Supplier", "Product", "Details", "Machine", "Remark", "Operator", "IsReturnedToPurchasing"
+                    "Id", "Code", "Date", "Bon", "Supplier", "Product", "Details", "Machine", "Remark", "Operator", "IsReturnedToPurchasing"
                 };
             Query = Query
                 .Select(o => new FpRegradingResultDocs
                 {
                     Id = o.Id,
                     Code = o.Code,
+                    Date = o.Date,
                     NoBon = o.NoBon,
                     NoBonId = o.NoBonId,
                     UnitName = o.UnitName,
@@ -159,7 +161,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services
                     _CreatedUtc = o._CreatedUtc,
                     _LastModifiedUtc=o._LastModifiedUtc,
                     IsReturnedToPurchasing=o.IsReturnedToPurchasing,
-                    Details = o.Details.Select(p => new FpRegradingResultDocsDetails { FpReturProInvDocsId = p.FpReturProInvDocsId, ProductName = p.ProductName, ProductCode = p.ProductCode, ProductId = p.ProductId, Id = o.Id, Length = p.Length, Remark = p.Remark, Code = p.Code, Grade = p.Grade, Retur = p.Retur }).Where(i => i.FpReturProInvDocsId.Equals(o.Id)).ToList()
+                    Details = o.Details.Select(p => new FpRegradingResultDocsDetails { FpReturProInvDocsId = p.FpReturProInvDocsId, ProductName = p.ProductName, ProductCode = p.ProductCode, ProductId = p.ProductId, Id = o.Id, Length = p.Length, Quantity = p.Quantity, Remark = p.Remark, Code = p.Code, Grade = p.Grade, Retur = p.Retur }).Where(i => i.FpReturProInvDocsId.Equals(o.Id)).ToList()
                 });
 
             Dictionary<string, string> FilterDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Filter);
@@ -253,7 +255,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services
         public async Task<FpRegradingResultDocs> CustomCodeGenerator(FpRegradingResultDocs Model)
         {
             var unit = string.Equals(Model.UnitName.ToUpper(), "PRINTING") ? "PR" : "FS";
-            var lastData = await this.DbSet.Where(w => string.Equals(w.UnitName, Model.UnitName)).OrderByDescending(o => o._CreatedUtc).FirstOrDefaultAsync();
+            var lastData = await this.DbSet.Where(w => w.UnitName == Model.UnitName).OrderByDescending(o => o._CreatedUtc).FirstOrDefaultAsync();
 
             DateTime Now = DateTime.Now;
             string Year = Now.ToString("yy");
@@ -303,8 +305,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services
                 }
                 catch (Exception e)
                 {
-                    throw new Exception(e.Message);
                     transaction.Rollback();
+                    throw new Exception(e.Message);
                 }
             }
             return Created;
@@ -429,9 +431,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Services
             return Tuple.Create(Data, TotalData, OrderDictionary, SelectedFields);
         }
 
-        public void UpdateIsReturnedToPurchasing(int fPRegradingResultDocsId)
+        public void UpdateIsReturnedToPurchasing(int fPRegradingResultDocsId, bool flag)
         {
-            FpRegradingResultDocs model = new FpRegradingResultDocs { Id = fPRegradingResultDocsId, IsReturnedToPurchasing = true };
+            FpRegradingResultDocs model = new FpRegradingResultDocs { Id = fPRegradingResultDocsId, IsReturnedToPurchasing = flag };
  
             DbContext.fpRegradingResultDocs.Attach(model);
             DbContext.Entry(model).Property(x => x.IsReturnedToPurchasing).IsModified = true;

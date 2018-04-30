@@ -13,6 +13,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.FPReturnInvToPurchasingV
         public string No { get; set; }
         public UnitViewModel Unit { get; set; }
         public SupplierViewModel Supplier { get; set; }
+        public int AutoIncrementNumber { get; set; }
         public List<FPReturnInvToPurchasingDetailViewModel> FPReturnInvToPurchasingDetails { get; set; }
 
         public FPReturnInvToPurchasingViewModel() { }
@@ -97,7 +98,13 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.FPReturnInvToPurchasingV
                     if (string.IsNullOrWhiteSpace(detail.FPRegradingResultDocsCode))
                     {
                         Count++;
-                        DetailError += "{ fpRegradingResultDocs: ' Regrading Result Docs No is required' }, ";
+                        DetailError += "{ fpRegradingResultDocs: 'Regrading Result Docs No is required' }, ";
+                    }
+
+                    else if (detail.NecessaryLength <= 0)
+                    {
+                        Count++;
+                        DetailError += "{ NecessaryLength: 'Necessary Length must be greater than zero' }, ";
                     }
                 }
 

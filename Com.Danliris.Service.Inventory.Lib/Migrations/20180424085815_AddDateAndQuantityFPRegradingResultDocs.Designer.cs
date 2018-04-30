@@ -11,9 +11,10 @@ using System;
 namespace Com.Danliris.Service.Inventory.Lib.Migrations
 {
     [DbContext(typeof(InventoryDbContext))]
-    partial class InventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180424085815_AddDateAndQuantityFPRegradingResultDocs")]
+    partial class AddDateAndQuantityFPRegradingResultDocs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,8 +259,6 @@ namespace Com.Danliris.Service.Inventory.Lib.Migrations
                     b.Property<int>("FPReturnInvToPurchasingId");
 
                     b.Property<double>("Length");
-
-                    b.Property<double>("NecessaryLength");
 
                     b.Property<string>("ProductCode")
                         .HasMaxLength(255);

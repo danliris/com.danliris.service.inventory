@@ -9,7 +9,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels
     public class FpRegradingResultDetailsDocsViewModel : BasicViewModel, IValidatableObject
     {
         public product Product { get; set; }
-        //public double Quantity { get; set; }
+        public double Quantity { get; set; }
         public double Length { get; set; }
         public double LengthBeforeReGrade { get; set; }
         public string Remark { get; set; }

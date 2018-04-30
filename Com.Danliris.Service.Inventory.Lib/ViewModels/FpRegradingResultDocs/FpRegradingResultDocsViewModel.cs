@@ -10,6 +10,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels
     public class FpRegradingResultDocsViewModel : BasicViewModel, IValidatableObject
     {
         public string Code { get; set; }
+        public DateTime? Date { get; set; }
         public noBon Bon { get; set; }
         public supplier Supplier { get; set; }
         public product Product { get; set; }
@@ -63,6 +64,9 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels
             if (this.Operator == null || string.IsNullOrWhiteSpace(this.Operator))
                 yield return new ValidationResult("Operator harus di isi", new List<string> { "Operator" });
 
+            if (this.Date == null)
+                yield return new ValidationResult("Tanggal harus di isi", new List<string> { "Date" });
+
             int Count = 0;
             string detailsError = "[";
             if (this.Details.Count.Equals(0) || this.Details == null)
@@ -111,6 +115,12 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels
                     {
                         Count++;
                         detailsError += "Length: 'Panjang harus di isi',";
+                    }
+
+                    if (data.Quantity.Equals(0))
+                    {
+                        Count++;
+                        detailsError += "Quantity: 'Jumlah harus di isi',";
                     }
                     //if (data.LengthBeforeReGrade.Equals(0))
                     //{

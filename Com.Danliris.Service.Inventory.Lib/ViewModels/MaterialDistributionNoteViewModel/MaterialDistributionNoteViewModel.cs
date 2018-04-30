@@ -67,82 +67,96 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialDistributionNote
                     Dictionary<string, object> filter = new Dictionary<string, object> { { "storageName", storageName }, { "uom", "MTR" }, { "productCode", new Dictionary<string, object> { { "$in", products.ToArray() } } } };
                     var response = httpClient.GetAsync($@"{APIEndpoint.Inventory}{inventorySummaryURI}filter=" + JsonConvert.SerializeObject(filter)).Result.Content.ReadAsStringAsync();
                     Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Result);
-                    
+
                     var json = result.Single(p => p.Key.Equals("data")).Value;
                     List<InventorySummaryViewModel> inventorySummaries = JsonConvert.DeserializeObject<List<InventorySummaryViewModel>>(json.ToString());
 
                     foreach (MaterialDistributionNoteItemViewModel mdni in this.MaterialDistributionNoteItems)
                     {
-                        int CountDetail = 0;
-
-                        string materialDistributionNoteDetailError = "[";
-
-                        foreach (MaterialDistributionNoteDetailViewModel mdnd in mdni.MaterialDistributionNoteDetails)
-                        {
-                            InventorySummaryViewModel inventorySummary = inventorySummaries.SingleOrDefault(p => p.productCode.Equals(mdnd.Product.code) && p.uom.Equals("MTR"));
-
-                            materialDistributionNoteDetailError += "{";
-
-                            if (inventorySummary == null)
-                            {
-                                CountDetail++;
-                                materialDistributionNoteDetailError += "Product: 'Product is not exists in the storage', ";
-                            }
-                            else
-                            {
-                                if (mdnd.Quantity == null)
-                                {
-                                    CountDetail++;
-                                    materialDistributionNoteDetailError += "Quantity: 'Quantity is required', ";
-                                }
-                                else if (mdnd.Quantity <= 0)
-                                {
-                                    CountDetail++;
-                                    materialDistributionNoteDetailError += "Quantity: 'Quantity must be greater than zero', ";
-                                }
-
-                                if (mdnd.ReceivedLength == null)
-                                {
-                                    CountDetail++;
-                                    materialDistributionNoteDetailError += "ReceivedLength: 'Length is required', ";
-                                }
-                                else if (mdnd.ReceivedLength <= 0)
-                                {
-                                    CountDetail++;
-                                    materialDistributionNoteDetailError += "ReceivedLength: 'Length must be greater than zero', ";
-                                }
-                                else if (mdnd.ReceivedLength > inventorySummary.quantity)
-                                {
-                                    CountDetail++;
-                                    materialDistributionNoteDetailError += "ReceivedLength: 'Length must be less than or equal than stock', ";
-                                }
-                                else
-                                {
-                                    inventorySummary.quantity -= (double)mdnd.ReceivedLength;
-                                }
-
-                                if (mdnd.Supplier == null || string.IsNullOrWhiteSpace(mdnd.Supplier._id))
-                                {
-                                    CountDetail++;
-                                    materialDistributionNoteDetailError += "Supplier: 'Supplier is required', ";
-                                }
-
-                                
-                            }
-
-                            materialDistributionNoteDetailError += "}, ";
-                        }
-
-                        materialDistributionNoteDetailError += "]";
-
-                        if (CountDetail > 0)
+                        if (mdni.MaterialDistributionNoteDetails.Count(p => p.ReceivedLength != null && p.ReceivedLength > 0).Equals(0))
                         {
                             Count++;
-                            materialDistributionNoteItemError += string.Concat("{ MaterialDistributionNoteDetails: ", materialDistributionNoteDetailError, " }, ");
+                            materialDistributionNoteItemError += "{ MaterialRequestNote: 'SPB detail is required' }, ";
                         }
                         else
                         {
-                            materialDistributionNoteItemError += "{}, ";
+                            int CountDetail = 0;
+
+                            string materialDistributionNoteDetailError = "[";
+
+                            foreach (MaterialDistributionNoteDetailViewModel mdnd in mdni.MaterialDistributionNoteDetails)
+                            {
+                                if (mdnd.ReceivedLength == null || mdnd.ReceivedLength == 0)
+                                {
+                                    materialDistributionNoteDetailError += "{}, ";
+                                    continue;
+                                }
+
+                                InventorySummaryViewModel inventorySummary = inventorySummaries.SingleOrDefault(p => p.productCode.Equals(mdnd.Product.code) && p.uom.Equals("MTR"));
+
+                                materialDistributionNoteDetailError += "{";
+                                
+                                if (inventorySummary == null)
+                                {
+                                    CountDetail++;
+                                    materialDistributionNoteDetailError += "Product: 'Product is not exists in the storage', ";
+                                }
+                                else
+                                {
+                                    if (mdnd.Quantity == null)
+                                    {
+                                        CountDetail++;
+                                        materialDistributionNoteDetailError += "Quantity: 'Quantity is required', ";
+                                    }
+                                    else if (mdnd.Quantity <= 0)
+                                    {
+                                        CountDetail++;
+                                        materialDistributionNoteDetailError += "Quantity: 'Quantity must be greater than zero', ";
+                                    }
+
+                                    if (mdnd.ReceivedLength == null)
+                                    {
+                                        CountDetail++;
+                                        materialDistributionNoteDetailError += "ReceivedLength: 'Length is required', ";
+                                    }
+                                    else if (mdnd.ReceivedLength <= 0)
+                                    {
+                                        CountDetail++;
+                                        materialDistributionNoteDetailError += "ReceivedLength: 'Length must be greater than zero', ";
+                                    }
+                                    else if (mdnd.ReceivedLength > inventorySummary.quantity)
+                                    {
+                                        CountDetail++;
+                                        materialDistributionNoteDetailError += "ReceivedLength: 'Length must be less than or equal than stock', ";
+                                    }
+                                    else
+                                    {
+                                        inventorySummary.quantity -= (double)mdnd.ReceivedLength;
+                                    }
+
+                                    if (mdnd.Supplier == null || string.IsNullOrWhiteSpace(mdnd.Supplier._id))
+                                    {
+                                        CountDetail++;
+                                        materialDistributionNoteDetailError += "Supplier: 'Supplier is required', ";
+                                    }
+                                }
+
+                                materialDistributionNoteDetailError += "}, ";
+                            }
+
+                            mdni.MaterialDistributionNoteDetails = mdni.MaterialDistributionNoteDetails.Where(p => p.ReceivedLength != null && p.ReceivedLength > 0).ToList();
+
+                            materialDistributionNoteDetailError += "]";
+
+                            if (CountDetail > 0)
+                            {
+                                Count++;
+                                materialDistributionNoteItemError += string.Concat("{ MaterialDistributionNoteDetails: ", materialDistributionNoteDetailError, " }, ");
+                            }
+                            else
+                            {
+                                materialDistributionNoteItemError += "{}, ";
+                            }
                         }
                     }
                 }

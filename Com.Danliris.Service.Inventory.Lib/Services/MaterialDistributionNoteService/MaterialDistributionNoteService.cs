@@ -287,7 +287,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialDistributionNoteSe
         public async Task<MaterialDistributionNote> CustomCodeGenerator(MaterialDistributionNote Model)
         {
             var Type = string.Equals(Model.UnitName.ToUpper(), "PRINTING") ? "PR" : "FS";
-            var lastData = await this.DbSet.Where(w => string.Equals(w.UnitName, Model.UnitName)).OrderByDescending(o => o._CreatedUtc).FirstOrDefaultAsync();
+            var lastData = await this.DbSet.Where(w => w.UnitName == Model.UnitName).OrderByDescending(o => o._CreatedUtc).FirstOrDefaultAsync();
 
             DateTime Now = DateTime.Now;
             string Year = Now.ToString("yy");
@@ -333,16 +333,35 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialDistributionNoteSe
                     materialsRequestNoteService.Token = Token;
                     materialsRequestNote_ItemService.Username = Username;
 
+                    List<InventorySummaryViewModel> data = new List<InventorySummaryViewModel>();
+
+
                     foreach (MaterialDistributionNoteItem materialDistributionNoteItem in Model.MaterialDistributionNoteItems)
                     {
                         MaterialsRequestNote materialsRequestNote = await materialsRequestNoteService.ReadModelById(materialDistributionNoteItem.MaterialRequestNoteId);
                         materialsRequestNote.IsDistributed = true;
 
+                        //inventory summary data
+                        if (!(Model.Type.ToUpper().Equals("RE - GRADING")))
+                        {
+                            foreach (MaterialDistributionNoteDetail materialDistributionNoteDetail in materialDistributionNoteItem.MaterialDistributionNoteDetails)
+                            {
+                                InventorySummaryViewModel InventorySummary = new InventorySummaryViewModel();
+                                InventorySummary.quantity = materialDistributionNoteDetail.MaterialRequestNoteItemLength - materialDistributionNoteDetail.ReceivedLength;
+                                InventorySummary.productCode = materialDistributionNoteDetail.ProductCode;
+                                InventorySummary.productId = materialDistributionNoteDetail.ProductId;
+                                InventorySummary.productName = materialDistributionNoteDetail.ProductName;
+                                InventorySummary.storageName = Model.UnitName;
+                                InventorySummary.uom = "MTR";
+
+                                data.Add(InventorySummary);
+                            }
+                        }
+
                         if (Model.Type.ToUpper().Equals("PRODUKSI"))
                         {
                             foreach (MaterialDistributionNoteDetail materialDistributionNoteDetail in materialDistributionNoteItem.MaterialDistributionNoteDetails)
                             {
-
                                 materialsRequestNote.MaterialsRequestNote_Items.Where(w => w.ProductionOrderId.Equals(materialDistributionNoteDetail.ProductionOrderId)).Select(s => { s.DistributedLength += materialDistributionNoteDetail.ReceivedLength; return s; }).ToList();
                             }
                             materialsRequestNoteService.UpdateDistributedQuantity(materialsRequestNote.Id, materialsRequestNote);
@@ -358,6 +377,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialDistributionNoteSe
                         materialsRequestNoteService.DbSet.Update(materialsRequestNote);
 
                     }
+
+                    this.UpdateInventorySummary(data);
+
                     DbContext.SaveChanges();
 
                     CreateInventoryDocument(Model, "OUT");
@@ -467,6 +489,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialDistributionNoteSe
 
                     HashSet<int> MaterialDistributionNoteItems = new HashSet<int>(this.DbContext.MaterialDistributionNoteItems.Where(p => p.MaterialDistributionNoteId.Equals(Id)).Select(p => p.Id));
 
+                    List<InventorySummaryViewModel> data = new List<InventorySummaryViewModel>();
+
                     foreach (int item in MaterialDistributionNoteItems)
                     {
                         HashSet<int> MaterialDistributionNoteDetails = new HashSet<int>(this.DbContext.MaterialDistributionNoteDetails.Where(p => p.MaterialDistributionNoteItemId.Equals(item)).Select(p => p.Id));
@@ -490,6 +514,23 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialDistributionNoteSe
                         MaterialsRequestNote materialsRequestNote = await materialsRequestNoteService.ReadModelById(materialDistributionNoteItem.MaterialRequestNoteId);
                         materialsRequestNote.IsDistributed = true;
 
+                        //inventory summary data
+                        if (!(materialDistributionNote.Type.ToUpper().Equals("RE - GRADING")))
+                        {
+                            foreach (MaterialDistributionNoteDetail materialDistributionNoteDetail in materialDistributionNoteItem.MaterialDistributionNoteDetails)
+                            {
+                                InventorySummaryViewModel InventorySummary = new InventorySummaryViewModel();
+                                InventorySummary.quantity = -(materialDistributionNoteDetail.MaterialRequestNoteItemLength - materialDistributionNoteDetail.ReceivedLength);
+                                InventorySummary.productCode = materialDistributionNoteDetail.ProductCode;
+                                InventorySummary.productId = materialDistributionNoteDetail.ProductId;
+                                InventorySummary.productName = materialDistributionNoteDetail.ProductName;
+                                InventorySummary.storageName = materialDistributionNote.UnitName;
+                                InventorySummary.uom = "MTR";
+
+                                data.Add(InventorySummary);
+                            }
+                        }
+
                         if (materialDistributionNote.Type.ToUpper().Equals("PRODUKSI"))
                         {
                             foreach (MaterialDistributionNoteDetail materialDistributionNoteDetail in materialDistributionNoteItem.MaterialDistributionNoteDetails)
@@ -510,6 +551,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialDistributionNoteSe
                         materialsRequestNoteService.OnUpdating(materialsRequestNote.Id, materialsRequestNote);
                         materialsRequestNoteService.DbSet.Update(materialsRequestNote);
                     }
+
+                    this.UpdateInventorySummary(data);
+
                     DbContext.SaveChanges();
 
                     CreateInventoryDocument(materialDistributionNote, "IN");
@@ -614,6 +658,16 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialDistributionNoteSe
             var Data = GetReportQuery(unitId, type, date, offset).ToList();
 
             return Data;
+        }
+
+        public void UpdateInventorySummary(List<InventorySummaryViewModel> item)
+        {
+            string inventorySummary = "inventory/inventory-summary/update/all-summary";
+
+            HttpClient httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
+            var response = httpClient.PutAsync($"{APIEndpoint.Inventory}{inventorySummary}", new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, General.JsonMediaType)).Result;
+            response.EnsureSuccessStatusCode();
         }
     }
 }

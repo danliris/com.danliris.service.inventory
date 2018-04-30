@@ -22,7 +22,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.MaterialRequestNoteDataU
         public MaterialsRequestNote_Item GetNewData()
         {
             ProductionOrderViewModel productionOrder = ProductionOrderDataUtil.GetProductionOrder(client);
-            ProductViewModel product = ProductDataUtil.GetProduct(client);
+            InventorySummaryViewModel product = InventorySummaryDataUtil.GetInventorySummary(client);
             
             return new MaterialsRequestNote_Item
             {
@@ -33,9 +33,9 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.MaterialRequestNoteDataU
                 OrderTypeId = productionOrder.orderType._id,
                 OrderTypeCode = productionOrder.orderType.code,
                 OrderTypeName = productionOrder.orderType.name,
-                ProductId = product._id,
-                ProductCode = product.code,
-                ProductName = product.name,
+                ProductId = product.productId,
+                ProductCode = product.productCode,
+                ProductName = product.productName,
                 Grade = "A",
                 Length = 5
             };

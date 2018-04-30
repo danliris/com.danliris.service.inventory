@@ -15,6 +15,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Models.FPReturnInvToPurchasingModel
         public string ProductCode { get; set; }
         public string ProductName { get; set; }
         public double Quantity { get; set; }
+        public double NecessaryLength { get; set; }
         public double Length { get; set; }
         public string Description { get; set; }
         public virtual FPReturnInvToPurchasing FPReturnInvToPurchasing { get; set; }

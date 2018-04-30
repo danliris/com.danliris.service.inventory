@@ -14,7 +14,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Models
         public string ProductName { get; set; }
         public string ProductId { get; set; }
         public string ProductCode { get; set; }
-        //public double Quantity { get; set; }
+        public double Quantity { get; set; }
         public double Length { get; set; }
         //public double LengthBeforeReGrade { get; set; }
         public string Remark { get; set; }

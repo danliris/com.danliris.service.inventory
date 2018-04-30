@@ -98,7 +98,7 @@ namespace Com.Danliris.Service.Inventory.Lib.PDFTemplates
                 rightCell.Phrase = new Phrase(string.Format("{0:n}", item.Quantity), normal_font);
                 table.AddCell(rightCell);
 
-                rightCell.Phrase = new Phrase(string.Format("{0:n}", item.Length), normal_font);
+                rightCell.Phrase = new Phrase(string.Format("{0:n}", item.NecessaryLength), normal_font);
                 table.AddCell(rightCell);
 
                 leftCell.Phrase = new Phrase(item.Description, normal_font);

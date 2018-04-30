@@ -47,8 +47,8 @@ namespace Com.Danliris.Service.Inventory.WebApi
         public void RegisterServices(IServiceCollection services)
         {
             services
-                .AddTransient<MaterialsRequestNoteService>()
-                .AddTransient<MaterialsRequestNote_ItemService>()
+                .AddScoped<MaterialsRequestNoteService>()
+                .AddScoped<MaterialsRequestNote_ItemService>()
                 .AddScoped<MaterialDistributionNoteService>()
                 .AddTransient<MaterialDistributionNoteItemService>()
                 .AddTransient<StockTransferNoteService>()

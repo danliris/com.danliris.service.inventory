@@ -45,7 +45,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades
                 {
                     foreach (FPReturnInvToPurchasingDetail detail in model.FPReturnInvToPurchasingDetails)
                     {
-                        fpRegradingResultDocsService.UpdateIsReturnedToPurchasing(detail.FPRegradingResultDocsId);
+                        fpRegradingResultDocsService.UpdateIsReturnedToPurchasing(detail.FPRegradingResultDocsId, true);
                         this.fpReturnInvToPurchasingDetailService.OnCreating(detail);
                     }
 
@@ -70,6 +70,62 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades
             return Created;
         }
 
+        /*
+        public async Task<int> Update(int id, FPReturnInvToPurchasing model)
+        {
+            int Updated = 0;
+
+            using (var transaction = this.fpReturnInvToPurchasingService.DbContext.Database.BeginTransaction())
+            {
+                try
+                {
+                    HashSet<int> fpReturnInvToPurchasingDetails = new HashSet<int>(fpReturnInvToPurchasingDetailService.DbSet
+                        .Where(w => w.FPReturnInvToPurchasingId.Equals(id))
+                        .Select(s => s.Id));
+                    Updated = await this.fpReturnInvToPurchasingService.UpdateAsync(id, model);
+
+                    Updated = await this.fpReturnInvToPurchasingService.CreateAsync(model);
+                    CreateInventoryDocument(model, "OUT");
+
+                    foreach (int detailId in fpReturnInvToPurchasingDetails)
+                    {
+                        FPReturnInvToPurchasingDetail detailModel = model.FPReturnInvToPurchasingDetails.FirstOrDefault(prop => prop.Id.Equals(detailId));
+                        if (model == null)
+                        {
+                            fpReturnInvToPurchasingDetailService.Delete(detailId);
+                        }
+                        else
+                        {
+                            fpReturnInvToPurchasingDetailService.Update(detailId, detailModel);
+                        }
+                    }
+
+                    foreach (FPReturnInvToPurchasingDetail detailModel in model.FPReturnInvToPurchasingDetails)
+                    {
+                        if (detailModel.Id.Equals(0))
+                        {
+                            fpReturnInvToPurchasingDetailService.Create(detailModel);
+                        }
+                    }
+
+                    transaction.Commit();
+                }
+                catch (ServiceValidationExeption e)
+                {
+                    transaction.Rollback();
+                    throw new ServiceValidationExeption(e.ValidationContext, e.ValidationResults);
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Update Error");
+                }
+            }
+
+            return Updated;
+        }
+        */
+
         public Tuple<List<object>, int, Dictionary<string, string>> Read(int page = 1, int size = 25, string order = "{}", string keyword = null, string filter = "{}")
         {
             #region Query
@@ -85,7 +141,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades
                     SupplierName = s.SupplierName,
                     _CreatedUtc = s._CreatedUtc,
                     _LastModifiedUtc = s._LastModifiedUtc,
-                    FPReturnInvToPurchasingDetails = s.FPReturnInvToPurchasingDetails.Select(p => new FPReturnInvToPurchasingDetail { FPReturnInvToPurchasingId = p.FPReturnInvToPurchasingId, Length = p.Length }).Where(i => i.FPReturnInvToPurchasingId.Equals(s.Id)).ToList()
+                    FPReturnInvToPurchasingDetails = s.FPReturnInvToPurchasingDetails.Select(p => new FPReturnInvToPurchasingDetail { FPReturnInvToPurchasingId = p.FPReturnInvToPurchasingId, Quantity = p.Quantity, Length = p.Length, NecessaryLength = p.NecessaryLength }).Where(i => i.FPReturnInvToPurchasingId.Equals(s.Id)).ToList()
                 });
 
             #endregion Query
@@ -138,8 +194,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades
                         Id = s.First().Id,
                         No = s.First().No,
                         UnitName = s.First().UnitName,
-                        TotalQuantity = s.Sum(d => d.FPReturnInvToPurchasingDetails.Count()),
+                        TotalQuantity = s.Sum(d => d.FPReturnInvToPurchasingDetails.Sum(p => p.Quantity)),
                         TotalLength = s.Sum(d => d.FPReturnInvToPurchasingDetails.Sum(p => p.Length)),
+                        TotalNecessaryLength = s.Sum(d => d.FPReturnInvToPurchasingDetails.Sum(p => p.NecessaryLength)),
                         SupplierName = s.First().SupplierName,
                         _CreatedUtc = s.First()._CreatedUtc
                     }).ToList()
@@ -172,10 +229,11 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades
                     FPReturnInvToPurchasing fpReturnInvToPurchasing = await this.ReadById(id);
                     Count = await this.fpReturnInvToPurchasingService.DeleteAsync(id);
 
-                    HashSet<int> fpReturnInvToPurchasingDetails = new HashSet<int>(this.fpReturnInvToPurchasingDetailService.DbSet.Where(p => p.FPReturnInvToPurchasingId.Equals(id)).Select(p => p.Id));
-                    foreach (int detail in fpReturnInvToPurchasingDetails)
+                    HashSet<object> fpReturnInvToPurchasingDetails = new HashSet<object>(this.fpReturnInvToPurchasingDetailService.DbSet.Where(p => p.FPReturnInvToPurchasingId.Equals(id)).Select(p => new { Id = p.Id, FPRegradingResultDocsId = p.FPRegradingResultDocsId }));
+                    foreach (dynamic detail in fpReturnInvToPurchasingDetails)
                     {
-                        await this.fpReturnInvToPurchasingDetailService.DeleteAsync(detail);
+                        fpRegradingResultDocsService.UpdateIsReturnedToPurchasing(detail.FPRegradingResultDocsId, false);
+                        await this.fpReturnInvToPurchasingDetailService.DeleteAsync(detail.Id);
                     }
 
                     CreateInventoryDocument(fpReturnInvToPurchasing, "IN");

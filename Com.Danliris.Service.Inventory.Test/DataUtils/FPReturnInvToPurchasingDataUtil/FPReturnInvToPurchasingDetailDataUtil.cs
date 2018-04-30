@@ -22,6 +22,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.FPReturnInvToPurchasingD
                     ProductCode = detail.ProductCode,
                     ProductName = detail.ProductName,
                     Quantity = 1,
+                    NecessaryLength = 1,
                     Length = detail.Length,
                     Description = ""
                 });

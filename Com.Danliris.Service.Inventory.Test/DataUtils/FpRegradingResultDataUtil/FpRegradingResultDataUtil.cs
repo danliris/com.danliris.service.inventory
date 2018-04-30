@@ -30,7 +30,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.FpRegradingResultDataUti
             Data.Product = new FpRegradingResultDocsViewModel.product();
             Data.Supplier = new FpRegradingResultDocsViewModel.supplier();
             Data.Details = new List<FpRegradingResultDetailsDocsViewModel> { new FpRegradingResultDetailsDocsViewModel() };
-
+            Data.Date = null;
             Data.Shift = string.Empty;
             Data.TotalLength = 0;
             Data.OriginalGrade = string.Empty;
@@ -48,6 +48,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.FpRegradingResultDataUti
 
             FpRegradingResultDocs TestData = new FpRegradingResultDocs
             {
+                Date = DateTime.UtcNow,
                 NoBon = unit.no,
                 NoBonId = unit._id,
 

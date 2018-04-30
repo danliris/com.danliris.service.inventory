@@ -29,6 +29,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.FpRegradingResultDataUti
                 ProductName = product.name,
                 ProductId = product._id,
                 ProductCode = product.code,
+                Quantity = 1,
                 Length = 100,
                 Grade = "A",
                 Remark = "test",

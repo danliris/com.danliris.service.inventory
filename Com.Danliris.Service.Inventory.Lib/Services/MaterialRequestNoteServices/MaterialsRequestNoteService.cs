@@ -71,7 +71,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
         public async Task<MaterialsRequestNote> CustomCodeGenerator(MaterialsRequestNote Model)
         {
             Model.Type = string.Equals(Model.UnitName.ToUpper(), "PRINTING") ? "P" : "F";
-            var lastData = await this.DbSet.Where(w => string.Equals(w.UnitName, Model.UnitName)).OrderByDescending(o => o._CreatedUtc).FirstOrDefaultAsync();
+            var lastData = await this.DbSet.Where(w => w.UnitName == Model.UnitName).OrderByDescending(o => o._CreatedUtc).FirstOrDefaultAsync();
 
             DateTime Now = DateTime.Now;
             string Year = Now.ToString("yy");
@@ -151,6 +151,16 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             response.EnsureSuccessStatusCode();
         }
 
+        public void UpdateInventorySummary(List<InventorySummaryViewModel> item)
+        {
+            string inventorySummary = "inventory/inventory-summary/update/all-summary";
+
+            HttpClient httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
+            var response = httpClient.PutAsync($"{APIEndpoint.Inventory}{inventorySummary}", new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, General.JsonMediaType)).Result;
+            response.EnsureSuccessStatusCode();
+        }
+
         public override async Task<int> CreateModel(MaterialsRequestNote Model)
         {
             int Created = 0;
@@ -162,10 +172,24 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                     Model = await this.CustomCodeGenerator(Model);
                     Created = await this.CreateAsync(Model);
 
+                    List<InventorySummaryViewModel> data = new List<InventorySummaryViewModel>();
+
                     foreach (MaterialsRequestNote_Item item in Model.MaterialsRequestNote_Items)
                     {
                         productionOrderIds.Add(item.ProductionOrderId);
+
+                        InventorySummaryViewModel InventorySummary = new InventorySummaryViewModel();
+                        InventorySummary.quantity = Model.RequestType != "PEMBELIAN" ? -item.Length : 0;
+                        InventorySummary.productCode = item.ProductCode;
+                        InventorySummary.productId = item.ProductId;
+                        InventorySummary.productName = item.ProductName;
+                        InventorySummary.storageName = Model.UnitName;
+                        InventorySummary.uom = "MTR";
+
+                        data.Add(InventorySummary);
                     }
+
+                    this.UpdateInventorySummary(data);
 
                     UpdateIsRequestedProductionOrder(productionOrderIds, "CREATE");
                     transaction.Commit();
@@ -270,6 +294,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
 
         public override async Task<int> UpdateModel(int Id, MaterialsRequestNote Model)
         {
+
             MaterialsRequestNote_ItemService materialsRequestNote_ItemService = this.ServiceProvider.GetService<MaterialsRequestNote_ItemService>();
             materialsRequestNote_ItemService.Username = this.Username;
 
@@ -278,11 +303,39 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             {
                 try
                 {
+                    var modelTemp = await this.DbSet
+                                    .Where(d => d.Id.Equals(Id) && d._IsDeleted.Equals(false))
+                                    .AsNoTracking()
+                                    .Include(d => d.MaterialsRequestNote_Items)
+                                    .FirstOrDefaultAsync();
+
+                    List<InventorySummaryViewModel> data = new List<InventorySummaryViewModel>();
+
+                    foreach (var item in modelTemp.MaterialsRequestNote_Items)
+                    {
+                        foreach (var i in Model.MaterialsRequestNote_Items)
+                        {
+                            if (item.Id == i.Id)
+                            {
+                                InventorySummaryViewModel InventorySummary = new InventorySummaryViewModel();
+                                InventorySummary.quantity = Model.RequestType != "PEMBELIAN" ? (item.Length - i.Length) : 0;
+                                InventorySummary.productCode = item.ProductCode;
+                                InventorySummary.productId = item.ProductId;
+                                InventorySummary.productName = item.ProductName;
+                                InventorySummary.storageName = Model.UnitName;
+                                InventorySummary.uom = "MTR";
+
+                                data.Add(InventorySummary);
+                            }
+                        }
+                    }
+
+                    this.UpdateInventorySummary(data);
+
                     HashSet<int> materialsRequestNote_Items = new HashSet<int>(materialsRequestNote_ItemService.DbSet
                         .Where(w => w.MaterialsRequestNoteId.Equals(Id))
                         .Select(s => s.Id));
                     Updated = await this.UpdateAsync(Id, Model);
-
 
                     foreach (int materialsRequestNote_Item in materialsRequestNote_Items)
                     {
@@ -303,7 +356,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                         {
                             await materialsRequestNote_ItemService.CreateModel(materialsRequestNote_Item);
                         }
+
                     }
+
 
                     transaction.Commit();
                 }
@@ -339,11 +394,25 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                         await materialsRequestNote_ItemService.DeleteModel(materialsRequestNote_Item);
                     }
 
+                    List<InventorySummaryViewModel> data = new List<InventorySummaryViewModel>();
                     List<string> productionOrderIds = new List<string>();
+
                     foreach (MaterialsRequestNote_Item item in Model.MaterialsRequestNote_Items)
                     {
                         productionOrderIds.Add(item.ProductionOrderId);
+
+                        InventorySummaryViewModel InventorySummary = new InventorySummaryViewModel();
+                        InventorySummary.quantity = Model.RequestType != "PEMBELIAN" ? item.Length : 0;
+                        InventorySummary.productCode = item.ProductCode;
+                        InventorySummary.productId = item.ProductId;
+                        InventorySummary.productName = item.ProductName;
+                        InventorySummary.storageName = Model.UnitName;
+                        InventorySummary.uom = "MTR";
+
+                        data.Add(InventorySummary);
                     }
+
+                    this.UpdateInventorySummary(data);
 
                     UpdateIsRequestedProductionOrder(productionOrderIds, "DELETE");
                     transaction.Commit();

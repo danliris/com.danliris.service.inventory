@@ -13,6 +13,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.FPReturnInvToPurchasingV
         public string FPRegradingResultDocsCode { get; set; }
         public ProductViewModel Product { get; set; }
         public double Quantity { get; set; }
+        public double NecessaryLength { get; set; }
         public double Length { get; set; }
         public string Description { get; set; }
 
