@@ -262,7 +262,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialDistributionNoteSe
                     productCode = mdnd.ProductCode,
                     productName = mdnd.ProductName,
                     quantity = mdnd.ReceivedLength,
-                    stockPlanning = Model.Type != "RE - GRADING" ? (mdnd.DistributedLength == 0 ? mdnd.MaterialRequestNoteItemLength - mdnd.ReceivedLength : mdnd.ReceivedLength * -1) : 0,
+                    stockPlanning = Model.Type != "RE - GRADING" ? (mdnd.DistributedLength == 0 ? mdnd.MaterialRequestNoteItemLength - mdnd.ReceivedLength : mdnd.ReceivedLength * -1) : mdnd.ReceivedLength * -1,
                     uomId = uom["_id"].ToString(),
                     uom = uom["unit"].ToString()
                 };
