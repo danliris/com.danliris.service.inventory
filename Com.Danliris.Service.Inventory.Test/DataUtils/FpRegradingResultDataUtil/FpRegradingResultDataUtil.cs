@@ -48,7 +48,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.FpRegradingResultDataUti
 
             FpRegradingResultDocs TestData = new FpRegradingResultDocs
             {
-                Date = DateTime.UtcNow,
+                Date = DateTimeOffset.UtcNow,
                 NoBon = unit.no,
                 NoBonId = unit._id,
 

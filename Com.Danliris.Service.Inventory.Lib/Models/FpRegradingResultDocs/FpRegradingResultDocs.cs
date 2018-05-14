@@ -10,7 +10,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Models
    public class FpRegradingResultDocs : StandardEntity, IValidatableObject
     {
         public string Code { get; set; }
-        public DateTime Date { get; set; }
+        public DateTimeOffset Date { get; set; }
         public string NoBon { get; set; } 
         public string NoBonId { get; set; }
         public string UnitName { get; set; }

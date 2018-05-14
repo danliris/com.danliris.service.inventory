@@ -96,13 +96,14 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialsRequestNoteView
                         Count++;
                         materialsRequestNote_ItemsError += "Length: 'Panjang harus lebih besar dari 0', ";
                     }
-                    else if (materialsRequestNote_Item.ProductionOrder != null && materialsRequestNote_Item.Length > (materialsRequestNote_Item.ProductionOrder.orderQuantity * 1.05))
-                    {
-                        Count++;
-                        materialsRequestNote_ItemsError += "Length: 'Panjang total tidak boleh lebih dari 105% toleransi', ";
-                    }
+
                     if (!string.Equals(this.RequestType.ToUpper(), "TEST") && !string.Equals(this.RequestType.ToUpper(), "PEMBELIAN"))
                     {
+                        if (materialsRequestNote_Item.ProductionOrder != null && materialsRequestNote_Item.Length > (materialsRequestNote_Item.ProductionOrder.orderQuantity * 1.05))
+                        {
+                            Count++;
+                            materialsRequestNote_ItemsError += "Length: 'Panjang total tidak boleh lebih dari 105% toleransi', ";
+                        }
                         if (materialsRequestNote_Item.ProductionOrder == null || string.IsNullOrWhiteSpace(materialsRequestNote_Item.ProductionOrder._id))
                         {
                             Count++;

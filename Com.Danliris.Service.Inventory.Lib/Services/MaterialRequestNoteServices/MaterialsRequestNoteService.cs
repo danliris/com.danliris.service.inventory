@@ -17,6 +17,7 @@ using Com.Moonlay.NetCore.Lib.Service;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryDocumentViewModel;
 
 namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServices
 {
@@ -151,15 +152,15 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             response.EnsureSuccessStatusCode();
         }
 
-        public void UpdateInventorySummary(List<InventorySummaryViewModel> item)
-        {
-            string inventorySummary = "inventory/inventory-summary/update/all-summary";
+        //public void UpdateInventorySummary(List<InventorySummaryViewModel> item)
+        //{
+        //    string inventorySummary = "inventory/inventory-summary/update/all-summary";
 
-            HttpClient httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
-            var response = httpClient.PutAsync($"{APIEndpoint.Inventory}{inventorySummary}", new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, General.JsonMediaType)).Result;
-            response.EnsureSuccessStatusCode();
-        }
+        //    HttpClient httpClient = new HttpClient();
+        //    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
+        //    var response = httpClient.PutAsync($"{APIEndpoint.Inventory}{inventorySummary}", new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, General.JsonMediaType)).Result;
+        //    response.EnsureSuccessStatusCode();
+        //}
 
         public override async Task<int> CreateModel(MaterialsRequestNote Model)
         {
@@ -172,24 +173,16 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                     Model = await this.CustomCodeGenerator(Model);
                     Created = await this.CreateAsync(Model);
 
-                    List<InventorySummaryViewModel> data = new List<InventorySummaryViewModel>();
 
                     foreach (MaterialsRequestNote_Item item in Model.MaterialsRequestNote_Items)
                     {
                         productionOrderIds.Add(item.ProductionOrderId);
-
-                        InventorySummaryViewModel InventorySummary = new InventorySummaryViewModel();
-                        InventorySummary.quantity = Model.RequestType != "PEMBELIAN" ? -item.Length : 0;
-                        InventorySummary.productCode = item.ProductCode;
-                        InventorySummary.productId = item.ProductId;
-                        InventorySummary.productName = item.ProductName;
-                        InventorySummary.storageName = Model.UnitName;
-                        InventorySummary.uom = "MTR";
-
-                        data.Add(InventorySummary);
                     }
 
-                    this.UpdateInventorySummary(data);
+                    if (Model.RequestType != "PEMBELIAN")
+                    {
+                        this.CreateInventoryDocument(Model, "OUT");
+                    }
 
                     UpdateIsRequestedProductionOrder(productionOrderIds, "CREATE");
                     transaction.Commit();
@@ -303,50 +296,33 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             {
                 try
                 {
-                    var modelTemp = await this.DbSet
-                                    .Where(d => d.Id.Equals(Id) && d._IsDeleted.Equals(false))
-                                    .AsNoTracking()
-                                    .Include(d => d.MaterialsRequestNote_Items)
-                                    .FirstOrDefaultAsync();
 
-                    List<InventorySummaryViewModel> data = new List<InventorySummaryViewModel>();
-
-                    foreach (var item in modelTemp.MaterialsRequestNote_Items)
-                    {
-                        foreach (var i in Model.MaterialsRequestNote_Items)
-                        {
-                            if (item.Id == i.Id)
-                            {
-                                InventorySummaryViewModel InventorySummary = new InventorySummaryViewModel();
-                                InventorySummary.quantity = Model.RequestType != "PEMBELIAN" ? (item.Length - i.Length) : 0;
-                                InventorySummary.productCode = item.ProductCode;
-                                InventorySummary.productId = item.ProductId;
-                                InventorySummary.productName = item.ProductName;
-                                InventorySummary.storageName = Model.UnitName;
-                                InventorySummary.uom = "MTR";
-
-                                data.Add(InventorySummary);
-                            }
-                        }
-                    }
-
-                    this.UpdateInventorySummary(data);
-
-                    HashSet<int> materialsRequestNote_Items = new HashSet<int>(materialsRequestNote_ItemService.DbSet
+                    HashSet<object> materialsRequestNote_Items = new HashSet<object>(materialsRequestNote_ItemService.DbSet
                         .Where(w => w.MaterialsRequestNoteId.Equals(Id))
-                        .Select(s => s.Id));
+                        .AsNoTracking());
+                    //.Select(s => new { Id = s.Id, ProductionOrderId = s.ProductionOrderId }));
+
                     Updated = await this.UpdateAsync(Id, Model);
 
-                    foreach (int materialsRequestNote_Item in materialsRequestNote_Items)
+                    List<string> productionOrderIds = new List<string>();
+
+                    List<MaterialsRequestNote_Item> itemForUpdateInventory = new List<MaterialsRequestNote_Item>();
+
+                    foreach (dynamic materialsRequestNote_Item in materialsRequestNote_Items)
                     {
-                        MaterialsRequestNote_Item model = Model.MaterialsRequestNote_Items.FirstOrDefault(prop => prop.Id.Equals(materialsRequestNote_Item));
+                        MaterialsRequestNote_Item model = Model.MaterialsRequestNote_Items.FirstOrDefault<dynamic>(prop => prop.Id.Equals(materialsRequestNote_Item.Id));
                         if (model == null)
                         {
-                            await materialsRequestNote_ItemService.DeleteModel(materialsRequestNote_Item);
+                            await materialsRequestNote_ItemService.DeleteModel(materialsRequestNote_Item.Id);
+                            productionOrderIds.Add(materialsRequestNote_Item.ProductionOrderId);
+                            itemForUpdateInventory.Add(materialsRequestNote_Item);
                         }
                         else
                         {
-                            await materialsRequestNote_ItemService.UpdateModel(materialsRequestNote_Item, model);
+                            double length = materialsRequestNote_Item.Length - model.Length;
+                            materialsRequestNote_Item.Length = length;
+                            itemForUpdateInventory.Add(materialsRequestNote_Item);
+                            await materialsRequestNote_ItemService.UpdateModel(materialsRequestNote_Item.Id, model);
                         }
                     }
 
@@ -355,10 +331,20 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                         if (materialsRequestNote_Item.Id.Equals(0))
                         {
                             await materialsRequestNote_ItemService.CreateModel(materialsRequestNote_Item);
+                            productionOrderIds.Add(materialsRequestNote_Item.ProductionOrderId);
+                            double length = materialsRequestNote_Item.Length * -1;
+                            materialsRequestNote_Item.Length = length;
+                            itemForUpdateInventory.Add(materialsRequestNote_Item);
                         }
-
                     }
 
+                    if (Model.RequestType != "PEMBELIAN")
+                    {
+                        Model.MaterialsRequestNote_Items = itemForUpdateInventory;
+                        this.CreateInventoryDocument(Model, "IN");
+                    }
+
+                    UpdateIsRequestedProductionOrder(productionOrderIds, "UPDATE");
 
                     transaction.Commit();
                 }
@@ -383,36 +369,31 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                     MaterialsRequestNote Model = await this.ReadModelById(Id);
                     Deleted = await this.DeleteAsync(Id);
 
-                    HashSet<int> materialsRequestNote_Items = new HashSet<int>(materialsRequestNote_ItemService.DbSet
-                        .Where(p => p.MaterialsRequestNoteId.Equals(Id))
-                        .Select(p => p.Id));
+
+                    HashSet<object> materialsRequestNote_Items = new HashSet<object>(materialsRequestNote_ItemService.DbSet
+                    .Where(w => w.MaterialsRequestNoteId.Equals(Id))
+                    .AsNoTracking());
 
                     materialsRequestNote_ItemService.Username = this.Username;
 
-                    foreach (int materialsRequestNote_Item in materialsRequestNote_Items)
+                    foreach (dynamic materialsRequestNote_Item in materialsRequestNote_Items)
                     {
-                        await materialsRequestNote_ItemService.DeleteModel(materialsRequestNote_Item);
+                        await materialsRequestNote_ItemService.DeleteModel(materialsRequestNote_Item.Id);
                     }
 
-                    List<InventorySummaryViewModel> data = new List<InventorySummaryViewModel>();
                     List<string> productionOrderIds = new List<string>();
 
                     foreach (MaterialsRequestNote_Item item in Model.MaterialsRequestNote_Items)
                     {
                         productionOrderIds.Add(item.ProductionOrderId);
 
-                        InventorySummaryViewModel InventorySummary = new InventorySummaryViewModel();
-                        InventorySummary.quantity = Model.RequestType != "PEMBELIAN" ? item.Length : 0;
-                        InventorySummary.productCode = item.ProductCode;
-                        InventorySummary.productId = item.ProductId;
-                        InventorySummary.productName = item.ProductName;
-                        InventorySummary.storageName = Model.UnitName;
-                        InventorySummary.uom = "MTR";
-
-                        data.Add(InventorySummary);
                     }
 
-                    this.UpdateInventorySummary(data);
+                    if (Model.RequestType != "PEMBELIAN")
+                    {
+                        this.CreateInventoryDocument(Model, "IN");
+                    }
+
 
                     UpdateIsRequestedProductionOrder(productionOrderIds, "DELETE");
                     transaction.Commit();
@@ -621,6 +602,71 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             int TotalData = pageable.TotalCount;
 
             return Tuple.Create(Data, TotalData);
+        }
+
+        public void CreateInventoryDocument(MaterialsRequestNote Model, string Type)
+        {
+            string inventoryDocumentURI = "inventory/inventory-documents";
+            string storageURI = "master/storages";
+            string uomURI = "master/uoms";
+
+            HttpClient httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
+
+            /* Get UOM */
+            Dictionary<string, object> filterUOM = new Dictionary<string, object> { { "unit", "MTR" } };
+            var responseUOM = httpClient.GetAsync($@"{APIEndpoint.Core}{uomURI}?filter=" + JsonConvert.SerializeObject(filterUOM)).Result.Content.ReadAsStringAsync();
+            Dictionary<string, object> resultUOM = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseUOM.Result);
+            var jsonUOM = resultUOM.Single(p => p.Key.Equals("data")).Value;
+            Dictionary<string, object> uom = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonUOM.ToString())[0];
+
+            /* Get Storage */
+            var storageName = Model.UnitName.Equals("PRINTING") ? "Gudang Greige Printing" : "Gudang Greige Finishing";
+            Dictionary<string, object> filterStorage = new Dictionary<string, object> { { "name", storageName } };
+            var responseStorage = httpClient.GetAsync($@"{APIEndpoint.Core}{storageURI}?filter=" + JsonConvert.SerializeObject(filterStorage)).Result.Content.ReadAsStringAsync();
+            Dictionary<string, object> resultStorage = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseStorage.Result);
+            var jsonStorage = resultStorage.Single(p => p.Key.Equals("data")).Value;
+            Dictionary<string, object> storage = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonStorage.ToString())[0];
+
+            /* Create Inventory Document */
+            List<InventoryDocumentItemViewModel> inventoryDocumentItems = new List<InventoryDocumentItemViewModel>();
+
+            List<MaterialsRequestNote_Item> list = Model.MaterialsRequestNote_Items
+            .GroupBy(m => new { m.ProductId, m.ProductCode, m.ProductName })
+            .Select(s => new MaterialsRequestNote_Item
+            {
+                ProductId = s.First().ProductId,
+                ProductCode = s.First().ProductCode,
+                ProductName = s.First().ProductName,
+                Length = s.Sum(d => d.Length)
+            }).ToList();
+
+            InventoryDocumentItemViewModel inventoryDocumentItem = new InventoryDocumentItemViewModel();
+            foreach (MaterialsRequestNote_Item item in list)
+            {
+                inventoryDocumentItem.productId = item.ProductId;
+                inventoryDocumentItem.productCode = item.ProductCode;
+                inventoryDocumentItem.productName = item.ProductName;
+                inventoryDocumentItem.quantity = item.Length;
+                inventoryDocumentItem.uomId = uom["_id"].ToString();
+                inventoryDocumentItem.uom = uom["unit"].ToString();
+                inventoryDocumentItems.Add(inventoryDocumentItem);
+            }
+
+            InventoryDocumentViewModel inventoryDocument = new InventoryDocumentViewModel
+            {
+                date = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                referenceNo = Model.Code,
+                referenceType = "Surat Permintaan Barang",
+                type = Type,
+                storageId = storage["_id"].ToString(),
+                storageCode = storage["code"].ToString(),
+                storageName = storage["name"].ToString(),
+                items = inventoryDocumentItems
+            };
+
+            var response = httpClient.PostAsync($"{APIEndpoint.Inventory}{inventoryDocumentURI}", new StringContent(JsonConvert.SerializeObject(inventoryDocument).ToString(), Encoding.UTF8, General.JsonMediaType)).Result;
+            response.EnsureSuccessStatusCode();
         }
     }
 }

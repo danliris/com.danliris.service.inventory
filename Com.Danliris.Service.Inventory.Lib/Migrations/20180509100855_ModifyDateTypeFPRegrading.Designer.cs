@@ -11,9 +11,10 @@ using System;
 namespace Com.Danliris.Service.Inventory.Lib.Migrations
 {
     [DbContext(typeof(InventoryDbContext))]
-    partial class InventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180509100855_ModifyDateTypeFPRegrading")]
+    partial class ModifyDateTypeFPRegrading
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

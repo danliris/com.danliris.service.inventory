@@ -10,7 +10,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels
     public class FpRegradingResultDocsViewModel : BasicViewModel, IValidatableObject
     {
         public string Code { get; set; }
-        public DateTime? Date { get; set; }
+        public DateTimeOffset? Date { get; set; }
         public noBon Bon { get; set; }
         public supplier Supplier { get; set; }
         public product Product { get; set; }
