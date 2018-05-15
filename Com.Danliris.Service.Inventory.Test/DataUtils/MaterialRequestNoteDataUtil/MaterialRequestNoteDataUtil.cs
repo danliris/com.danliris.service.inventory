@@ -67,5 +67,14 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.MaterialRequestNoteDataU
             await this.Service.CreateModel(Data);
             return Data;
         }
+
+        public async Task<MaterialsRequestNote> GetTestDataCustom()
+        {
+            MaterialsRequestNote Data = GetNewData();
+            Data.MaterialsRequestNote_Items = new List<MaterialsRequestNote_Item> { materialRequestNoteItemDataUtil.GetNewData(), materialRequestNoteItemDataUtil.GetNewDataCustom() };
+            this.Service.Token = HttpClientTestService.Token;
+            await this.Service.CreateModel(Data);
+            return Data;
+        }
     }
 }

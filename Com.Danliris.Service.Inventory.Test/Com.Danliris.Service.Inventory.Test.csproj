@@ -20,8 +20,4 @@
     <ProjectReference Include="..\Com.Danliris.Service.Inventory.WebApi\Com.Danliris.Service.Inventory.WebApi.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\MaterialRequestNote\" />
-  </ItemGroup>
-
 </Project>

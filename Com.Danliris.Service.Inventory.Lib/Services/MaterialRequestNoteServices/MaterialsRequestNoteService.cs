@@ -305,7 +305,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                     Updated = await this.UpdateAsync(Id, Model);
 
                     List<string> productionOrderIds = new List<string>();
-
+                    List<string> newProductionOrderIds = new List<string>();
                     List<MaterialsRequestNote_Item> itemForUpdateInventory = new List<MaterialsRequestNote_Item>();
 
                     foreach (dynamic materialsRequestNote_Item in materialsRequestNote_Items)
@@ -331,7 +331,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                         if (materialsRequestNote_Item.Id.Equals(0))
                         {
                             await materialsRequestNote_ItemService.CreateModel(materialsRequestNote_Item);
-                            productionOrderIds.Add(materialsRequestNote_Item.ProductionOrderId);
+                            newProductionOrderIds.Add(materialsRequestNote_Item.ProductionOrderId);
                             double length = materialsRequestNote_Item.Length * -1;
                             materialsRequestNote_Item.Length = length;
                             itemForUpdateInventory.Add(materialsRequestNote_Item);
@@ -345,7 +345,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                     }
 
                     UpdateIsRequestedProductionOrder(productionOrderIds, "UPDATE");
-
+                    UpdateIsRequestedProductionOrder(newProductionOrderIds, "CREATE");
                     transaction.Commit();
                 }
                 catch (Exception e)
