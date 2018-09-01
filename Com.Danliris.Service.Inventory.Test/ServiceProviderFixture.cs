@@ -24,7 +24,7 @@ using Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades;
 
 namespace Com.Danliris.Service.Inventory.Test
 {
-    public class ServiceProviderFixture : IDisposable
+    public class ServiceProviderFixture
     {
         public IServiceProvider ServiceProvider { get; private set; }
 
@@ -99,6 +99,11 @@ namespace Com.Danliris.Service.Inventory.Test
                 .AddTransient<InventoryDocumentDataUtil>()
                 .AddTransient<InventoryDocumentItemDataUtil>()
 
+                .AddTransient<InventoryMovementFacade>()
+                .AddTransient<InventoryMovementDataUtil>()
+
+                .AddTransient<InventoryMovementReportFacade>()
+
                 .AddSingleton<TestHelpers.HttpClientTestService>(provider => new TestHelpers.HttpClientTestService(provider))
                 .AddSingleton<HttpClientService>()
                 .AddSingleton<IdentityService>()
@@ -109,9 +114,9 @@ namespace Com.Danliris.Service.Inventory.Test
             dbContext.Database.Migrate();
         }
 
-        public void Dispose()
-        {
-        }
+        //public void Dispose()
+        //{
+        //}
     }
 
     [CollectionDefinition("ServiceProviderFixture Collection")]

@@ -46,7 +46,8 @@ namespace Com.Danliris.Service.Inventory.WebApi
                 .AddTransient<FpRegradingResultDocsReportFacade>()
                 .AddTransient<InventoryDocumentFacade>()
                 .AddTransient<InventoryMovementFacade>()
-                .AddTransient<InventorySummaryFacade>();
+                .AddTransient<InventorySummaryFacade>()
+                .AddTransient<InventoryMovementReportFacade>();
         }
 
         public void RegisterServices(IServiceCollection services)
