@@ -14,12 +14,12 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1
     [ApiVersion("1.0")]
     [Route("v{version:apiVersion}/inventory/inventory-movement-reports")]
     [Authorize]
-    public class InvetoryMovementReportController : Controller
+    public class InventoryMovementReportController : Controller
     {
         private string ApiVersion = "1.0.0";
         private readonly InventoryMovementReportFacade inventoryMovementReportFacade;
 
-        public InvetoryMovementReportController(InventoryMovementReportFacade inventoryMovementReportFacade)
+        public InventoryMovementReportController(InventoryMovementReportFacade inventoryMovementReportFacade)
         {
             this.inventoryMovementReportFacade = inventoryMovementReportFacade;
         }

@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
 
 namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
 {
@@ -78,6 +79,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
             {
                 Query = Query.OrderByDescending(b => b._LastModifiedUtc);
             }
+            else
+            {
+                string Key = OrderDictionary.Keys.First();
+                string OrderType = OrderDictionary[Key];
+                Query = Query.OrderBy(string.Concat(Key, " ", OrderType));
+            }
 
             Pageable<InventoryMovementViewModel> pageable = new Pageable<InventoryMovementViewModel>(Query, page - 1, size);
             List<InventoryMovementViewModel> Data = pageable.Data.ToList<InventoryMovementViewModel>();
@@ -90,7 +97,6 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
             var Query = GetReportQuery(storageCode, productCode, type, dateFrom, dateTo, offset);
             Query = Query.OrderByDescending(b => b._LastModifiedUtc);
             DataTable result = new DataTable();
-            //No	Unit	Budget	Kategori	Tanggal PR	Nomor PR	Kode Barang	Nama Barang	Jumlah	Satuan	Tanggal Diminta Datang	Status	Tanggal Diminta Datang Eksternal
 
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Storage", DataType = typeof(String) });

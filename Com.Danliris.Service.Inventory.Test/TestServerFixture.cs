@@ -84,6 +84,8 @@ namespace Com.Danliris.Service.Inventory.Test
 
                         .AddTransient<InventoryMovementDataUtil>()
 
+                        .AddTransient<InventorySummaryDataUtil>()
+
                         .AddSingleton<HttpClientTestService>()
                         .AddDbContext<InventoryDbContext>(options => options.UseSqlServer(configuration["DefaultConnection"]), ServiceLifetime.Transient);
                 })
