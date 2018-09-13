@@ -167,24 +167,33 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
 
         async Task<string> GenerateNo(InventoryMovement model)
         {
-            string Year = model.Date.ToString("yy");
-            string Month = model.Date.ToString("MM");
+            CodeGenerator codeGenerator = new CodeGenerator();
 
-
-            string no = $"MOV-{Year}-{Month}-{model.StorageCode}-";
-            int Padding = 7;
-
-            var lastNo = await this.dbSet.Where(w => w.No.StartsWith(no) && !w._IsDeleted).OrderByDescending(o => o.No).FirstOrDefaultAsync();
-
-            if (lastNo == null)
+            do
             {
-                return no + "1".PadLeft(Padding, '0');
+                model.No = codeGenerator.GenerateCode();
             }
-            else
-            {
-                int lastNoNumber = Int32.Parse(lastNo.No.Replace(no, "")) + 1;
-                return no + lastNoNumber.ToString().PadLeft(Padding, '0');
-            }
+            while (this.dbSet.Any(d => d.No.Equals(model.No)));
+
+            return model.No;
+            //string Year = model.Date.ToString("yy");
+            //string Month = model.Date.ToString("MM");
+
+
+            //string no = $"MOV-{Year}-{Month}-{model.StorageCode}-";
+            //int Padding = 7;
+
+            //var lastNo = await this.dbSet.Where(w => w.No.StartsWith(no) && !w._IsDeleted).OrderByDescending(o => o.No).FirstOrDefaultAsync();
+
+            //if (lastNo == null)
+            //{
+            //    return no + "1".PadLeft(Padding, '0');
+            //}
+            //else
+            //{
+            //    int lastNoNumber = Int32.Parse(lastNo.No.Replace(no, "")) + 1;
+            //    return no + lastNoNumber.ToString().PadLeft(Padding, '0');
+            //}
         }
     }
 }
