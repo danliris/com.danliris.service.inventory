@@ -44,7 +44,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialsRequestNoteView
                     }
                     else if (materialsRequestNote_Item.Product.name != null || string.IsNullOrWhiteSpace(materialsRequestNote_Item.Product.name))
                     {
-                        string inventorySummaryURI = "inventory/inventory-summary?order=%7B%7D&page=1&size=1000000000&";
+                        string inventorySummaryURI = "inventory/inventory-summaries?order=%7B%7D&page=1&size=1000000000&";
 
                         MaterialsRequestNoteService Service = (MaterialsRequestNoteService)validationContext.GetService(typeof(MaterialsRequestNoteService));
                         HttpClient httpClient = new HttpClient();
@@ -59,7 +59,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialsRequestNoteView
 
                         var storageName = this.Unit.name.Equals("PRINTING") ? "Gudang Greige Printing" : "Gudang Greige Finishing";
 
-                        Dictionary<string, object> filter = new Dictionary<string, object> { { "storageName", storageName }, { "uom", "MTR" }, { "productCode", new Dictionary<string, object> { { "$in", products.ToArray() } } } };
+                        Dictionary<string, object> filter = new Dictionary<string, object> { { "StorageName", storageName }, { "UomUnit", "MTR" } };//, { "ProductCode", new Dictionary<string, object> { { "$in", products.ToArray() } } } };
                         var response = httpClient.GetAsync($@"{APIEndpoint.Inventory}{inventorySummaryURI}filter=" + JsonConvert.SerializeObject(filter)).Result.Content.ReadAsStringAsync();
                         Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Result);
 
@@ -68,7 +68,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialsRequestNoteView
 
                         if (!(inventorySummaries.Count.Equals(0)))
                         {
-                            InventorySummaryViewModel inventorySummary = inventorySummaries.SingleOrDefault(p => p.productCode.Equals(materialsRequestNote_Item.Product.code) && p.uom.Equals("MTR"));
+                            InventorySummaryViewModel inventorySummary = inventorySummaries.SingleOrDefault(p => products.Contains(p.productCode));
                             if (inventorySummary == null)
                             {
                                 Count++;
