@@ -47,6 +47,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Models.InventoryModel
         public double StockPlanning { get; set; }
         public string ProductRemark { get; set; }
 
+        public int MongoIndexItem { get; set; }
+
         public int InventoryDocumentId { get; set; }
         public virtual InventoryDocument InventoryDocument { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

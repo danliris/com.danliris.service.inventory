@@ -132,7 +132,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
             try
             {
                 InventoryMovementFacade movement = new InventoryMovementFacade(serviceProvider, dbContext);
-                model.No = await GenerateNo(model);
+                model.No = GenerateNo(model);
 
                 model._CreatedAgent = "Facade";
                 model._CreatedBy = username;
@@ -201,7 +201,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
 
 
 
-        async Task<string> GenerateNo(InventoryDocument model)
+        string GenerateNo(InventoryDocument model)
         {
 
             do
