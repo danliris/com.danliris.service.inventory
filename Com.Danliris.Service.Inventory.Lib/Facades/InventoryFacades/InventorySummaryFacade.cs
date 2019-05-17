@@ -119,6 +119,16 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
             return a;
         }
 
+        public List<string> GetProductCodeForMaterialRequestNote(string storageName)
+        {
+            IQueryable<InventorySummary> Query = this.dbSet;
+
+            Query = Query
+                .Where(s => s.StorageName.Equals(storageName) && s.UomUnit.Equals("MTR"));
+
+            return Query.Select(s=> s.ProductCode).ToList();
+        }
+
         public async Task<int> Create(InventorySummary model, string username)
         {
             int Created = 0;
