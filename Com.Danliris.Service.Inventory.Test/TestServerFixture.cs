@@ -49,7 +49,7 @@ namespace Com.Danliris.Service.Inventory.Test
                     */
                     new KeyValuePair<string, string>("CoreEndpoint", "http://localhost:5001/v1/"),
                     new KeyValuePair<string, string>("InventoryEndpoint", "http://localhost:5002/v1/"),
-                    new KeyValuePair<string, string>("ProductionEndpoint", "http://localhost:5003/v1/"),
+                    new KeyValuePair<string, string>("SalesEndpoint", "http://localhost:5003/v1/"),
                     new KeyValuePair<string, string>("PurchasingEndpoint", "http://localhost:5004/v1/"),
                     new KeyValuePair<string, string>("Secret", "DANLIRISTESTENVIRONMENT"),
                     new KeyValuePair<string, string>("ASPNETCORE_ENVIRONMENT", "Test"),
