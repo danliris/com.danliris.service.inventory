@@ -94,7 +94,7 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.MaterialRequestNote
 
             serviceProvider
                 .Setup(x => x.GetService(typeof(IHttpClientService)))
-                .Returns(new HttpClientTestService());
+                .Returns(new HttpClientTestService2());
 
             return serviceProvider;
         }
