@@ -33,7 +33,7 @@ namespace Com.Danliris.Service.Inventory.Test.Facades.Inventory
             get { return (InventoryMovementReportFacade)ServiceProvider.GetService(typeof(InventoryMovementReportFacade)); }
         }
 
-        [Fact]
+        //[Fact]
         //public async void Should_Success_Get_Report_Data()
         //{
         //    InventoryMovement model = await DataUtil.GetTestData("Unit test");
