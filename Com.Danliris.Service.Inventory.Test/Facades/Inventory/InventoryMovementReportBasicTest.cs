@@ -33,21 +33,21 @@ namespace Com.Danliris.Service.Inventory.Test.Facades.Inventory
             get { return (InventoryMovementReportFacade)ServiceProvider.GetService(typeof(InventoryMovementReportFacade)); }
         }
 
-        //[Fact]
-        //public async void Should_Success_Get_Report_Data()
-        //{
-        //    InventoryMovement model = await DataUtil.GetTestData("Unit test");
-        //    var Response = Facade.GetReport(model.StorageCode, model.ProductCode, model.Type, null, null, 1, 25, "{}", 7);
-        //    Assert.NotEqual(Response.Item2, 0);
-        //}
+        [Fact]
+        public async void Should_Success_Get_Report_Data()
+        {
+            InventoryMovement model = await DataUtil.GetTestData("Unit test");
+            var Response = Facade.GetReport(model.StorageCode, model.ProductCode, model.Type, null, null, 1, 25, "{}", 7);
+            Assert.NotEqual(Response.Item2, 0);
+        }
 
-        //[Fact]
-        //public async void Should_Success_Get_Report_Data_Null_Parameter()
-        //{
-        //    InventoryMovement model = await DataUtil.GetTestData("Unit test");
-        //    var Response = Facade.GetReport(null, null, null, null, null, 1, 25, "{}", 7);
-        //    Assert.NotEqual(Response.Item2, 0);
-        //}
+        [Fact]
+        public async void Should_Success_Get_Report_Data_Null_Parameter()
+        {
+            InventoryMovement model = await DataUtil.GetTestData("Unit test");
+            var Response = Facade.GetReport(null, null, null, null, null, 1, 25, "{}", 7);
+            Assert.NotEqual(Response.Item2, 0);
+        }
 
         [Fact]
         public async void Should_Success_Get_Report_Data_Excel()
