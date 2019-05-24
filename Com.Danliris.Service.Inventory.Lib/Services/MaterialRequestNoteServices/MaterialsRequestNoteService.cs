@@ -103,42 +103,42 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             return Model;
         }
 
-        public void UpdateIsRequestedProductionOrder(List<string> productionOrderIds, string context)
+        public void UpdateIsRequestedProductionOrder(List<int> productionOrderIds, string context)
         {
-            string productionOrderUri = "sales/production-orders/update/is-requested";
-
-            var data = new
-            {
-                context = context,
-                ids = productionOrderIds
-            };
+            string productionOrderUri = "sales/production-orders/update-requested-true";
 
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
 
-            var response = httpClient.PutAsync($"{APIEndpoint.Production}{productionOrderUri}", new StringContent(JsonConvert.SerializeObject(data).ToString(), Encoding.UTF8, General.JsonMediaType)).Result;
+            var response = httpClient.PutAsync($"{APIEndpoint.Sales}{productionOrderUri}", new StringContent(JsonConvert.SerializeObject(productionOrderIds).ToString(), Encoding.UTF8, General.JsonMediaType)).Result;
             response.EnsureSuccessStatusCode();
         }
 
-        public void UpdateIsCompletedProductionOrder(List<SppParams> contextAndIds)
+        public void UpdateIsCompletedTrueProductionOrder(int id)
         {
-            string productionOrderUri = "sales/production-orders/update/is-completed";
-
-            var data = new
-            {
-                contextAndIds = contextAndIds
-            };
+            string productionOrderUri = "sales/production-orders/update-iscompleted-true";
 
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
 
-            var response = httpClient.PutAsync($"{APIEndpoint.Production}{productionOrderUri}", new StringContent(JsonConvert.SerializeObject(data).ToString(), Encoding.UTF8, General.JsonMediaType)).Result;
+            var response = httpClient.PutAsync($"{APIEndpoint.Sales}{productionOrderUri}", new StringContent(JsonConvert.SerializeObject(id).ToString(), Encoding.UTF8, General.JsonMediaType)).Result;
+            response.EnsureSuccessStatusCode();
+        }
+
+        public void UpdateIsCompletedFalseProductionOrder(int id)
+        {
+            string productionOrderUri = "sales/production-orders/update-iscompleted-false";
+
+            HttpClient httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
+
+            var response = httpClient.PutAsync($"{APIEndpoint.Sales}{productionOrderUri}", new StringContent(JsonConvert.SerializeObject(id).ToString(), Encoding.UTF8, General.JsonMediaType)).Result;
             response.EnsureSuccessStatusCode();
         }
 
         public void UpdateDistributedQuantityProductionOrder(List<SppParams> contextAndIds)
         {
-            string productionOrderUri = "sales/production-orders/update/distributed-quantity";
+            string productionOrderUri = "sales/production-orders/update-distributed-quantity";
 
             var data = new
             {
@@ -148,7 +148,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
 
-            var response = httpClient.PutAsync($"{APIEndpoint.Production}{productionOrderUri}", new StringContent(JsonConvert.SerializeObject(data).ToString(), Encoding.UTF8, General.JsonMediaType)).Result;
+            var response = httpClient.PutAsync($"{APIEndpoint.Sales}{productionOrderUri}", new StringContent(JsonConvert.SerializeObject(data).ToString(), Encoding.UTF8, General.JsonMediaType)).Result;
             response.EnsureSuccessStatusCode();
         }
 
@@ -169,14 +169,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             {
                 try
                 {
-                    List<string> productionOrderIds = new List<string>();
+                    List<int> productionOrderIds = new List<int>();
                     Model = await this.CustomCodeGenerator(Model);
                     Created = await this.CreateAsync(Model);
 
 
                     foreach (MaterialsRequestNote_Item item in Model.MaterialsRequestNote_Items)
                     {
-                        productionOrderIds.Add(item.ProductionOrderId);
+                        productionOrderIds.Add(int.Parse(item.ProductionOrderId));
                     }
 
                     if (Model.RequestType != "PEMBELIAN")
@@ -219,34 +219,16 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             {
                 try
                 {
-                    int CountIsIncomplete = 0;
-                    List<SppParams> contextAndIds = new List<SppParams>();
                     foreach (MaterialsRequestNote_Item item in Model.MaterialsRequestNote_Items)
                     {
-                        SppParams sppParams = new SppParams();
                         if (!item.ProductionOrderIsCompleted)
                         {
-                            CountIsIncomplete += 1;
-                            sppParams.context = "INCOMPLETE";
-                            sppParams.id = item.ProductionOrderId;
+                            UpdateIsCompletedFalseProductionOrder(int.Parse(item.ProductionOrderId));
                         }
                         else
                         {
-                            sppParams.context = "COMPLETE";
-                            sppParams.id = item.ProductionOrderId;
+                            UpdateIsCompletedTrueProductionOrder(int.Parse(item.ProductionOrderId));
                         }
-
-                        contextAndIds.Add(sppParams);
-                    }
-                    UpdateIsCompletedProductionOrder(contextAndIds);
-
-                    if (CountIsIncomplete == 0)
-                    {
-                        Model.IsCompleted = true;
-                    }
-                    else
-                    {
-                        Model.IsCompleted = false;
                     }
 
                     await UpdateModel(Id, Model);
@@ -304,8 +286,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
 
                     Updated = await this.UpdateAsync(Id, Model);
 
-                    List<string> productionOrderIds = new List<string>();
-                    List<string> newProductionOrderIds = new List<string>();
+                    List<int> productionOrderIds = new List<int>();
+                    List<int> newProductionOrderIds = new List<int>();
                     List<MaterialsRequestNote_Item> itemForUpdateInventory = new List<MaterialsRequestNote_Item>();
 
                     foreach (dynamic materialsRequestNote_Item in materialsRequestNote_Items)
@@ -314,7 +296,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                         if (model == null)
                         {
                             await materialsRequestNote_ItemService.DeleteModel(materialsRequestNote_Item.Id);
-                            productionOrderIds.Add(materialsRequestNote_Item.ProductionOrderId);
+                            productionOrderIds.Add(int.Parse(materialsRequestNote_Item.ProductionOrderId));
                             itemForUpdateInventory.Add(materialsRequestNote_Item);
                         }
                         else
@@ -331,7 +313,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                         if (materialsRequestNote_Item.Id.Equals(0))
                         {
                             await materialsRequestNote_ItemService.CreateModel(materialsRequestNote_Item);
-                            newProductionOrderIds.Add(materialsRequestNote_Item.ProductionOrderId);
+                            newProductionOrderIds.Add(int.Parse(materialsRequestNote_Item.ProductionOrderId));
                             double length = materialsRequestNote_Item.Length * -1;
                             materialsRequestNote_Item.Length = length;
                             itemForUpdateInventory.Add(materialsRequestNote_Item);
@@ -381,11 +363,11 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                         await materialsRequestNote_ItemService.DeleteModel(materialsRequestNote_Item.Id);
                     }
 
-                    List<string> productionOrderIds = new List<string>();
+                    List<int> productionOrderIds = new List<int>();
 
                     foreach (MaterialsRequestNote_Item item in Model.MaterialsRequestNote_Items)
                     {
-                        productionOrderIds.Add(item.ProductionOrderId);
+                        productionOrderIds.Add(int.Parse(item.ProductionOrderId));
 
                     }
 
@@ -606,7 +588,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
 
         public void CreateInventoryDocument(MaterialsRequestNote Model, string Type)
         {
-            string inventoryDocumentURI = "inventory/inventory-documents";
+            string inventoryDocumentURI = "inventory-documents";
             string storageURI = "master/storages";
             string uomURI = "master/uoms";
 
@@ -614,7 +596,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
 
             /* Get UOM */
-            Dictionary<string, object> filterUOM = new Dictionary<string, object> { { "unit", "MTR" } };
+            Dictionary<string, object> filterUOM = new Dictionary<string, object> { { "Unit", "MTR" } };
             var responseUOM = httpClient.GetAsync($@"{APIEndpoint.Core}{uomURI}?filter=" + JsonConvert.SerializeObject(filterUOM)).Result.Content.ReadAsStringAsync();
             Dictionary<string, object> resultUOM = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseUOM.Result);
             var jsonUOM = resultUOM.Single(p => p.Key.Equals("data")).Value;
@@ -622,7 +604,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
 
             /* Get Storage */
             var storageName = Model.UnitName.Equals("PRINTING") ? "Gudang Greige Printing" : "Gudang Greige Finishing";
-            Dictionary<string, object> filterStorage = new Dictionary<string, object> { { "name", storageName } };
+            Dictionary<string, object> filterStorage = new Dictionary<string, object> { { "Name", storageName } };
             var responseStorage = httpClient.GetAsync($@"{APIEndpoint.Core}{storageURI}?filter=" + JsonConvert.SerializeObject(filterStorage)).Result.Content.ReadAsStringAsync();
             Dictionary<string, object> resultStorage = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseStorage.Result);
             var jsonStorage = resultStorage.Single(p => p.Key.Equals("data")).Value;
@@ -649,8 +631,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                 inventoryDocumentItem.productCode = item.ProductCode;
                 inventoryDocumentItem.productName = item.ProductName;
                 inventoryDocumentItem.quantity = item.Length;
-                inventoryDocumentItem.uomId = uom["_id"].ToString();
-                inventoryDocumentItem.uom = uom["unit"].ToString();
+                inventoryDocumentItem.uomId = uom["Id"].ToString();
+                inventoryDocumentItem.uom = uom["Unit"].ToString();
                 inventoryDocumentItems.Add(inventoryDocumentItem);
             }
 

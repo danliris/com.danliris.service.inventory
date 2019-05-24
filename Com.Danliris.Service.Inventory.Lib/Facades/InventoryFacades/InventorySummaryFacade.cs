@@ -45,13 +45,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
 
             List<string> searchAttributes = new List<string>()
             {
-                "No", "ReferenceNo", "StorageName","ReferenceType"
+                "ProductCode",
             };
 
             if (keyword != null)
             {
                 Query = Query.Where(General.BuildSearch(searchAttributes), keyword);
             }
+
             #region OrderBy
 
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(order);
@@ -68,6 +69,19 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
             }
 
             #endregion OrderBy
+
+            //Dictionary<string, object> FilterDictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(filter);
+            //if (FilterDictionary != null && !FilterDictionary.Count.Equals(0))
+            //{
+            //    foreach (var f in FilterDictionary)
+            //    {
+            //        string Key = f.Key;
+            //        object Value = f.Value;
+            //        string filterQuery = string.Concat(string.Empty, Key, " == @0");
+
+            //        Query = Query.Where(filterQuery, Value);
+            //    }
+            //}
 
             #region Paging
 
@@ -103,6 +117,16 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
             var a = this.dbSet.Where(d => d.Id.Equals(id) && d._IsDeleted.Equals(false))
                 .FirstOrDefault();
             return a;
+        }
+
+        public List<string> GetProductCodeForMaterialRequestNote(string storageName)
+        {
+            IQueryable<InventorySummary> Query = this.dbSet;
+
+            Query = Query
+                .Where(s => s.StorageName.Equals(storageName) && s.UomUnit.Equals("MTR"));
+
+            return Query.Select(s=> s.ProductCode).ToList();
         }
 
         public async Task<int> Create(InventorySummary model, string username)

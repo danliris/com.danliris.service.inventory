@@ -1,4 +1,4 @@
-﻿using Com.Danliris.Service.Inventory.Lib.Services;
+﻿﻿using Com.Danliris.Service.Inventory.Lib.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -25,7 +25,7 @@ namespace Com.Danliris.Service.Inventory.Test.Helpers
 
             this.SetBearerToken(token);
 
-            IdentityService identityService = (IdentityService) serviceProvider.GetService(typeof(IdentityService));
+            IdentityService identityService = (IdentityService)serviceProvider.GetService(typeof(IdentityService));
             identityService.Token = Token;
             identityService.Username = "Unit Test";
         }

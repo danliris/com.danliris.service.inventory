@@ -12,6 +12,10 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialsRequestNoteView
         public double? DistributedLength { get; set; }
         public string Grade { get; set; }
         public string Remark { get; set; }
+        public string ProductionOrderId { get; set; }
+        public string ProductionOrderNo { get; set; }
+        public double? ProductionOrderQuantity { get; set; }
+        public bool ProductionOrderIsCompleted { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

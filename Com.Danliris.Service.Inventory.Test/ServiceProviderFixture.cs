@@ -21,6 +21,8 @@ using Com.Danliris.Service.Inventory.Lib.Services.FPReturnInvToPurchasingService
 using Com.Danliris.Service.Inventory.Lib.Facades;
 using Com.Danliris.Service.Inventory.Test.DataUtils.InventoryDataUtils;
 using Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades;
+using Com.Danliris.Service.Inventory.Lib.Interfaces;
+using Com.Danliris.Service.Inventory.Test.Helpers;
 
 namespace Com.Danliris.Service.Inventory.Test
 {
@@ -32,7 +34,7 @@ namespace Com.Danliris.Service.Inventory.Test
         {
             APIEndpoint.Core = Configuration.GetValue<string>("CoreEndpoint") ?? Configuration["CoreEndpoint"];
             APIEndpoint.Inventory = Configuration.GetValue<string>("InventoryEndpoint") ?? Configuration["InventoryEndpoint"];
-            APIEndpoint.Production = Configuration.GetValue<string>("ProductionEndpoint") ?? Configuration["ProductionEndpoint"];
+            APIEndpoint.Sales = Configuration.GetValue<string>("SalesEndpoint") ?? Configuration["SalesEndpoint"];
             APIEndpoint.Purchasing = Configuration.GetValue<string>("PurchasingEndpoint") ?? Configuration["PurchasingEndpoint"];
         }
 
@@ -108,9 +110,10 @@ namespace Com.Danliris.Service.Inventory.Test
                 .AddTransient<InventoryMovementReportFacade>()
 
                 .AddTransient<InventorySummaryReportFacade>()
-
                 .AddSingleton<TestHelpers.HttpClientTestService>(provider => new TestHelpers.HttpClientTestService(provider))
                 .AddSingleton<HttpClientService>()
+                .AddSingleton<TestHelpers.HttpClientTestService2>(provider => new TestHelpers.HttpClientTestService2())
+                .AddSingleton<IHttpClientService, HttpClientTestService2>()
                 .AddSingleton<IdentityService>()
 
                 .BuildServiceProvider();
