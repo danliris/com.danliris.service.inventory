@@ -28,6 +28,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Models.MaterialDistributionNoteMode
         public string SupplierName { get; set; }
         public virtual MaterialDistributionNoteItem MaterialDistributionNoteItem { get; set; }
 
+        public int SupplierIntegerId { get; set; }
+        public int ProductIntegerId { get; set; }
+        public long ProductionOrderLongId { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             return new List<ValidationResult>();

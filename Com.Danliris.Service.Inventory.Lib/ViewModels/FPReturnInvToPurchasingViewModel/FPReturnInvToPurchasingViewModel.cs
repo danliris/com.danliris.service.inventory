@@ -25,7 +25,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.FPReturnInvToPurchasingV
             #region Unit
 
             this.Unit = new UnitViewModel();
-            this.Unit.name = model.UnitName;
+            this.Unit.Name = model.UnitName;
 
             #endregion Unit
 
@@ -53,7 +53,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.FPReturnInvToPurchasingV
 
             #region Unit
 
-            model.UnitName = this.Unit.name;
+            model.UnitName = this.Unit.Name;
 
             #endregion Unit
 
@@ -79,7 +79,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.FPReturnInvToPurchasingV
         {
             int Count = 0;
 
-            if (this.Unit == null || string.IsNullOrWhiteSpace(this.Unit.name))
+            if (this.Unit == null || string.IsNullOrWhiteSpace(this.Unit.Name))
                 yield return new ValidationResult("Unit is required", new List<string> { "Unit" });
 
             if (this.Supplier == null || string.IsNullOrWhiteSpace(this.Supplier._id))

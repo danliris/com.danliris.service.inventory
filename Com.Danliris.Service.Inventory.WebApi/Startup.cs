@@ -4,6 +4,8 @@ using Com.Danliris.Service.Inventory.Lib.Facades;
 using Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades;
 using Com.Danliris.Service.Inventory.Lib.Helpers;
 using Com.Danliris.Service.Inventory.Lib.IntegrationServices;
+using Com.Danliris.Service.Inventory.Lib.Interfaces;
+using Com.Danliris.Service.Inventory.Lib.Interfaces.MaterialRequestNote;
 using Com.Danliris.Service.Inventory.Lib.MongoRepositories.InventoryDocument;
 using Com.Danliris.Service.Inventory.Lib.Services;
 using Com.Danliris.Service.Inventory.Lib.Services.FPReturnInvToPurchasingService;
@@ -57,7 +59,7 @@ namespace Com.Danliris.Service.Inventory.WebApi
         public void RegisterServices(IServiceCollection services)
         {
             services
-                .AddScoped<MaterialsRequestNoteService>()
+                .AddScoped<IMaterialsRequestNote,MaterialsRequestNoteService>()
                 .AddScoped<MaterialsRequestNote_ItemService>()
                 .AddScoped<MaterialDistributionNoteService>()
                 .AddTransient<MaterialDistributionNoteItemService>()
@@ -70,7 +72,8 @@ namespace Com.Danliris.Service.Inventory.WebApi
                 .AddTransient<FPReturnInvToPurchasingDetailService>()
                 .AddScoped<IdentityService>()
                 .AddScoped<HttpClientService>()
-                .AddScoped<ValidateService>();
+                .AddScoped<IHttpClientService, HttpClientService>()
+                .AddScoped<IValidateService, ValidateService>();
         }
 
 
@@ -146,7 +149,7 @@ namespace Com.Danliris.Service.Inventory.WebApi
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<InventoryDbContext>();
-                context.Database.Migrate();
+                //context.Database.Migrate();
             }
             app.UseAuthentication();
             app.UseCors("InventoryPolicy");

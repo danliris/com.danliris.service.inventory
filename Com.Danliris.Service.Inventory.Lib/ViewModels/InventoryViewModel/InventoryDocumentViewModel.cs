@@ -23,7 +23,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryViewModel
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (this.storageId == null || storageId==0)
+            if (storageId==0)
                 yield return new ValidationResult("Gudang harus diisi", new List<string> { "storageId" });
             if (this.referenceNo == null || string.IsNullOrWhiteSpace(this.referenceNo))
                 yield return new ValidationResult("No. referensi harus diisi", new List<string> { "referenceNo" });
@@ -47,7 +47,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryViewModel
                 {
                     itemError += "{";
 
-                    if (item.productId == null || item.productId==0)
+                    if (item.productId==0)
                     {
                         itemErrorCount++;
                         itemError += "productId: 'Barang harus diisi', ";

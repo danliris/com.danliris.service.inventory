@@ -25,6 +25,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Models.MaterialsRequestNoteModel
         public double DistributedLength { get; set; }
         public double Length { get; set; }
         public string Remark { get; set; }
+
+        public int ProductIntegerId { get; set; }
+        public long ProductionOrderLongId { get; set; }
+        public int OrderTypeIntegerId { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             return new List<ValidationResult>();

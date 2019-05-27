@@ -6,8 +6,8 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialsRequestNoteView
 {
     public class MaterialsRequestNote_ItemViewModel : BasicViewModel, IValidatableObject
     {
-        public ProductionOrderViewModel ProductionOrder { get; set; }
-        public ProductViewModel Product { get; set; }
+        public ProductionOrderSQLViewModel ProductionOrder { get; set; }
+        public ProductSQLViewModel Product { get; set; }
         public double? Length { get; set; }
         public double? DistributedLength { get; set; }
         public string Grade { get; set; }

@@ -10,8 +10,8 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialDistributionNote
     {
         public int MaterialDistributionNoteItemId { get; set; }
         public int MaterialsRequestNoteItemId { get; set; }
-        public ProductionOrderViewModel ProductionOrder { get; set; }
-        public ProductViewModel Product { get; set; }
+        public ProductionOrderSQLViewModel ProductionOrder { get; set; }
+        public ProductSQLViewModel Product { get; set; }
         public string Grade { get; set; }
         public double? Quantity { get; set; }
         public double? MaterialRequestNoteItemLength { get; set; }
@@ -19,6 +19,6 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialDistributionNote
         public double? ReceivedLength { get; set; }
         public bool IsDisposition { get; set; }
         public bool IsCompleted { get; set; }
-        public SupplierViewModel Supplier { get; set; }
+        public SupplierSQLViewModel Supplier { get; set; }
     }
 }

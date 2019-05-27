@@ -7,6 +7,7 @@ using Com.Danliris.Service.Inventory.Lib.Helpers;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
 using Com.Moonlay.NetCore.Lib;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServices
 {
@@ -59,11 +60,11 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             while (this.DbSet.Any(d => d.Code.Equals(model.Code)));
 
             base.OnCreating(model);
-
+            var identity = ServiceProvider.GetService<IdentityService>();
             model._CreatedAgent = "Service";
-            model._CreatedBy = this.Username;
+            model._CreatedBy = identity.Username;
             model._LastModifiedAgent = "Service";
-            model._LastModifiedBy = this.Username;
+            model._LastModifiedBy = identity.Username;
         }
 
         public override void OnUpdating(int id, MaterialsRequestNote_Item model)

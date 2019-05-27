@@ -40,7 +40,7 @@ namespace Com.Danliris.Service.Inventory.Lib.PDFTemplates
 
             cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "BAGIAN", 15, 750, 0);
             cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ":", 70, 750, 0);
-            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, viewModel.Unit.name, 80, 750, 0);
+            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, viewModel.Unit.Name, 80, 750, 0);
 
             cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "NO", 450, 760, 0);
             cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ":", 485, 760, 0);
@@ -107,11 +107,11 @@ namespace Com.Danliris.Service.Inventory.Lib.PDFTemplates
                     cell.Phrase = new Phrase(item.MaterialRequestNoteCode, normal_font);
                     table.AddCell(cell);
 
-                    cell.Phrase = new Phrase(detail.ProductionOrder.orderNo, normal_font);
+                    cell.Phrase = new Phrase(detail.ProductionOrder.OrderNo, normal_font);
                     table.AddCell(cell);
 
                     cell = new PdfPCell() { Border = Rectangle.TOP_BORDER | Rectangle.LEFT_BORDER | Rectangle.BOTTOM_BORDER | Rectangle.RIGHT_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, VerticalAlignment = Element.ALIGN_MIDDLE, Padding = 5 };
-                    cell.Phrase = new Phrase(detail.Product.name, normal_font);
+                    cell.Phrase = new Phrase(detail.Product.Name, normal_font);
                     table.AddCell(cell);
 
                     cell = new PdfPCell() { Border = Rectangle.TOP_BORDER | Rectangle.LEFT_BORDER | Rectangle.BOTTOM_BORDER | Rectangle.RIGHT_BORDER, HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_MIDDLE, Padding = 5 };
@@ -126,7 +126,7 @@ namespace Com.Danliris.Service.Inventory.Lib.PDFTemplates
                     table.AddCell(cell);
 
                     cell = new PdfPCell() { Border = Rectangle.TOP_BORDER | Rectangle.LEFT_BORDER | Rectangle.BOTTOM_BORDER | Rectangle.RIGHT_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, VerticalAlignment = Element.ALIGN_MIDDLE, Padding = 5 };
-                    cell.Phrase = new Phrase(detail.Supplier.name, normal_font);
+                    cell.Phrase = new Phrase(detail.Supplier.Name, normal_font);
                     table.AddCell(cell);
 
                     TotalQuantity += detail.Quantity;

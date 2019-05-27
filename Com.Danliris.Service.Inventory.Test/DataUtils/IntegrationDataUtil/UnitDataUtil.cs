@@ -20,7 +20,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.IntegrationDataUtil
             Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(data.Result.ToString());
 
             List<UnitViewModel> list = JsonConvert.DeserializeObject<List<UnitViewModel>>(result["data"].ToString());
-            UnitViewModel fp = list.First(p => p.name.Equals("FINISHING"));
+            UnitViewModel fp = list.First(p => p.Name.Equals("FINISHING"));
 
             return fp;
         }

@@ -24,7 +24,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialDistributionNote
         {
             int Count = 0;
 
-            if (this.Unit == null || string.IsNullOrWhiteSpace(this.Unit._id))
+            if (this.Unit == null || Unit.Id == 0)
                 yield return new ValidationResult("Unit is required", new List<string> { "Unit" });
 
             if (string.IsNullOrWhiteSpace(this.Type))
@@ -59,10 +59,10 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialDistributionNote
                     List<string> products = new List<string>();
                     foreach (MaterialDistributionNoteItemViewModel mdni in this.MaterialDistributionNoteItems)
                     {
-                        products.AddRange(mdni.MaterialDistributionNoteDetails.Select(p => p.Product.code).ToList());
+                        products.AddRange(mdni.MaterialDistributionNoteDetails.Select(p => p.Product.Code).ToList());
                     }
 
-                    var storageName = this.Unit.name.Equals("PRINTING") ? "Gudang Greige Printing" : "Gudang Greige Finishing";
+                    var storageName = this.Unit.Name.Equals("PRINTING") ? "Gudang Greige Printing" : "Gudang Greige Finishing";
 
                     Dictionary<string, object> filter = new Dictionary<string, object> { { "storageName", storageName }, { "uom", "MTR" }, { "productCode", new Dictionary<string, object> { { "$in", products.ToArray() } } } };
                     var response = httpClient.GetAsync($@"{APIEndpoint.Inventory}{inventorySummaryURI}filter=" + JsonConvert.SerializeObject(filter)).Result.Content.ReadAsStringAsync();
@@ -92,7 +92,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialDistributionNote
                                     continue;
                                 }
 
-                                InventorySummaryViewModel inventorySummary = inventorySummaries.SingleOrDefault(p => p.productCode.Equals(mdnd.Product.code) && p.uom.Equals("MTR"));
+                                InventorySummaryViewModel inventorySummary = inventorySummaries.SingleOrDefault(p => p.productCode.Equals(mdnd.Product.Code) && p.uom.Equals("MTR"));
 
                                 materialDistributionNoteDetailError += "{";
                                 
@@ -134,7 +134,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.MaterialDistributionNote
                                         inventorySummary.quantity -= (double)mdnd.ReceivedLength;
                                     }
 
-                                    if (mdnd.Supplier == null || string.IsNullOrWhiteSpace(mdnd.Supplier._id))
+                                    if (mdnd.Supplier == null || mdnd.Supplier.Id == 0)
                                     {
                                         CountDetail++;
                                         materialDistributionNoteDetailError += "Supplier: 'Supplier is required', ";

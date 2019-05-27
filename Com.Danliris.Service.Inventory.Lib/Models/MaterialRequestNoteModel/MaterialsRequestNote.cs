@@ -20,6 +20,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Models.MaterialsRequestNoteModel
         public bool IsDistributed { get; set; }
         public bool IsCompleted { get; set; }
         public int AutoIncrementNumber { get; set; }
+
+        public int UnitIntegerId { get; set; }
+
         public virtual ICollection<MaterialsRequestNote_Item> MaterialsRequestNote_Items { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

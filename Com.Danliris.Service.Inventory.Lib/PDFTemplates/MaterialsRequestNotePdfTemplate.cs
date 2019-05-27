@@ -50,7 +50,7 @@ namespace Com.Danliris.Service.Inventory.Lib.PDFTemplates
 
             cb.SetFontAndSize(bf, 10);
             cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "UNIT", 20, 495, 0);
-            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, $": {viewModel.Unit.name}", 55, 495, 0);
+            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, $": {viewModel.Unit.Name}", 55, 495, 0);
             cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "NO", 20, 480, 0);
             cb.SetFontAndSize(bf_bold, 10);
             cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, $": {viewModel.Code}", 55, 480, 0);
@@ -145,7 +145,7 @@ namespace Com.Danliris.Service.Inventory.Lib.PDFTemplates
                     cell.Phrase = new Phrase(index.ToString(), small_font);
                     table.AddCell(cell);
 
-                    leftCell.Phrase = new Phrase(item.Product.name.Trim(), small_font);
+                    leftCell.Phrase = new Phrase(item.Product.Name.Trim(), small_font);
                     table.AddCell(leftCell);
 
                     cell.Phrase = new Phrase(item.Grade.Trim(), small_font);
@@ -162,10 +162,10 @@ namespace Com.Danliris.Service.Inventory.Lib.PDFTemplates
                     cell.Phrase = new Phrase(index.ToString(), small_font);
                     table.AddCell(cell);
 
-                    leftCell.Phrase = new Phrase(item.ProductionOrder.orderNo.Trim(), small_font);
+                    leftCell.Phrase = new Phrase(item.ProductionOrder.OrderNo.Trim(), small_font);
                     table.AddCell(leftCell);
 
-                    leftCell.Phrase = new Phrase(item.Product.name.Trim(), small_font);
+                    leftCell.Phrase = new Phrase(item.Product.Name.Trim(), small_font);
                     table.AddCell(leftCell);
 
                     cell.Phrase = new Phrase(item.Grade.Trim(), small_font);
@@ -243,7 +243,7 @@ namespace Com.Danliris.Service.Inventory.Lib.PDFTemplates
             cb.SetFontAndSize(bf, 9);
             cb.ShowTextAligned(PdfContentByte.ALIGN_CENTER, "(..........................)", 210, 50, 0);
             cb.SetFontAndSize(bf, 9);
-            cb.ShowTextAligned(PdfContentByte.ALIGN_CENTER, $"Kabag {viewModel.Unit.name}", 210, 35, 0);
+            cb.ShowTextAligned(PdfContentByte.ALIGN_CENTER, $"Kabag {viewModel.Unit.Name}", 210, 35, 0);
 
             //RIGHT
             cb.SetFontAndSize(bf, 9);

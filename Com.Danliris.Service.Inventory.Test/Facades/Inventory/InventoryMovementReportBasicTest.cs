@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades;
+﻿using Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades;
 using Com.Danliris.Service.Inventory.Lib.Models.InventoryModel;
 using Com.Danliris.Service.Inventory.Lib.Services;
 using Com.Danliris.Service.Inventory.Test.DataUtils.InventoryDataUtils;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace Com.Danliris.Service.Inventory.Test.Facades.Inventory

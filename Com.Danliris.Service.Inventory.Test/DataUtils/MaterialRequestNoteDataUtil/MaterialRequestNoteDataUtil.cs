@@ -46,9 +46,9 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.MaterialRequestNoteDataU
 
             MaterialsRequestNote TestData = new MaterialsRequestNote
             {
-                UnitId = fp._id,
-                UnitCode = fp.code,
-                UnitName = fp.name,
+                UnitIntegerId = fp.Id,
+                UnitCode = fp.Code,
+                UnitName = fp.Name,
                 Remark = "",
                 RequestType = "AWAL",
                 IsDistributed = false,

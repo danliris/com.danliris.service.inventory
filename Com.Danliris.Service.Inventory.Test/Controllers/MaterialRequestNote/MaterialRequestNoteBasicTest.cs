@@ -36,9 +36,8 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.MaterialRequestNote
                     Unit = new Lib.ViewModels.UnitViewModel
                     {
                         Id=1,
-                        _id = "1",
-                        code = "TEST",
-                        name = "TEST"
+                        Code = "TEST",
+                        Name = "TEST"
                     },
                     RequestType = "AWAL",
                     Remark = "",
@@ -49,10 +48,10 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.MaterialRequestNote
                     {
                         new MaterialsRequestNote_ItemViewModel
                         {
-                            ProductionOrder = new Lib.ViewModels.ProductionOrderViewModel
+                            ProductionOrder = new Lib.ViewModels.ProductionOrderSQLViewModel
                             {
-                                isCompleted = false,
-                                orderQuantity = 1,
+                                IsCompleted = false,
+                                OrderQuantity = 1,
                             },
                             ProductionOrderIsCompleted = false
                         }

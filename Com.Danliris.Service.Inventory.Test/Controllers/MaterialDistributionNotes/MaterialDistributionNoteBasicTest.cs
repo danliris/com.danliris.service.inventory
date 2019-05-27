@@ -37,9 +37,8 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.MaterialDistributionNo
                     Unit = new Lib.ViewModels.UnitViewModel
                     {
                         Id = 1,
-                        _id = "1",
-                        code = "TEST",
-                        name = "TEST"
+                        Code = "TEST",
+                        Name = "TEST"
                     },
                     Type = "PRODUKSI",
                     IsApproved = false,
@@ -58,25 +57,26 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.MaterialDistributionNo
                                 {
                                     MaterialDistributionNoteItemId = 1,
                                     MaterialsRequestNoteItemId = 1,
-                                    ProductionOrder = new Lib.ViewModels.ProductionOrderViewModel
+                                    ProductionOrder = new Lib.ViewModels.ProductionOrderSQLViewModel
                                     {
-                                        _id = "1",
-                                        orderNo = "1",
-                                        orderQuantity= 1,
-                                        isCompleted = false,
-                                        distributedQuantity = 1,
-                                        orderType = new Lib.ViewModels.OrderTypeViewModel
+                                        Id = 1,
+                                        OrderNo = "1",
+                                        OrderQuantity= 1,
+                                        IsCompleted = false,
+                                        DistributedQuantity = 1,
+                                        OrderType = new Lib.ViewModels.OrderTypeViewModel
                                         {
+                                            Id=1,
                                             _id = "1",
                                             code = "TEST",
                                             name = "TEST"
                                         },
                                     },
-                                    Product = new Lib.ViewModels.ProductViewModel
+                                    Product = new Lib.ViewModels.ProductSQLViewModel
                                     {
-                                        _id = "1",
-                                        code = "TEST",
-                                        name = "TEST"
+                                        Id =1,
+                                        Code = "TEST",
+                                        Name = "TEST"
                                     },
                                     Grade = "",
                                     Quantity = 1,
@@ -85,11 +85,11 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.MaterialDistributionNo
                                     ReceivedLength = 1,
                                     IsDisposition = false,
                                     IsCompleted = false,
-                                    Supplier = new Lib.ViewModels.SupplierViewModel
+                                    Supplier = new Lib.ViewModels.SupplierSQLViewModel
                                     {
-                                        _id = "1",
-                                        code = "TEST",
-                                        name = "TEST"
+                                        Id = 1,
+                                        Code = "TEST",
+                                        Name = "TEST"
                                     }
                                 }
                             }
