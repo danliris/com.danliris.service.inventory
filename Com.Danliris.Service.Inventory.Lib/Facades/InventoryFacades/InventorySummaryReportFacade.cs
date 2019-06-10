@@ -137,5 +137,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Facades.InventoryFacades
                 uom = x.UomUnit,
             }).ToList();
         }
+
+        public InventorySummary GetSummaryByParams(int storageId, int productId, int uomId)
+        {
+            return DbSet.FirstOrDefault(f => f.StorageId.Equals(storageId) && f.ProductId.Equals(productId) && f.UomId.Equals(uomId));
+        }
     }
 }
