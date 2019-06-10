@@ -29,7 +29,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Interfaces.MaterialRequestNote
         void OnDeleting(MaterialsRequestNote model);
         IQueryable<MaterialsRequestNoteReportViewModel> GetReportQuery(string materialsRequestNoteCode, string productionOrderId, string unitId, string productId, string status, DateTime? dateFrom, DateTime? dateTo, int offset);
         Tuple<List<MaterialsRequestNoteReportViewModel>, int> GetReport(string materialsRequestNoteCode, string productionOrderId, string unitId, string productId, string status, DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order, int offset);
-        void CreateInventoryDocument(MaterialsRequestNote Model, string Type);
+        Task<int> CreateInventoryDocument(MaterialsRequestNote Model, string Type);
         MaterialsRequestNoteViewModel MapToViewModel(MaterialsRequestNote model);
         MaterialsRequestNote MapToModel(MaterialsRequestNoteViewModel viewModel);
 

@@ -26,10 +26,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
 {
     public class MaterialsRequestNoteService : BasicService<InventoryDbContext, MaterialsRequestNote>, IMap<MaterialsRequestNote, MaterialsRequestNoteViewModel>, IMaterialsRequestNote
     {
+        private readonly InventoryDocumentFacade inventoryDocumentFacade;
+        private readonly IHttpClientService httpClientService;
         public MaterialsRequestNoteService(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             var identity = ServiceProvider.GetService<IdentityService>();
             Username = identity.Username;
+            httpClientService = ServiceProvider.GetService<IHttpClientService>();
+            inventoryDocumentFacade = ServiceProvider.GetService<InventoryDocumentFacade>();
         }
 
         public override Tuple<List<MaterialsRequestNote>, int, Dictionary<string, string>, List<string>> ReadModel(int Page = 1, int Size = 25, string Order = "{}", List<string> Select = null, string Keyword = null, string Filter = "{}")
@@ -594,18 +598,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             return Tuple.Create(Data, TotalData);
         }
 
-        public Task CreateInventoryDocument(MaterialsRequestNote Model, string Type)
+        public Task<int> CreateInventoryDocument(MaterialsRequestNote Model, string Type)
         {
-            string inventoryDocumentURI = "inventory-documents";
             string storageURI = "master/storages";
             string uomURI = "master/uoms";
-
-            HttpClient httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
-
+            
             /* Get UOM */
             Dictionary<string, object> filterUOM = new Dictionary<string, object> { { "Unit", "MTR" } };
-            var responseUOM = httpClient.GetAsync($@"{APIEndpoint.Core}{uomURI}?filter=" + JsonConvert.SerializeObject(filterUOM)).Result.Content.ReadAsStringAsync();
+            var responseUOM = httpClientService.GetAsync($@"{APIEndpoint.Core}{uomURI}?filter=" + JsonConvert.SerializeObject(filterUOM)).Result.Content.ReadAsStringAsync();
             Dictionary<string, object> resultUOM = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseUOM.Result);
             var jsonUOM = resultUOM.Single(p => p.Key.Equals("data")).Value;
             Dictionary<string, object> uom = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonUOM.ToString())[0];
@@ -613,7 +613,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
             /* Get Storage */
             var storageName = Model.UnitName.Equals("PRINTING") ? "Gudang Greige Printing" : "Gudang Greige Finishing";
             Dictionary<string, object> filterStorage = new Dictionary<string, object> { { "Name", storageName } };
-            var responseStorage = httpClient.GetAsync($@"{APIEndpoint.Core}{storageURI}?filter=" + JsonConvert.SerializeObject(filterStorage)).Result.Content.ReadAsStringAsync();
+            var responseStorage = httpClientService.GetAsync($@"{APIEndpoint.Core}{storageURI}?filter=" + JsonConvert.SerializeObject(filterStorage)).Result.Content.ReadAsStringAsync();
             Dictionary<string, object> resultStorage = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseStorage.Result);
             var jsonStorage = resultStorage.Single(p => p.Key.Equals("data")).Value;
             Dictionary<string, object> storage = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonStorage.ToString())[0];
@@ -658,12 +658,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.MaterialsRequestNoteServic
                 Items = inventoryDocumentItems
             };
 
-            InventoryDocumentFacade inventoryFacade = this.ServiceProvider.GetService<InventoryDocumentFacade>();
-
-            return inventoryFacade.Create(inventoryDocument, Username);
-
-            //var response = httpClient.PostAsync($"{APIEndpoint.Inventory}{inventoryDocumentURI}", new StringContent(JsonConvert.SerializeObject(inventoryDocument).ToString(), Encoding.UTF8, General.JsonMediaType)).Result;
-            //response.EnsureSuccessStatusCode();
+            
+            return inventoryDocumentFacade.Create(inventoryDocument, Username);
+            
         }
     }
 }
