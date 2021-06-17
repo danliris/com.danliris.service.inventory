@@ -14,9 +14,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.ReportGreigeWeavingPerType
+namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.ReportGreigeWeavingPerGrade
 {
-    public class ReportGreigeWeavingPerTypeService : IReportGreigeWeavingPerTypeService
+    public class ReportGreigeWeavingPerGradeService : IReportGreigeWeavingPerGradeService
     {
         private string USER_AGENT = "Service";
         private const string UserAgent = "inventory-service";
@@ -28,7 +28,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
         public InventoryDbContext DbContext;
 
 
-        public ReportGreigeWeavingPerTypeService(IServiceProvider serviceProvider, InventoryDbContext dbContext)
+        public ReportGreigeWeavingPerGradeService(IServiceProvider serviceProvider, InventoryDbContext dbContext)
         {
             DbContext = dbContext;
             ServiceProvider = serviceProvider;
@@ -39,18 +39,26 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
             //IdentityService = serviceProvider.GetService<IIdentityService>();
         }
 
-        public async Task<Tuple<List<ReportGreigeWeavingPerTypeViewModel>, int>> GetStockReport(DateTime? dateTo, int offset, int page, int size, string Order)
+
+        public async Task<Tuple<List<ReportGreigeWeavingPerGradeViewModel>, int>> GetStockGrade(DateTime? dateTo, int offset, int page, int size, string Order)
         {
 
-            List<ReportGreigeWeavingPerTypeViewModel> Query = await GetStockQuery(dateTo, offset);
-            Pageable<ReportGreigeWeavingPerTypeViewModel> pageable = new Pageable<ReportGreigeWeavingPerTypeViewModel>(Query, page - 1, size);
+            List<ReportGreigeWeavingPerGradeViewModel> Query = await GetQuery(dateTo, offset);
+            //Query = Query.Where(x => (x.BeginningBalanceQty != 0) || (x.BeginningBalancePrice != 0) || (x.EndingBalancePrice > 0) || (x.EndingBalanceQty > 0) || (x.ExpendKon1APrice > 0) || (x.ExpendKon1AQty > 0) ||
+            //(x.ExpendKon1BPrice > 0) || (x.ExpendKon1BQty > 0) || (x.ExpendKon2APrice > 0) || (x.ExpendKon2AQty > 0) || (x.ExpendKon2BPrice > 0) || (x.ExpendKon2BQty > 0) || (x.ExpendKon2CPrice > 0) || (x.ExpendKon2CQty > 0) ||
+            //(x.ExpendProcessPrice > 0) || (x.ExpendProcessQty > 0) || (x.ExpendRestPrice > 0) || (x.ExpendRestQty > 0) || (x.ExpendReturPrice > 0) || (x.ExpendReturQty > 0) || (x.ExpendSamplePrice > 0) || (x.ExpendSampleQty > 0) ||
+            //(x.ReceiptCorrectionPrice > 0) || (x.ReceiptCorrectionQty > 0) || (x.ReceiptKon1APrice > 0) || (x.ReceiptKon1AQty > 0) || (x.ReceiptKon1BPrice > 0) || (x.ReceiptKon1BQty > 0) || (x.ReceiptKon2APrice > 0) || (x.ReceiptKon2AQty > 0)
+            //|| (x.ReceiptKon2BPrice > 0) || (x.ReceiptKon2BQty > 0) || (x.ReceiptKon2CPrice > 0) || (x.ReceiptKon2CQty > 0) || (x.ReceiptProcessPrice > 0) || (x.ReceiptProcessQty > 0) || (x.ReceiptPurchasePrice > 0) || (x.ReceiptPurchaseQty > 0)).ToList();
 
-            List<ReportGreigeWeavingPerTypeViewModel> Data = pageable.Data.ToList();
+            //Query = Query.OrderBy(x => x.ProductCode).ThenBy(x => x.PlanPo).ToList();
+            Pageable<ReportGreigeWeavingPerGradeViewModel> pageable = new Pageable<ReportGreigeWeavingPerGradeViewModel>(Query, page - 1, size);
+            List<ReportGreigeWeavingPerGradeViewModel> Data = pageable.Data.ToList();
             int TotalData = pageable.TotalCount;
+            //int TotalData = Data.Count();
             return Tuple.Create(Data, TotalData);
         }
 
-        public async Task<List<ReportGreigeWeavingPerTypeViewModel>> GetStockQuery(DateTime? dateto, int offset)
+        public async Task<List<ReportGreigeWeavingPerGradeViewModel>> GetQuery(DateTime? dateto, int offset)
         {
             DateTime dateReport = dateto == null ? DateTime.Now : (DateTime)dateto;
             var startDate = new DateTime(dateReport.Year, dateReport.Month, 1);
@@ -63,7 +71,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                             a._IsDeleted == false
                             && b._IsDeleted == false
 
-                            select new ReportGreigeWeavingDataViewModel
+                            select new ReportGreigeWeavingPerGradeAllViewModel
                             {
                                 Date = b.Date,
                                 _CreatedUtc = a._CreatedUtc,
@@ -79,13 +87,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                                 YarnType2 = a.YarnType2,
                                 QuantityPiece = a.QuantityPiece,
                                 Quantity = a.Quantity,
+                                Grade = a.Grade,
                                 Type = a.Type
 
 
                             }
                 );
 
-            var MasukAll = QueryAll.Where(d => d.Date.AddHours(offset).Date >= startDate.Date && d.Date.AddHours(offset).Date <= dateReport.Date && d.Type == "IN").Select(x => new ReportGreigeWeavingPerTypeViewModel
+            var MasukAll = QueryAll.Where(d => d.Date.AddHours(offset).Date >= startDate.Date && d.Date.AddHours(offset).Date <= dateReport.Date && d.Type == "IN").Select(x => new ReportGreigeWeavingPerGradeViewModel
             {
                 Construction = x.Construction,
                 MaterialName = x.MaterialName,
@@ -97,6 +106,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 YarnOrigin2 = x.YarnOrigin2,
                 YarnType1 = x.YarnType1,
                 YarnType2 = x.YarnType2,
+                Grade = x.Grade,
                 InQuantityPiece = x.Type == "IN" ? x.QuantityPiece : 0,
                 InQuantity = x.Type == "IN" ? x.Quantity : 0,
                 OutQuantityPiece = 0,
@@ -120,7 +130,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 s.YarnOrigin2,
                 s.YarnType1,
                 s.YarnType2
-            }).Select(x => new ReportGreigeWeavingPerTypeViewModel
+            }).Select(x => new ReportGreigeWeavingPerGradeViewModel
             {
                 Construction = x.FirstOrDefault().Construction,
                 MaterialName = x.Key.MaterialName,
@@ -132,6 +142,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 YarnOrigin2 = x.Key.YarnOrigin2,
                 YarnType1 = x.Key.YarnType1,
                 YarnType2 = x.Key.YarnType2,
+                Grade = x.FirstOrDefault().Grade,
                 InQuantityPiece = x.Sum(f => f.InQuantityPiece),
                 InQuantity = x.Sum(f => f.InQuantity),
                 OutQuantityPiece = 0,
@@ -143,7 +154,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
 
             });
 
-            var KeluarAll = QueryAll.Where(d => d.Date.AddHours(offset).Date >= startDate.Date && d.Date.AddHours(offset).Date <= dateReport.Date && d.Type == "OUT").Select(x => new ReportGreigeWeavingPerTypeViewModel
+
+            var KeluarAll = QueryAll.Where(d => d.Date.AddHours(offset).Date >= startDate.Date && d.Date.AddHours(offset).Date <= dateReport.Date && d.Type == "OUT").Select(x => new ReportGreigeWeavingPerGradeViewModel
             {
                 Construction = x.Construction,
                 MaterialName = x.MaterialName,
@@ -155,6 +167,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 YarnOrigin2 = x.YarnOrigin2,
                 YarnType1 = x.YarnType1,
                 YarnType2 = x.YarnType2,
+                Grade = x.Grade,
                 InQuantityPiece = 0,
                 InQuantity = 0,
                 OutQuantityPiece = x.Type == "OUT" ? x.QuantityPiece : 0,
@@ -180,7 +193,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 s.YarnType2
 
 
-            }).Select(x => new ReportGreigeWeavingPerTypeViewModel
+            }).Select(x => new ReportGreigeWeavingPerGradeViewModel
             {
                 Construction = x.FirstOrDefault().Construction,
                 MaterialName = x.Key.MaterialName,
@@ -192,6 +205,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 YarnOrigin2 = x.Key.YarnOrigin2,
                 YarnType1 = x.Key.YarnType1,
                 YarnType2 = x.Key.YarnType2,
+                Grade = x.FirstOrDefault().Grade,
                 InQuantityPiece = 0,
                 InQuantity = 0,
                 OutQuantityPiece = x.Sum(f => f.OutQuantityPiece),
@@ -216,7 +230,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 s.YarnType2,
                 s.Type
 
-            }).Select(x => new ReportGreigeWeavingDataViewModel
+            }).Select(x => new ReportGreigeWeavingPerGradeAllViewModel
             {
                 _CreatedUtc = x.FirstOrDefault()._CreatedUtc,
                 Construction = x.FirstOrDefault().Construction,
@@ -231,6 +245,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 YarnType2 = x.Key.YarnType2,
                 QuantityPiece = x.Sum(d => d.QuantityPiece),
                 Quantity = x.Sum(d => d.Quantity),
+                Grade = x.FirstOrDefault().Grade,
                 Type = x.Key.Type
 
             });
@@ -248,7 +263,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 s.YarnType2,
                 s.Type
 
-            }).Select(x => new ReportGreigeWeavingDataViewModel
+            }).Select(x => new ReportGreigeWeavingPerGradeAllViewModel
             {
                 _CreatedUtc = x.FirstOrDefault()._CreatedUtc,
                 Construction = x.FirstOrDefault().Construction,
@@ -263,6 +278,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 YarnType2 = x.Key.YarnType2,
                 QuantityPiece = x.Sum(d => d.QuantityPiece),
                 Quantity = x.Sum(d => d.Quantity),
+                Grade = x.FirstOrDefault().Grade,
                 Type = x.Key.Type
 
 
@@ -280,7 +296,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 s.YarnType1,
                 s.YarnType2
 
-            }).Select(x => new ReportGreigeWeavingPerTypeViewModel
+            }).Select(x => new ReportGreigeWeavingPerGradeViewModel
             {
                 Construction = x.FirstOrDefault().Construction,
                 MaterialName = x.Key.MaterialName,
@@ -292,6 +308,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 YarnOrigin2 = x.Key.YarnOrigin2,
                 YarnType1 = x.Key.YarnType1,
                 YarnType2 = x.Key.YarnType2,
+                Grade = x.FirstOrDefault().Grade,
                 InQuantityPiece = 0,
                 InQuantity = 0,
                 OutQuantityPiece = 0,
@@ -317,7 +334,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 s.YarnType1,
                 s.YarnType2
 
-            }).Select(x => new ReportGreigeWeavingPerTypeViewModel
+            }).Select(x => new ReportGreigeWeavingPerGradeViewModel
             {
                 Construction = x.FirstOrDefault().Construction,
                 MaterialName = x.Key.MaterialName,
@@ -329,6 +346,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 YarnOrigin2 = x.Key.YarnOrigin2,
                 YarnType1 = x.Key.YarnType1,
                 YarnType2 = x.Key.YarnType2,
+                Grade = x.FirstOrDefault().Grade,
                 InQuantityPiece = 0,
                 InQuantity = 0,
                 OutQuantityPiece = 0,
@@ -361,7 +379,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 s.YarnOrigin2,
                 s.YarnType1,
                 s.YarnType2
-            }, (key, data) => new ReportGreigeWeavingPerTypeViewModel
+            }, (key, data) => new ReportGreigeWeavingPerGradeViewModel
             {
                 Construction = data.FirstOrDefault().Construction,
                 MaterialName = key.MaterialName,
@@ -373,6 +391,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 YarnOrigin2 = key.YarnOrigin2,
                 YarnType1 = key.YarnType1,
                 YarnType2 = key.YarnType2,
+                Grade = data.FirstOrDefault().Grade,
                 InQuantityPiece = data.Sum(d => d.InQuantityPiece),
                 InQuantity = data.Sum(d => d.InQuantity),
                 OutQuantityPiece = data.Sum(d => d.OutQuantityPiece),
@@ -384,13 +403,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
 
             });
 
-
-            List<ReportGreigeWeavingPerTypeViewModel> stockReportViewModels = new List<ReportGreigeWeavingPerTypeViewModel>();
+            List<ReportGreigeWeavingPerGradeViewModel> stockReportViewModels = new List<ReportGreigeWeavingPerGradeViewModel>();
             int index = 1;
             foreach (var i in DataStock)
             {
 
-                stockReportViewModels.Add(new ReportGreigeWeavingPerTypeViewModel
+                stockReportViewModels.Add(new ReportGreigeWeavingPerGradeViewModel
                 {
                     Nomor = index++,
                     Construction = i.Construction,
@@ -403,6 +421,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                     YarnOrigin2 = i.YarnOrigin2,
                     YarnType1 = i.YarnType1,
                     YarnType2 = i.YarnType2,
+                    Grade = i.Grade,
                     InQuantityPiece = i.InQuantityPiece,
                     InQuantity = i.InQuantity,
                     OutQuantityPiece = i.OutQuantityPiece,
@@ -412,13 +431,11 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                     EndingQuantityPiece = i.EndingQuantityPiece,
                     EndingQuantity = i.EndingQuantity
 
-
                 });
-
 
             }
 
-            var total = new ReportGreigeWeavingPerTypeViewModel
+            var total = new ReportGreigeWeavingPerGradeViewModel
             {
                 Construction = "TOTAL",
                 MaterialName = "-",
@@ -447,14 +464,13 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
 
             return stockReportViewModels;
 
-
         }
 
         public async Task<MemoryStream> GenerateExcel(DateTime? dateTo, int offset)
         {
-            var Query = await GetStockQuery(dateTo, offset);
+            var Query = await GetQuery(dateTo, offset);
             DateTime DateTo = dateTo == null ? DateTime.Now : (DateTime)dateTo;
-            //string Bulan = DateTo.ToString("MMM yyyy", new CultureInfo("id-ID"));
+            string Bulan = DateTo.ToString("MMM yyyy", new CultureInfo("id-ID"));
             string Tanggal = DateTo.ToString("dd MMM yyyy", new CultureInfo("id-ID"));
 
             DataTable result = new DataTable();
@@ -473,7 +489,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 result.Columns.Add(new DataColumn() { ColumnName = headers[i], DataType = typeof(Double) });
             }
 
-            Query.RemoveAt(Query.Count() - 1 );
+            Query.RemoveAt(Query.Count() - 1);
 
             double TotBeginQuantityPiece = 0;
             double TotBeginQuantity = 0;
@@ -505,7 +521,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 //    item.ExpandUom, item.EndingBalanceQty, item.EndingUom, item.From);
 
 
-                result.Rows.Add(item.Nomor, item.Construction,"", "", "", "", item.BeginQuantityPiece, item.BeginQuantity, item.InQuantityPiece, item.InQuantity, item.OutQuantityPiece, item.OutQuantity,
+                result.Rows.Add(item.Nomor, item.Construction, "", "", item.Grade, "", item.BeginQuantityPiece, item.BeginQuantity, item.InQuantityPiece, item.InQuantity, item.OutQuantityPiece, item.OutQuantity,
                                 item.EndingQuantityPiece, item.EndingQuantity);
 
             }
@@ -545,6 +561,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
             sheet.Cells[$"A5:{col}5"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
             sheet.Cells[$"A5:{col}5"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
 
+
             sheet.Cells["A9"].LoadFromDataTable(result, false, OfficeOpenXml.Table.TableStyles.Light14);
             sheet.Cells["G7"].Value = headers[6];
             sheet.Cells["G7:H7"].Merge = true;
@@ -570,12 +587,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
 
             }
 
-          /* foreach (var i in Enumerable.Range(0, 1))
-            {
-                col = (char)('N' + i);
-                sheet.Cells[$"{col}4"].Value = headers[i + 14];
-                sheet.Cells[$"{col}4:{col}5"].Merge = true;
-            } */
+            /* foreach (var i in Enumerable.Range(0, 1))
+              {
+                  col = (char)('N' + i);
+                  sheet.Cells[$"{col}4"].Value = headers[i + 14];
+                  sheet.Cells[$"{col}4:{col}5"].Merge = true;
+              } */
 
             sheet.Cells["A7:N8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             sheet.Cells["A7:N8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -623,5 +640,4 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
 
         }
     }
-
 }
