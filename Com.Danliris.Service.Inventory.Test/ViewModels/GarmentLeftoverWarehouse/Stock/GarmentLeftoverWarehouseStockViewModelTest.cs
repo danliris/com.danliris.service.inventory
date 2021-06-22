@@ -21,6 +21,8 @@ namespace Com.Danliris.Service.Inventory.Test.ViewModels.GarmentLeftoverWarehous
                 RONo = "RONo",
                 Unit = new Lib.ViewModels.UnitViewModel(),
                 Uom = new Lib.ViewModels.UomViewModel(),
+                LeftoverComodity= new Lib.ViewModels.LeftoverComodityViewModel(),
+                BasicPrice=1
             };
 
             Assert.NotNull(viewModel.Histories);
@@ -32,6 +34,8 @@ namespace Com.Danliris.Service.Inventory.Test.ViewModels.GarmentLeftoverWarehous
             Assert.Equal("RONo", viewModel.RONo);
             Assert.NotNull(viewModel.Unit);
             Assert.NotNull(viewModel.Uom);
+            Assert.NotNull(viewModel.LeftoverComodity);
+            Assert.Equal(1, viewModel.BasicPrice);
 
         }
     }

@@ -179,7 +179,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.B
 
             List<string> SearchAttributes = new List<string>()
             {
-                "TypeOfGoods", "BalanceStockDate", "_CreatedBy"
+                "TypeOfGoods", "_CreatedBy"
             };
             Query = QueryHelper<GarmentLeftoverWarehouseBalanceStock>.Search(Query, SearchAttributes, keyword);
 

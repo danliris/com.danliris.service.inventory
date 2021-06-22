@@ -324,6 +324,12 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
                         {
                             Id = "1",
                             Unit = "Uom"
+                        },
+                        Product= new ProductViewModel
+                        {
+                            Id="1",
+                            Code="code",
+                            Name="name"
                         }
                     }
                 }
@@ -358,6 +364,63 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             var result = service.MapToViewModel(data);
 
             Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void ValidateViewModel()
+        {
+            GarmentLeftoverWarehouseExpenditureAccessoriesViewModel viewModel = new GarmentLeftoverWarehouseExpenditureAccessoriesViewModel()
+            {
+                ExpenditureDate = null,
+                ExpenditureDestination = "",
+            };
+            var result = viewModel.Validate(null);
+            Assert.True(result.Count() > 0);
+
+            GarmentLeftoverWarehouseExpenditureAccessoriesViewModel viewModel2 = new GarmentLeftoverWarehouseExpenditureAccessoriesViewModel()
+            {
+                ExpenditureDate = DateTimeOffset.MinValue,
+                ExpenditureDestination = "JUAL LOKAL",
+                Items = new List<GarmentLeftoverWarehouseExpenditureAccessoriesItemViewModel>()
+                    {
+                        new GarmentLeftoverWarehouseExpenditureAccessoriesItemViewModel()
+                        {
+                            PONo=null,
+                            Product=null
+                        }
+                    }
+            };
+            var result2 = viewModel2.Validate(null);
+            Assert.True(result2.Count() > 0);
+
+            GarmentLeftoverWarehouseExpenditureAccessoriesViewModel viewModel3 = new GarmentLeftoverWarehouseExpenditureAccessoriesViewModel()
+            {
+                ExpenditureDate = DateTimeOffset.Now.AddDays(2),
+                ExpenditureDestination = "UNIT",
+                Items = new List<GarmentLeftoverWarehouseExpenditureAccessoriesItemViewModel>()
+                    {
+                        new GarmentLeftoverWarehouseExpenditureAccessoriesItemViewModel()
+                        {
+                        }
+                    }
+            };
+            var result3 = viewModel3.Validate(null);
+            Assert.True(result3.Count() > 0);
+
+            GarmentLeftoverWarehouseExpenditureAccessoriesViewModel viewModel4 = new GarmentLeftoverWarehouseExpenditureAccessoriesViewModel()
+            {
+                ExpenditureDate = DateTimeOffset.Now,
+                ExpenditureDestination = "LAIN-LAIN",
+                Items = new List<GarmentLeftoverWarehouseExpenditureAccessoriesItemViewModel>()
+                    {
+                        new GarmentLeftoverWarehouseExpenditureAccessoriesItemViewModel()
+                        {
+                        }
+                    }
+            };
+            var result4 = viewModel4.Validate(null);
+            Assert.True(result4.Count() > 0);
+
         }
     }
 }

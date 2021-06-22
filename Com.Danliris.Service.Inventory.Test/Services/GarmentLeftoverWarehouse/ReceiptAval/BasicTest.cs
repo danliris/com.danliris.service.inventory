@@ -417,6 +417,45 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             };
             var result3 = viewModel3.Validate(null);
             Assert.True(result3.Count() > 0);
+
+            GarmentLeftoverWarehouseReceiptAvalViewModel viewModel4 = new GarmentLeftoverWarehouseReceiptAvalViewModel()
+            {
+                UnitFrom = null,
+                AvalType = "AVAL BAHAN PENOLONG",
+                ReceiptDate = DateTimeOffset.Now.AddDays(4),
+                Items = new List<GarmentLeftoverWarehouseReceiptAvalItemViewModel>()
+                {
+                    new GarmentLeftoverWarehouseReceiptAvalItemViewModel()
+                    {
+                        Product=null,
+                        Quantity=0,
+                        Uom=null
+                    }
+                }
+            };
+            var result4 = viewModel4.Validate(null);
+            Assert.True(result4.Count() > 0);
+
+            GarmentLeftoverWarehouseReceiptAvalViewModel viewModel5 = new GarmentLeftoverWarehouseReceiptAvalViewModel()
+            {
+                UnitFrom = null,
+                AvalType = "AVAL KOMPONEN",
+                ReceiptDate = null,
+                Items = new List<GarmentLeftoverWarehouseReceiptAvalItemViewModel>()
+                {
+                    new GarmentLeftoverWarehouseReceiptAvalItemViewModel()
+                    {
+                        Product=null,
+                        Quantity=0,
+                        Uom=null,
+                        AvalComponentNo=null
+                    }
+                }
+            };
+            var result5 = viewModel5.Validate(null);
+            Assert.True(result5.Count() > 0);
         }
+
+        
     }
 }

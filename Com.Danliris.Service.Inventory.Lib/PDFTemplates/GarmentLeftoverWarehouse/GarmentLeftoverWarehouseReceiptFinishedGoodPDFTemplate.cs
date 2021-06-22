@@ -188,11 +188,11 @@ namespace Com.Danliris.Service.Inventory.Lib.PDFTemplates.GarmentLeftoverWarehou
             return stream;
         }
 
-        private class ro
-        {
-            public string RONo { get; set; }
-            public string ExpenditureGoodNo { get; set; }
-            public int count { get; set; }
-        }
+        //private class ro
+        //{
+        //    public string RONo { get; set; }
+        //    public string ExpenditureGoodNo { get; set; }
+        //    public int count { get; set; }
+        //}
     }
 }

@@ -86,6 +86,34 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
         }
 
         [Fact]
+        public async Task Read_Selected_Success()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+
+            GarmentLeftoverWarehouseExpenditureFinishedGoodService service = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            await _dataUtil(service).GetTestData();
+
+            List<string> select = new List<string>
+            {
+                "FinishedGoodExpenditureNo"
+            };
+
+            var result = service.Read(1, 25, "{}", select, null, "{}");
+
+            Assert.NotEmpty(result.Data);
+        }
+
+        [Fact]
         public async Task ReadById_Success()
         {
             var serviceProvider = GetServiceProvider();
@@ -254,7 +282,13 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
                                 Name = "Unit"
                             },
                             ExpenditureQuantity=1,
-                            StockQuantity=2
+                            StockQuantity=2,
+                            LeftoverComodity= new LeftoverComodityViewModel
+                            {
+                                Id = 1,
+                                Code = "code",
+                                Name = "name"
+                            }
                         }
                     }
             };
