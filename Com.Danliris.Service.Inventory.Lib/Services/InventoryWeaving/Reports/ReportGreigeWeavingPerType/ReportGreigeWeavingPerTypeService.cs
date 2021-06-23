@@ -454,7 +454,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
         {
             var Query = await GetStockQuery(dateTo, offset);
             DateTime DateTo = dateTo == null ? DateTime.Now : (DateTime)dateTo;
-            string Bulan = DateTo.ToString("MMM yyyy", new CultureInfo("id-ID"));
+            //string Bulan = DateTo.ToString("MMM yyyy", new CultureInfo("id-ID"));
             string Tanggal = DateTo.ToString("dd MMM yyyy", new CultureInfo("id-ID"));
 
             DataTable result = new DataTable();
@@ -473,7 +473,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 result.Columns.Add(new DataColumn() { ColumnName = headers[i], DataType = typeof(Double) });
             }
 
-            Query.RemoveAt(Query.Count() - 1);
+            Query.RemoveAt(Query.Count() - 1 );
 
             double TotBeginQuantityPiece = 0;
             double TotBeginQuantity = 0;
@@ -505,7 +505,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                 //    item.ExpandUom, item.EndingBalanceQty, item.EndingUom, item.From);
 
 
-                result.Rows.Add(item.Nomor, item.Construction, "", "", "", "", item.BeginQuantityPiece, item.BeginQuantity, item.InQuantityPiece, item.InQuantity, item.OutQuantityPiece, item.OutQuantity,
+                result.Rows.Add(item.Nomor, item.Construction,"", "", "", "", item.BeginQuantityPiece, item.BeginQuantity, item.InQuantityPiece, item.InQuantity, item.OutQuantityPiece, item.OutQuantity,
                                 item.EndingQuantityPiece, item.EndingQuantity);
 
             }
@@ -517,69 +517,53 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
             var col = (char)('A' + (result.Columns.Count - 1));
             //string tglawal = new DateTimeOffset(dateFrom.Value.Date).ToOffset(new TimeSpan(offset, 0, 0)).ToString("dd MMM yyyy", new CultureInfo("id-ID"));
             //string tglakhir = new DateTimeOffset(dateTo.Value.Date).ToOffset(new TimeSpan(offset, 0, 0)).ToString("dd MMM yyyy", new CultureInfo("id-ID"));
-            sheet.Cells[$"A1:{col}1"].Value = string.Format("LAPORAN SALDO AKHIR GUDANG GREY");
+            sheet.Cells[$"A1:{col}1"].Value = string.Format("LAPORAN SALDO AKHIR GUDANG GREY PER JENIS");
             sheet.Cells[$"A1:{col}1"].Merge = true;
-            sheet.Cells[$"A1:{col}1"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+            sheet.Cells[$"A1:{col}1"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
             sheet.Cells[$"A1:{col}1"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
             sheet.Cells[$"A1:{col}1"].Style.Font.Bold = true;
-            sheet.Cells[$"A2:{col}2"].Value = string.Format("PERIODE : {0}", Bulan);
+            sheet.Cells[$"A2:{col}2"].Value = string.Format("Tanggal : {0}", Tanggal);
             sheet.Cells[$"A2:{col}2"].Merge = true;
             sheet.Cells[$"A2:{col}2"].Style.Font.Bold = true;
-            sheet.Cells[$"A2:{col}2"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+            sheet.Cells[$"A2:{col}2"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
             sheet.Cells[$"A2:{col}2"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-            sheet.Cells[$"A3:{col}3"].Value = string.Format("BAGIAN : WEAVING 3 / AJL");
-            sheet.Cells[$"A3:{col}3"].Merge = true;
-            sheet.Cells[$"A3:{col}3"].Style.Font.Bold = true;
-            sheet.Cells[$"A3:{col}3"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-            sheet.Cells[$"A3:{col}3"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
 
-            sheet.Cells[$"A4:{col}4"].Value = string.Format("PER TGL. : {0}", Tanggal);
-            sheet.Cells[$"A4:{col}4"].Merge = true;
-            sheet.Cells[$"A4:{col}4"].Style.Font.Bold = true;
-            sheet.Cells[$"A4:{col}4"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-            sheet.Cells[$"A4:{col}4"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
 
-            sheet.Cells[$"A5:{col}5"].Value = string.Format("BARANG : GREY");
-            sheet.Cells[$"A5:{col}5"].Merge = true;
-            sheet.Cells[$"A5:{col}5"].Style.Font.Bold = true;
-            sheet.Cells[$"A5:{col}5"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-            sheet.Cells[$"A5:{col}5"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-
-            sheet.Cells["A9"].LoadFromDataTable(result, false, OfficeOpenXml.Table.TableStyles.Light14);
-            sheet.Cells["G7"].Value = headers[6];
-            sheet.Cells["G7:H7"].Merge = true;
-            sheet.Cells["I7"].Value = headers[8];
-            sheet.Cells["I7:J7"].Merge = true;
-            sheet.Cells["K7"].Value = headers[10];
-            sheet.Cells["K7:L7"].Merge = true;
-            sheet.Cells["M7"].Value = headers[12];
-            sheet.Cells["M7:N7"].Merge = true;
+            sheet.Cells["A6"].LoadFromDataTable(result, false, OfficeOpenXml.Table.TableStyles.Light14);
+            sheet.Cells["G4"].Value = headers[6];
+            sheet.Cells["G4:H4"].Merge = true;
+            sheet.Cells["I4"].Value = headers[8];
+            sheet.Cells["I4:J4"].Merge = true;
+            sheet.Cells["K4"].Value = headers[10];
+            sheet.Cells["K4:L4"].Merge = true;
+            sheet.Cells["M4"].Value = headers[12];
+            sheet.Cells["M4:N4"].Merge = true;
 
 
             foreach (var i in Enumerable.Range(0, 6))
             {
                 col = (char)('A' + i);
-                sheet.Cells[$"{col}7"].Value = headers[i];
-                sheet.Cells[$"{col}7:{col}8"].Merge = true;
+                sheet.Cells[$"{col}4"].Value = headers[i];
+                sheet.Cells[$"{col}4:{col}5"].Merge = true;
             }
 
             for (var i = 0; i < 8; i++)
             {
                 col = (char)('G' + i);
-                sheet.Cells[$"{col}8"].Value = subheaders[i];
+                sheet.Cells[$"{col}5"].Value = subheaders[i];
 
             }
 
-            /* foreach (var i in Enumerable.Range(0, 1))
-              {
-                  col = (char)('N' + i);
-                  sheet.Cells[$"{col}4"].Value = headers[i + 14];
-                  sheet.Cells[$"{col}4:{col}5"].Merge = true;
-              } */
+          /* foreach (var i in Enumerable.Range(0, 1))
+            {
+                col = (char)('N' + i);
+                sheet.Cells[$"{col}4"].Value = headers[i + 14];
+                sheet.Cells[$"{col}4:{col}5"].Merge = true;
+            } */
 
-            sheet.Cells["A7:N8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            sheet.Cells["A7:N8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            sheet.Cells["A7:N8"].Style.Font.Bold = true;
+            sheet.Cells["A4:N5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            sheet.Cells["A4:N5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            sheet.Cells["A4:N5"].Style.Font.Bold = true;
             var widths = new int[] { 10, 30, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 };
             foreach (var i in Enumerable.Range(0, headers.Length))
             {
@@ -595,23 +579,23 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
 
             //sheet.Cells[$"A{5}:J{5 + a + 3}"].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-            sheet.Cells[$"A{6}:N{7 + a + 2}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            sheet.Cells[$"A{7}:O{7 + a + 2}"].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            sheet.Cells[$"A{3}:N{4 + a + 2}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            sheet.Cells[$"A{4}:O{4 + a + 2}"].Style.Border.Left.Style = ExcelBorderStyle.Thin;
 
 
-            sheet.Cells[$"A{9 + a}"].Value = "T O T A L  . . . . . . . . . . . . . . .";
-            sheet.Cells[$"A{9 + a}:F{9 + a}"].Merge = true;
-            sheet.Cells[$"A{9 + a}:N{9 + a}"].Style.Font.Bold = true;
-            sheet.Cells[$"A{9 + a}:F{9 + a}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            sheet.Cells[$"A{9 + a}:F{9 + a}"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            sheet.Cells[$"G{9 + a}"].Value = TotBeginQuantityPiece;
-            sheet.Cells[$"H{9 + a}"].Value = TotBeginQuantity;
-            sheet.Cells[$"I{9 + a}"].Value = TotInQuantityPiece;
-            sheet.Cells[$"J{9 + a}"].Value = TotInQuantity;
-            sheet.Cells[$"K{9 + a}"].Value = TotOutQuantityPiece;
-            sheet.Cells[$"L{9 + a}"].Value = TotOutQuantity;
-            sheet.Cells[$"M{9 + a}"].Value = TotEndingQuantityPiece;
-            sheet.Cells[$"N{9 + a}"].Value = TotEndingQuantity;
+            sheet.Cells[$"A{6 + a}"].Value = "T O T A L  . . . . . . . . . . . . . . .";
+            sheet.Cells[$"A{6 + a}:F{6 + a}"].Merge = true;
+            sheet.Cells[$"A{6 + a}:N{6 + a}"].Style.Font.Bold = true;
+            sheet.Cells[$"A{6 + a}:F{6 + a}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            sheet.Cells[$"A{6 + a}:F{6 + a}"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            sheet.Cells[$"G{6 + a}"].Value = TotBeginQuantityPiece;
+            sheet.Cells[$"H{6 + a}"].Value = TotBeginQuantity;
+            sheet.Cells[$"I{6 + a}"].Value = TotInQuantityPiece;
+            sheet.Cells[$"J{6 + a}"].Value = TotInQuantity;
+            sheet.Cells[$"K{6 + a}"].Value = TotOutQuantityPiece;
+            sheet.Cells[$"L{6 + a}"].Value = TotOutQuantity;
+            sheet.Cells[$"M{6 + a}"].Value = TotEndingQuantityPiece;
+            sheet.Cells[$"N{6 + a}"].Value = TotEndingQuantity;
 
 
 
