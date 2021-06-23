@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Com.Danliris.Service.Inventory.Lib.Services;
-using Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.ReportGreigeWeavingPerType;
+using Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.ReportGreigeWeavingPerGrade;
 using Com.Danliris.Service.Inventory.WebApi.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,17 +15,17 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.WeavingInventory.
 {
     [Produces("application/json")]
     [ApiVersion("1.0")]
-    [Route("v{version:apiVersion}/report-last-stock-greige-weaving-types")]
+    [Route("v{version:apiVersion}/report-last-stock-greige-grades")]
     [Authorize]
-    public class ReportGreigeWeavingPerTypeController : Controller
+    public class ReportGreigeWeavingPerGradeController : Controller
     {
         private string ApiVersion = "1.0.0";
         private readonly IMapper mapper;
-        private readonly IReportGreigeWeavingPerTypeService service;
+        private readonly IReportGreigeWeavingPerGradeService service;
         private readonly IServiceProvider serviceProvider;
         private readonly IdentityService identityService;
 
-        public ReportGreigeWeavingPerTypeController(IReportGreigeWeavingPerTypeService service, IServiceProvider serviceProvider)
+        public ReportGreigeWeavingPerGradeController(IReportGreigeWeavingPerGradeService service, IServiceProvider serviceProvider)
         {
             this.service = service;
             this.serviceProvider = serviceProvider;
@@ -33,15 +33,18 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.WeavingInventory.
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetReport(DateTime? dateTo, int page = 1, int size = 25, string Order = "{}")
+        public async Task<IActionResult> GetStock(DateTime? dateTo, int page = 1, int size = 25, string Order = "{}")
         {
             try
             {
+                identityService.Username = User.Claims.Single(p => p.Type.Equals("username")).Value;
+                identityService.TimezoneOffset = int.Parse(Request.Headers["x-timezone-offset"].First());
+                identityService.Token = Request.Headers["Authorization"].First().Replace("Bearer ", "");
 
                 int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
                 string accept = Request.Headers["Accept"];
 
-                var data = await service.GetStockReport(dateTo, offset, page, size, Order);
+                var data = await service.GetStockGrade(dateTo, offset, page, size, Order);
 
 
 
@@ -63,6 +66,7 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.WeavingInventory.
             }
         }
 
+
         [HttpGet("download")]
         public async Task<IActionResult> GetExcelAll([FromHeader(Name = "x-timezone-offset")] string timezone, DateTime? dateTo)
         {
@@ -75,7 +79,7 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.WeavingInventory.
                 string Tanggal = DateTo.ToString("dd MMM yyyy", new CultureInfo("id-ID"));
 
                 var Result = await service.GenerateExcel(dateTo, clientTimeZoneOffset);
-                string filename = "Saldo Akhir Gudang Grey per Jenis- " + Tanggal + ".xlsx";
+                string filename = "Saldo Akhir Gudang Grey per Grade- " + Tanggal + ".xlsx";
 
                 xlsInBytes = Result.ToArray();
                 var file = File(xlsInBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
