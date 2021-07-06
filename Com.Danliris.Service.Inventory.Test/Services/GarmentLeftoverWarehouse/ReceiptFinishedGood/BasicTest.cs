@@ -397,7 +397,78 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             HttpService httpService = new HttpService(new IdentityService());
             await Assert.ThrowsAnyAsync<Exception>(() => httpService.PutAsync(null, null));
         }
+        
+        private GarmentLeftoverWarehouseReceiptFinishedGoodDataUtil _dataUtilFinishedGood(GarmentLeftoverWarehouseReceiptFinishedGoodService service)
+        {
 
+            GetServiceProvider();
+            return new GarmentLeftoverWarehouseReceiptFinishedGoodDataUtil(service);
+        }
+        [Fact]
+        public async Task Should_Success_GetReportT()
+        {
+
+
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+
+            GarmentLeftoverWarehouseReceiptFinishedGoodService service = new GarmentLeftoverWarehouseReceiptFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            
+            var dataFinishedGood = await _dataUtilFinishedGood(service).GetTestData(); ;
+
+            var result = service.GetMonitoring( DateTime.Now, DateTime.Now, 1, 1, "{}", 7);
+
+
+            Assert.NotNull(result);
+        }
+        [Fact]
+        public async Task Should_Success_GetXlsReportT()
+        {
+
+
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+
+           
+            GarmentLeftoverWarehouseReceiptFinishedGoodService service = new GarmentLeftoverWarehouseReceiptFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+
+            var dataFinishedGood = await _dataUtilFinishedGood(service).GetTestData(); ;
+
+            var result = service.GenerateExcel(DateTime.Now, DateTime.Now, 7);
+
+
+            Assert.NotNull(result);
+        }
         
     }
 }
