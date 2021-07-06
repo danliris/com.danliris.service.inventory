@@ -52,7 +52,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                 select new GarmentLeftoverWarehouseMutationReportViewModel
                                 {
                                     ClassificationCode = "RJ001",
-                                    ClassificationName = "Reject",
+                                    ClassificationName = "Barang Jadi Reject",
                                     SaldoAwal = b.Quantity,
                                     Pemasukan = 0,
                                     Pengeluaran = 0,
@@ -60,7 +60,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                     Selisih = 0,
                                     SaldoAkhir = 0,
                                     StockOpname = 0,
-                                    UnitQtyName = b.UomUnit
+                                    UnitQtyName = "PCS"
                                 }).GroupBy(x => new { x.ClassificationCode, x.ClassificationName, x.UnitQtyName }, (key, group) => new GarmentLeftoverWarehouseMutationReportViewModel
                                 {
                                     ClassificationCode = key.ClassificationCode,
@@ -84,7 +84,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                        select new GarmentLeftoverWarehouseMutationReportViewModel
                                        {
                                            ClassificationCode = "RJ001",
-                                           ClassificationName = "Reject",
+                                           ClassificationName = "Barang Jadi Reject",
                                            SaldoAwal = b.Quantity,
                                            Pemasukan = 0,
                                            Pengeluaran = 0,
@@ -92,7 +92,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                            Selisih = 0,
                                            SaldoAkhir = 0,
                                            StockOpname = 0,
-                                           UnitQtyName = b.UomUnit
+                                           UnitQtyName = "PCS"
                                        }).GroupBy(x => new { x.ClassificationCode, x.ClassificationName, x.UnitQtyName }, (key, group) => new GarmentLeftoverWarehouseMutationReportViewModel
                                        {
                                            ClassificationCode = key.ClassificationCode,
@@ -148,7 +148,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                       select new GarmentLeftoverWarehouseMutationReportViewModel
                                       {
                                           ClassificationCode = "RJ001",
-                                          ClassificationName = "Reject",
+                                          ClassificationName = "Barang Jadi Reject",
                                           SaldoAwal = b.ExpenditureQuantity * (-1),
                                           Pemasukan = 0,
                                           Pengeluaran = 0,
@@ -228,7 +228,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                              select new GarmentLeftoverWarehouseMutationReportViewModel
                                              {
                                                  ClassificationCode = "RJ001",
-                                                 ClassificationName = "Reject",
+                                                 ClassificationName = "Barang Jadi Reject",
                                                  SaldoAwal = 0,
                                                  Pemasukan = b.Quantity,
                                                  Pengeluaran = 0,
@@ -292,7 +292,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                             select new GarmentLeftoverWarehouseMutationReportViewModel
                                             {
                                                 ClassificationCode = "RJ001",
-                                                ClassificationName = "Reject",
+                                                ClassificationName = "Barang Jadi Reject",
                                                 SaldoAwal = 0,
                                                 Pemasukan = 0,
                                                 Pengeluaran = b.ExpenditureQuantity,
@@ -435,7 +435,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     SaldoAkhir.Add(new GarmentLeftoverWarehouseMutationReportViewModel
                     {
                         ClassificationCode = "RJ001",
-                        ClassificationName = "Reject",
+                        ClassificationName = "Barang Jadi Reject",
                         SaldoAwal = 0,
                         Pemasukan = 0,
                         Pengeluaran = 0,
@@ -443,7 +443,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                         Selisih = 0,
                         SaldoAkhir = 0,
                         StockOpname = 0,
-                        UnitQtyName = "KG"
+                        UnitQtyName = "PCS"
                     });
                 };
 
