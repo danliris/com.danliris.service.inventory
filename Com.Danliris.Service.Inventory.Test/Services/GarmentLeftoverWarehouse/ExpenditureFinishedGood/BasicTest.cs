@@ -7,7 +7,6 @@ using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.Stock
 using Com.Danliris.Service.Inventory.Lib.ViewModels;
 using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.ExpenditureFinishedGood;
 using Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse.ExpenditureFinishedGood;
-using Com.Danliris.Service.Inventory.Test.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
@@ -365,80 +364,6 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             };
             var result2 = viewModel2.Validate(null);
             Assert.True(result2.Count() > 0);
-        }
-        private GarmentLeftoverWarehouseExpenditureFinishedGoodDataUtil _dataUtilFinishedGood(GarmentLeftoverWarehouseExpenditureFinishedGoodService service)
-        {
-
-            GetServiceProvider();
-            return new GarmentLeftoverWarehouseExpenditureFinishedGoodDataUtil(service);
-        }
-        [Fact]
-        public async Task Should_Success_GetReportT()
-        {
-
-
-            var serviceProvider = GetServiceProvider();
-
-            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
-            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(1);
-
-            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-              .ReturnsAsync(1);
-
-            serviceProvider
-                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
-                .Returns(stockServiceMock.Object);
-
-            serviceProvider
-                .Setup(x => x.GetService(typeof(IHttpService)))
-                .Returns(new HttpTestService());
-
-            GarmentLeftoverWarehouseExpenditureFinishedGoodService utilService = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), GetServiceProvider().Object);
-
-            GarmentLeftoverWarehouseExpenditureFinishedGoodService service = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
-
-            
-            var dataFinishedGood = await _dataUtilFinishedGood(service).GetTestData(); ;
-
-            var result = utilService.GetReport( DateTime.Now, DateTime.Now, 1, 1, "{}", 7);
-
-
-            Assert.NotNull(result);
-        }
-        [Fact]
-        public async Task Should_Success_GetXlsReportT()
-        {
-
-
-            var serviceProvider = GetServiceProvider();
-
-            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
-            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(1);
-
-            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-              .ReturnsAsync(1);
-
-            serviceProvider
-                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
-                .Returns(stockServiceMock.Object);
-
-            serviceProvider
-                .Setup(x => x.GetService(typeof(IHttpService)))
-                .Returns(new HttpTestService());
-
-            GarmentLeftoverWarehouseExpenditureFinishedGoodService utilService = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), GetServiceProvider().Object);
-
-            GarmentLeftoverWarehouseExpenditureFinishedGoodService service = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
-
-
-            var dataFinishedGood = await _dataUtilFinishedGood(service).GetTestData(); ;
-
-            var result = utilService.GenerateExcel(DateTime.Now, DateTime.Now, 7);
-
-
-            Assert.NotNull(result);
         }
     }
 }

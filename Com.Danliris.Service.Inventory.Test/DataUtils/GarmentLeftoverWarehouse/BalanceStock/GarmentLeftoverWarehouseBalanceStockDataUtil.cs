@@ -84,39 +84,6 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                 }
             };
         }
-        public GarmentLeftoverWarehouseBalanceStock GetNewData_ACC()
-        {
-            return new GarmentLeftoverWarehouseBalanceStock
-            {
-                BalanceStockDate = DateTimeOffset.Now,
-                TypeOfGoods = "ACCESSORIES",
-                Items = new List<GarmentLeftoverWarehouseBalanceStockItem>
-                {
-                    new GarmentLeftoverWarehouseBalanceStockItem
-                    {
-                        BasicPrice = 1,
-                        UnitId = 1,
-                        UnitCode = "Unit",
-                        UnitName = "Unit",
-                        PONo = "PONo",
-                        Quantity = 1,
-                        UomId = 1,
-                        UomUnit = "Uom",
-                        LeftoverComodityCode="Como",
-                        LeftoverComodityId=1,
-                        LeftoverComodityName="ComoName",
-                        ProductCode="product",
-                        ProductId=1,
-                        ProductName="prName",
-                        RONo="ro",
-                        Composition="asa",
-                        Construction="asf",
-                        ProductRemark="asfa",
-
-                    }
-                }
-            };
-        }
 
         public async Task<GarmentLeftoverWarehouseBalanceStock> GetTestData_FINISHEDGOOD()
         {
@@ -136,14 +103,6 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
             return data;
         }
 
-        public async Task<GarmentLeftoverWarehouseBalanceStock> GetTestData_ACC()
-        {
-            GarmentLeftoverWarehouseBalanceStock data = GetNewData_ACC();
-
-            await Service.CreateAsync(data);
-
-            return data;
-        }
         public GarmentLeftoverWarehouseBalanceStock CopyData(GarmentLeftoverWarehouseBalanceStock oldData)
         {
             GarmentLeftoverWarehouseBalanceStock newData = new GarmentLeftoverWarehouseBalanceStock();
