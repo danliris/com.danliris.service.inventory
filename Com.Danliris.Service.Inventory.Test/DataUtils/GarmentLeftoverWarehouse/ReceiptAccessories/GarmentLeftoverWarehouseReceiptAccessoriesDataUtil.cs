@@ -38,7 +38,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                 {
                     new GarmentLeftoverWarehouseReceiptAccessoryItem
                     {
-                        POSerialNumber = "po",
+                        POSerialNumber = "PO",
                         UomUnitId = 1,
                         ProductId = 1,
                         ProductCode = "Product",

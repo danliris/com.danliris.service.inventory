@@ -124,7 +124,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             });
             if (size != 0)
             {
-                if (page == ((TotalCountReport / size) + 1) && TotalCountReport != 0)
+                if (page == ((listData.Count / size) + 1) && TotalCountReport != 0)
                 {
                     var QtyTotal = items.Sum(x => x.Quantity);
                     ReceiptMonitoringViewModel vm = new ReceiptMonitoringViewModel();
@@ -326,27 +326,29 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 }
 
             });
-
-            if (page == ((listData.Count() / size) + 1) && listData.Count() != 0)
+            if (size != 0)
             {
-                var QtyTotal = listData.Sum(x => x.Quantity);
-                ReceiptMonitoringViewModel vm = new ReceiptMonitoringViewModel();
+                if (page == ((listData.Count() / size) + 1) && listData.Count() != 0)
+                {
+                    var QtyTotal = listData.Sum(x => x.Quantity);
+                    ReceiptMonitoringViewModel vm = new ReceiptMonitoringViewModel();
 
-                vm.ProductRemark = "";
-                vm.Product = new ProductViewModel();
-                vm.Quantity = QtyTotal;
-                vm.Uom = new UomViewModel();
-                vm.UnitFrom = new UnitViewModel();
-                vm.ReceiptDate = DateTimeOffset.MinValue;
-                vm.ReceiptNoteNo = "T O T A L";
-                vm.POSerialNumber = "";
-                vm.index = 0;
-                vm.UENNo = "";
-                vm.FabricRemark = "";
-                vm.Composition = "";
+                    vm.ProductRemark = "";
+                    vm.Product = new ProductViewModel();
+                    vm.Quantity = QtyTotal;
+                    vm.Uom = new UomViewModel();
+                    vm.UnitFrom = new UnitViewModel();
+                    vm.ReceiptDate = DateTimeOffset.MinValue;
+                    vm.ReceiptNoteNo = "T O T A L";
+                    vm.POSerialNumber = "";
+                    vm.index = 0;
+                    vm.UENNo = "";
+                    vm.FabricRemark = "";
+                    vm.Composition = "";
 
-                listData.Add(vm);
+                    listData.Add(vm);
 
+                }
             }
 
             return listData;
@@ -452,9 +454,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                         item.Uom.Unit, no, type, date);
                 }
 
-                result.Rows.Add(0, "T O T A L . . . . ", "",
-                      "", "", "", "", "", "", QtyTotal,
-                       "","", "", "", "");
+                result.Rows.Add("", "T O T A L . . . . ", "",
+                     "", "", "", "", "", "", QtyTotal,
+                      "", "", "", "");
             }
             ExcelPackage package = new ExcelPackage();
             var sheet = package.Workbook.Worksheets.Add("Report Penerimaan Gudang Sisa");
@@ -479,13 +481,13 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
         {
             var httpService = (IHttpService)ServiceProvider.GetService(typeof(IHttpService));
 
-            Dictionary<string, object> filterLocalCoverLetter = new Dictionary<string, object> { { "POSerialNumber", POSerialNumber } };
-            var filter = JsonConvert.SerializeObject(filterLocalCoverLetter);
-            var responseLocalCoverLetter = httpService.GetAsync($"{GarmentCustomsUri}?filter=" + filter).Result.Content.ReadAsStringAsync();
+            Dictionary<string, object> filterBC = new Dictionary<string, object> { { "POSerialNumber", POSerialNumber } };
+            var filter = JsonConvert.SerializeObject(filterBC);
+            var response = httpService.GetAsync($"{GarmentCustomsUri}?filter=" + filter).Result.Content.ReadAsStringAsync();
 
-            Dictionary<string, object> resultLocalCoverLetter = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseLocalCoverLetter.Result);
-            var jsonLocalCoverLetter = resultLocalCoverLetter.Single(p => p.Key.Equals("data")).Value;
-            var a = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonLocalCoverLetter.ToString());
+            Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Result);
+            var jsonBC = result.Single(p => p.Key.Equals("data")).Value;
+            var a = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonBC.ToString());
             if (a.Count > 0)
             {
                 //Dictionary<string, object> dataLocalCoverLetter = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonLocalCoverLetter.ToString())[0];

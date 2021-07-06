@@ -83,7 +83,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                 ExpenditureTo = "JUAL LOKAL",
                 Description = "Remark",
                 LocalSalesNoteNo = "LocalSalesNoteNo",
-                AvalType = "AVAL ACCESSORIES",
+                AvalType = "AVAL BAHAN PENOLONG",
                 BuyerId = 1,
                 BuyerCode = "BuyerCode",
                 BuyerName = "BuyerName",
@@ -104,6 +104,15 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                     }
                 }
             };
+        }
+
+        public async Task<GarmentLeftoverWarehouseExpenditureAval> GetTestDataCOMPONEN()
+        {
+            GarmentLeftoverWarehouseExpenditureAval data = await GetNewDataFabric();
+            data.AvalType = "AVAL KOMPONEN";
+            await Service.CreateAsync(data);
+
+            return data;
         }
 
         public async Task<GarmentLeftoverWarehouseExpenditureAval> GetTestDataAcc()
