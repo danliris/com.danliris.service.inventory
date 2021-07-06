@@ -37,7 +37,6 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                     {
                         UENItemId = 1,
                         ProductId = 1, 
-                        POSerialNumber="PONo",
                         ProductCode = "Product",
                         ProductName = "Product",
                         ProductRemark = "Remark",
