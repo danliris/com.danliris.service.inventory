@@ -43,7 +43,30 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving
         }
 
 
-        
+        public async Task<int> Create(InventoryWeavingDocument model)
+        {
+
+
+            int Created = 0;
+
+            using (var transaction = DbContext.Database.BeginTransaction())
+            {
+                try
+                {
+                    model.FlagForCreate(IdentityService.Username, USER_AGENT);
+                    model.FlagForUpdate(IdentityService.Username, USER_AGENT);
+                    DbSet.Add(model);
+                    Created = await DbContext.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Insert Error : " + e.Message);
+                }
+            }
+
+            return Created;
+        }
 
         public ReadResponse<InventoryWeavingDocument> Read(int page, int size, string order, string keyword, string filter)
         {

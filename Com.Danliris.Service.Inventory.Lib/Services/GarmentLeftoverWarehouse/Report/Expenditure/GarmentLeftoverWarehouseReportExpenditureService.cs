@@ -303,8 +303,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var Query = GetReportQuery(dateFrom, dateTo, receiptType, offset);
             Query = Query.OrderByDescending(b => b._LastModifiedUtc);
 
-            var QtyTotal = Query.Sum(x => x.Quantity);
-            var ExpendQtyTotal = Query.Sum(x => x.QtyKG);
+            double QtyTotal = Query.Sum(x => x.Quantity);
+            double ExpendQtyTotal = Query.Sum(x => x.QtyKG);
             DataTable result = new DataTable();
 
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });

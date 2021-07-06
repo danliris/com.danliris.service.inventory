@@ -4,6 +4,8 @@ using Com.Danliris.Service.Inventory.Lib.Models.GarmentLeftoverWarehouse.Stock;
 using Com.Danliris.Service.Inventory.Lib.Services;
 using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.BalanceStock;
 using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.Stock;
+using Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse.ExpenditureFabric;
+using Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse.Stock;
 using Com.Danliris.Service.Inventory.Lib.ViewModels;
 using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.BalanceStock;
 using Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse.BalanceStock;
@@ -47,6 +49,10 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             return dbContext;
         }
 
+        private GarmentLeftoverWarehouseStockDataUtil _dataUtilType(GarmentLeftoverWarehouseBalanceStockService service)
+        {
+            return new GarmentLeftoverWarehouseStockDataUtil(service);
+        }
         private GarmentLeftoverWarehouseBalanceStockDataUtil _dataUtil(GarmentLeftoverWarehouseBalanceStockService service)
         {
             return new GarmentLeftoverWarehouseBalanceStockDataUtil(service);
@@ -69,6 +75,10 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             var serviceProvider = GetServiceProvider();
 
             var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
             stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(1);
 
@@ -81,12 +91,13 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
                 .Returns(new HttpTestService());
 
             GarmentLeftoverWarehouseBalanceStockService service = new GarmentLeftoverWarehouseBalanceStockService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
-
+ 
             await _dataUtil(service).GetTestData_FINISHEDGOOD();
-
+ 
             var result = service.Read(1, 25, "{}", null, null, "{}");
 
             Assert.NotEmpty(result.Data);
+
         }
 
         [Fact]
@@ -95,7 +106,13 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             var serviceProvider = GetServiceProvider();
 
             var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+ 
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+
+                .ReturnsAsync(1);
+
             stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+ 
                 .ReturnsAsync(1);
 
             serviceProvider
@@ -107,21 +124,27 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
                 .Returns(new HttpTestService());
 
             GarmentLeftoverWarehouseBalanceStockService service = new GarmentLeftoverWarehouseBalanceStockService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
-
+             
             var data = await _dataUtil(service).GetTestData_FINISHEDGOOD();
-
+ 
             var result = await service.ReadByIdAsync(data.Id);
 
             Assert.NotNull(result);
         }
 
         [Fact]
+ 
         public async Task Create_Success_FINISHEDGOOD()
+ 
         {
             var serviceProvider = GetServiceProvider();
 
             var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+ 
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                 .ReturnsAsync(1);
             stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+ 
                 .ReturnsAsync(1);
 
             serviceProvider
@@ -133,7 +156,7 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
                 .Returns(new HttpTestService());
 
             GarmentLeftoverWarehouseBalanceStockService service = new GarmentLeftoverWarehouseBalanceStockService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
-
+            
             var data = _dataUtil(service).GetNewData_FINISHEDGOOD();
 
             var result = await service.CreateAsync(data);

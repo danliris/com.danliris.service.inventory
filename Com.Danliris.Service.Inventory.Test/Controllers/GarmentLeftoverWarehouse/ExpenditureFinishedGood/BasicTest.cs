@@ -2,11 +2,13 @@
 using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.ExpenditureFinishedGood;
 using Com.Danliris.Service.Inventory.Lib.ViewModels;
 using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.ExpenditureFinishedGood;
+using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.Report;
 using Com.Danliris.Service.Inventory.Test.Helpers;
 using Com.Danliris.Service.Inventory.WebApi.Controllers.v1.GarmentLeftoverWarehouse.GarmentLeftoverWarehouseExpenditureFinishedGoodControllers;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text;
 using Xunit;
@@ -119,6 +121,54 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.GarmentLeftoverWarehou
             mocks.Service.Setup(f => f.MapToViewModel(It.IsAny<GarmentLeftoverWarehouseExpenditureFinishedGood>())).Returns(ViewModel);
 
             var response = await GetController(mocks).GetPdfById(1);
+            Assert.Equal((int)HttpStatusCode.InternalServerError, GetStatusCode(response));
+        }
+        [Fact]
+        public void Should_Success_GetReport()
+        {
+            var mocks = GetMocks();
+
+            mocks.Service.Setup(f => f.GetReport(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), 7))
+                .Returns(new Tuple<List<ExpenditureFInishedGoodReportViewModel>, int>(new List<ExpenditureFInishedGoodReportViewModel>(), 1));
+
+
+            var response = GetController(mocks).GetReportAll(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), "");
+            Assert.Equal((int)HttpStatusCode.OK, GetStatusCode(response));
+
+        }
+        [Fact]
+        public void Should_Error_GetReport()
+        {
+            var mocks = GetMocks();
+            mocks.Service.Setup(f => f.GetReport(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), 7))
+                .Throws(new Exception());
+            var controller = GetController(mocks);
+            controller.ControllerContext.HttpContext.Request.Headers["Accept"] = "application/json";
+            var response = GetController(mocks).GetReportAll(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), "");
+            Assert.Equal((int)HttpStatusCode.InternalServerError, GetStatusCode(response));
+        }
+
+        [Fact]
+        public void Should_Success_GetXlsReport()
+        {
+            var mocks = GetMocks();
+
+            mocks.Service.Setup(f => f.GenerateExcel(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>())
+               ).Returns(new MemoryStream());
+            var response = GetController(mocks).GetXlsAll(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>());
+            Assert.NotNull(response);
+
+        }
+
+        [Fact]
+        public void Should_Error_GetXlsReport()
+        {
+            var mocks = GetMocks();
+            mocks.Service.Setup(f => f.GenerateExcel(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>())
+            ).Throws(new Exception());
+            var controller = GetController(mocks);
+            controller.ControllerContext.HttpContext.Request.Headers["Accept"] = "application/json";
+            var response = GetController(mocks).GetXlsAll(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>());
             Assert.Equal((int)HttpStatusCode.InternalServerError, GetStatusCode(response));
         }
     }
