@@ -36,7 +36,8 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                     new GarmentLeftoverWarehouseReceiptFabricItem
                     {
                         UENItemId = 1,
-                        ProductId = 1,
+                        ProductId = 1, 
+                        POSerialNumber="PONo",
                         ProductCode = "Product",
                         ProductName = "Product",
                         ProductRemark = "Remark",
