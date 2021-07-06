@@ -324,7 +324,7 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
 
             var data = _dataUtil(service, GetCurrentMethod()).GetTestDataAcc();
 
-            var result = await service.DeleteAsync(data.Id);
+            var result = await service.DeleteAsync(1);
 
             Assert.NotEqual(0, result);
         }
