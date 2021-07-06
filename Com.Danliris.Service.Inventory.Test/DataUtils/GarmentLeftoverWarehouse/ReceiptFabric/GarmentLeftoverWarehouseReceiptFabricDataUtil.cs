@@ -45,7 +45,8 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                         BasicPrice = 1,
                         Quantity = 1,
                         UomId = 1,
-                        UomUnit = "Uom"
+                        UomUnit = "Uom",
+                        POSerialNumber="PONo"
                     }
                 }
             };

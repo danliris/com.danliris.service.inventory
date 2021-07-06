@@ -115,6 +115,25 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
             return data;
         }
 
+        public async Task<GarmentLeftoverWarehouseExpenditureAval> GetTestDataCOMPONEN()
+        {
+            GarmentLeftoverWarehouseExpenditureAval data = await GetNewDataFabric(); 
+            data.AvalType = "AVAL KOMPONEN";
+            await Service.CreateAsync(data);
+
+            return data;
+        }
+
+        public async Task<GarmentLeftoverWarehouseExpenditureAval> GetTestDataBP()
+        {
+            GarmentLeftoverWarehouseExpenditureAval data = await GetNewDataFabric();
+            data.AvalType = "AVAL BAHAN PENOLONG";
+
+            await Service.CreateAsync(data);
+
+            return data;
+        }
+
         public GarmentLeftoverWarehouseExpenditureAval CopyData(GarmentLeftoverWarehouseExpenditureAval oldData)
         {
             GarmentLeftoverWarehouseExpenditureAval newData = new GarmentLeftoverWarehouseExpenditureAval();
