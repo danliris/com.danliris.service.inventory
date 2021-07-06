@@ -326,28 +326,31 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 }
 
             });
-
-            if (page == ((listData.Count() / size) + 1) && listData.Count() != 0)
+            if (size != 0)
             {
-                var QtyTotal = listData.Sum(x => x.Quantity);
-                ReceiptMonitoringViewModel vm = new ReceiptMonitoringViewModel();
+                if (page == ((listData.Count() / size) + 1) && listData.Count() != 0)
+                {
+                    var QtyTotal = listData.Sum(x => x.Quantity);
+                    ReceiptMonitoringViewModel vm = new ReceiptMonitoringViewModel();
 
-                vm.ProductRemark = "";
-                vm.Product = new ProductViewModel();
-                vm.Quantity = QtyTotal;
-                vm.Uom = new UomViewModel();
-                vm.UnitFrom = new UnitViewModel();
-                vm.ReceiptDate = DateTimeOffset.MinValue;
-                vm.ReceiptNoteNo = "T O T A L";
-                vm.POSerialNumber = "";
-                vm.index = 0;
-                vm.UENNo = "";
-                vm.FabricRemark = "";
-                vm.Composition = "";
+                    vm.ProductRemark = "";
+                    vm.Product = new ProductViewModel();
+                    vm.Quantity = QtyTotal;
+                    vm.Uom = new UomViewModel();
+                    vm.UnitFrom = new UnitViewModel();
+                    vm.ReceiptDate = DateTimeOffset.MinValue;
+                    vm.ReceiptNoteNo = "T O T A L";
+                    vm.POSerialNumber = "";
+                    vm.index = 0;
+                    vm.UENNo = "";
+                    vm.FabricRemark = "";
+                    vm.Composition = "";
 
-                listData.Add(vm);
+                    listData.Add(vm);
 
+                }
             }
+            
 
             return listData;
         }
@@ -452,9 +455,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                         item.Uom.Unit, no, type, date);
                 }
 
-                result.Rows.Add(0, "T O T A L . . . . ", "",
-                      "", "", "", "", "", "", QtyTotal,
-                       "","", "", "", "");
+                result.Rows.Add("", "T O T A L . . . . ", "",
+                      "", "", "", "", "","", QtyTotal,
+                       "","", "", "");
             }
             ExcelPackage package = new ExcelPackage();
             var sheet = package.Workbook.Worksheets.Add("Report Penerimaan Gudang Sisa");
