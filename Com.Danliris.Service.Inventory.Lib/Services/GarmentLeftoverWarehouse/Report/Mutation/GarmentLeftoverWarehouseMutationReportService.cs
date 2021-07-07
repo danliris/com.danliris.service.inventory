@@ -46,7 +46,6 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
             var BalanceDate = DbContext.GarmentLeftoverWarehouseBalanceStocks.OrderByDescending(x=>x.BalanceStockDate).Select(x=>x.BalanceStockDate).FirstOrDefault();
 
-
             var BalanceStock = (from a in DbContext.GarmentLeftoverWarehouseBalanceStocks
                                 join b in DbContext.GarmentLeftoverWarehouseBalanceStocksItems on a.Id equals b.BalanceStockId
                                 where a._IsDeleted == false && b._IsDeleted == false && a.TypeOfGoods == "BARANG JADI"
@@ -382,7 +381,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     UnitQtyName = "KG"
                 });
             }
-            
+
             if (SaldoAkhir.FirstOrDefault(x => x.ClassificationName == "Aval Komponen") == null) {
                 SaldoAkhir.Add(new GarmentLeftoverWarehouseMutationReportViewModel
                 {
@@ -446,8 +445,6 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     UnitQtyName = "KG"
                 });
             };
-
-
 
             var mutation = SaldoAkhir.Concat(mutationScrap).ToList();
 
