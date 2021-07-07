@@ -6,7 +6,6 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryWeavingViewMode
 {
     public class InventoryWeavingInOutViewModel
     {
-        public int Nomor { get; set; }
         public string Construction { get; set; }
         public string Grade { get; set; }
         public string Piece { get; set; }
