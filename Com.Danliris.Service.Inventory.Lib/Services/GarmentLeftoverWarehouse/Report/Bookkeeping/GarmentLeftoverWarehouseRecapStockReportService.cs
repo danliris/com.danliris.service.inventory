@@ -453,6 +453,71 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 };
                 GarmentLeftoverWarehouseRecapStockReportViewModel.Add(garmentLeftover);
             }
+            List<GarmentLeftoverWarehouseRecapStockReportViewModel> recapStockReportViewModels = new List<GarmentLeftoverWarehouseRecapStockReportViewModel>();
+
+            foreach (var item in GarmentLeftoverWarehouseRecapStockReportViewModel.Where(s=>s.Description !="TOTAL"))
+            {
+                if(item.Description=="SALDO" || item.Description.Contains("D/"))
+                {
+                    GarmentLeftoverWarehouseRecapStockReportViewModel garmentLeftover = new GarmentLeftoverWarehouseRecapStockReportViewModel
+                    {
+                        Description = "SALDO AKHIR",
+                        FabricQty = item.FabricQty,
+                        FabricUom = item.FabricUom,
+                        FabricPrice = item.FabricPrice,
+                        AccPrice = item.AccPrice,
+                        FinishedGoodQty = item.FinishedGoodQty,
+                        FinishedGoodUom = item.FinishedGoodUom,
+                        FinishedGoodPrice = item.FinishedGoodPrice
+                    };
+                    recapStockReportViewModels.Add(garmentLeftover);
+
+                }else
+                {
+                    GarmentLeftoverWarehouseRecapStockReportViewModel garmentLeftover = new GarmentLeftoverWarehouseRecapStockReportViewModel
+                    {
+                        Description = "SALDO AKHIR",
+                        FabricQty = -item.FabricQty,
+                        FabricUom = item.FabricUom,
+                        FabricPrice = -item.FabricPrice,
+                        AccPrice = -item.AccPrice,
+                        FinishedGoodQty = -item.FinishedGoodQty,
+                        FinishedGoodUom = item.FinishedGoodUom,
+                        FinishedGoodPrice = -item.FinishedGoodPrice
+                    };
+                    recapStockReportViewModels.Add(garmentLeftover);
+                }
+
+            }
+            var querySaldoAkhir = recapStockReportViewModels.ToList()
+                 .GroupBy(x => new { x.FabricUom, x.FinishedGoodUom,x.Description }, (key, group) => new
+                 {
+                     Description = key.Description,
+
+                     FabricUom = key.FabricUom,
+                     FinishedGoodUom = key.FinishedGoodUom,
+                     FabricQty = group.Sum(s =>  s.FabricQty),
+                     FabricPrice = group.Sum(s => s.FabricPrice),
+                     AccPrice = group.Sum(s => s.AccPrice),
+                     FinishedGoodQty = group.Sum(s => s.FinishedGoodQty),
+                     FinishedGoodPrice = group.Sum(s => s.FinishedGoodPrice)
+                 });
+
+            foreach(var item in querySaldoAkhir.Where(s=> s.FabricUom !=null))
+            {
+                GarmentLeftoverWarehouseRecapStockReportViewModel garmentLeftover = new GarmentLeftoverWarehouseRecapStockReportViewModel
+                {
+                    Description = item.Description,
+                    FabricQty = item.FabricQty,
+                    FabricUom = item.FabricUom,
+                    FabricPrice = item.FabricPrice,
+                    AccPrice = item.AccPrice,
+                    FinishedGoodQty = item.FinishedGoodQty,
+                    FinishedGoodUom = item.FinishedGoodUom,
+                    FinishedGoodPrice = item.FinishedGoodPrice
+                };
+                GarmentLeftoverWarehouseRecapStockReportViewModel.Add(garmentLeftover);
+            }
             return GarmentLeftoverWarehouseRecapStockReportViewModel.AsQueryable();
         }
 
@@ -531,13 +596,13 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                         {
                             string _val = worksheet.Cells["A" + i].Value.ToString();
 
-                            if (_val.Contains("TOTAL"))
+                            if (_val.Contains("TOTAL") || _val.Contains("SALDO AKHIR"))
                             {
 
                                 worksheet.Cells["A" + i + ":R" + i + ""].Style.Font.Bold = true;
 
                             }
-                            if (_val.Contains("PENERIMAAN") || _val.Contains("PENGELUARAN"))
+                            if (_val.Contains("PENERIMAAN") || _val.Contains("PENGELUARAN") )
                             {
                                 worksheet.Cells["A" + i + ":R" + i + ""].Merge = true;
                                 worksheet.Cells["A" + i + ":R" + i + ""].Style.Font.Bold = true;

@@ -73,7 +73,6 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
         [Fact]
         public async Task Should_Success_GetReport_Fabric()
         {
-
             var serviceProvider1 = GetServiceProvider();
 
             var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
@@ -124,7 +123,7 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
         public async Task Should_Success_GetReport_Fabric_page2()
         {
             var serviceProvider1 = GetServiceProvider();
- 
+
             var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
             stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(1);
@@ -261,7 +260,6 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
  
             GarmentLeftoverWarehouseReceiptFabricService service = new GarmentLeftoverWarehouseReceiptFabricService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
             ReceiptMonitoringService Reportservice = new ReceiptMonitoringService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
-
             var result = Reportservice.GenerateExcelFabric(DateTime.Now, DateTime.Now, 7);
 
 
@@ -318,8 +316,8 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
 
         }
 
+
         //[Fact] 
-       
         //public async Task Should_Success_GetReport_Acc_page2()
         //{
         //    var serviceProvider1 = GetServiceProvider();
