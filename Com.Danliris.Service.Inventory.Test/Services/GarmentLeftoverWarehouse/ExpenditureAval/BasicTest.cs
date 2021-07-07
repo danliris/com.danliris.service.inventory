@@ -517,8 +517,6 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
                 .Setup(x=>x.GetAsync(It.Is<string>(s=>s.Contains("scrap-transactions/mutation"))))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent( JsonConvert.SerializeObject(new List<GarmentLeftoverWarehouseMutationReportViewModel>())) });
 
-
-
             serviceProvider21
                 .Setup(x => x.GetService(typeof(IIdentityService)))
                 .Returns(new IdentityService() { Token = "Token", Username = "Test" });

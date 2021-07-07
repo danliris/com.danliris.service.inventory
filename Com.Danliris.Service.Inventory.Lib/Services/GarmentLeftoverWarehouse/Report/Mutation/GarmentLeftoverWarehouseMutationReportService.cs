@@ -44,8 +44,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             DateTimeOffset DateFrom = dateFrom == null ? new DateTime(1970, 1, 1) : (DateTimeOffset)dateFrom;
             DateTimeOffset DateTo = dateTo == null ? DateTime.Now : (DateTimeOffset)dateTo;
 
-            var BalanceDate = DbContext.GarmentLeftoverWarehouseBalanceStocks.OrderByDescending(x=>x.BalanceStockDate).Select(x=>x.BalanceStockDate).FirstOrDefault();
-
+            var BalanceDate = DbContext.GarmentLeftoverWarehouseBalanceStocks.OrderByDescending(x => x.BalanceStockDate).Select(x => x.BalanceStockDate).FirstOrDefault();
 
             var BalanceStock = (from a in DbContext.GarmentLeftoverWarehouseBalanceStocks
                                 join b in DbContext.GarmentLeftoverWarehouseBalanceStocksItems on a.Id equals b.BalanceStockId
@@ -382,7 +381,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     UnitQtyName = "KG"
                 });
             }
-            
+
             if (SaldoAkhir.FirstOrDefault(x => x.ClassificationName == "Aval Komponen") == null) {
                 SaldoAkhir.Add(new GarmentLeftoverWarehouseMutationReportViewModel
                 {
@@ -452,6 +451,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var mutation = SaldoAkhir.Concat(mutationScrap).ToList();
 
             return mutation.OrderBy(x => x.ClassificationCode).ToList();
+
 
         }
 
