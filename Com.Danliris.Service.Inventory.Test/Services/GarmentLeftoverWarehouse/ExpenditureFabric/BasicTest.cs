@@ -205,6 +205,7 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             newData.ExpenditureDate = newData.ExpenditureDate.AddDays(-1);
             newData.Remark = "New" + newData.Remark;
             newData.LocalSalesNoteNo = "New" + newData.LocalSalesNoteNo;
+            newData.IsUsed = true;
             var firsItem = newData.Items.First();
             firsItem.Quantity++;
             var lastItem = newData.Items.Last();

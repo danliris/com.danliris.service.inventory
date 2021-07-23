@@ -284,6 +284,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.E
                     {
                         existingModel.QtyKG = model.QtyKG;
                     }
+                    if (existingModel.IsUsed != model.IsUsed)
+                    {
+                        existingModel.IsUsed = model.IsUsed;
+                    }
                     existingModel.FlagForUpdate(IdentityService.Username, UserAgent);
 
                     foreach (var existingItem in existingModel.Items)
