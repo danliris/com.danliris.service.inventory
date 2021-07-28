@@ -42,7 +42,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             public string PONo { get; internal set; }
         }
         #region REPORT
-        public IQueryable<GarmentLeftoverWarehouseFlowStockMonitoringViewModel> GetReportQuery(string category,DateTime? dateFrom, DateTime? dateTo, int UnitId,  int offset, string typeAval = "")
+        public List<GarmentLeftoverWarehouseFlowStockMonitoringViewModel> GetReportQuery(string category,DateTime? dateFrom, DateTime? dateTo, int UnitId,  int offset, string typeAval = "")
         {
 
             DateTimeOffset DateFrom = dateFrom == null ? new DateTime(1970, 1, 1) : (DateTimeOffset)dateFrom;
@@ -616,7 +616,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 };
                 stockMonitoringViewModels.Add(garmentLeftover);
             }
-            return stockMonitoringViewModels.AsQueryable();
+            var result = stockMonitoringViewModels.OrderByDescending(b => b.PONo);
+            return result.ToList();
         }
 
      
@@ -624,7 +625,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
         {
             var Query = GetReportQuery(category,dateFrom, dateTo, unit, offset);
 
-            Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(order);
+            /*Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(order);
             if (OrderDictionary.Count.Equals(0))
             {
                 Query = Query.OrderByDescending(b => b.PONo);
@@ -638,15 +639,17 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
             Pageable<GarmentLeftoverWarehouseFlowStockMonitoringViewModel> pageable = new Pageable<GarmentLeftoverWarehouseFlowStockMonitoringViewModel>(Query, page - 1, size);
             List<GarmentLeftoverWarehouseFlowStockMonitoringViewModel> Data = pageable.Data.ToList<GarmentLeftoverWarehouseFlowStockMonitoringViewModel>();
+            */
 
-            int TotalData = pageable.TotalCount;
-            return Tuple.Create(Data, TotalData);
+            //int TotalData = pageable.TotalCount;
+            int TotalData = Query.Count();
+            return Tuple.Create(Query, TotalData);
         }
 
         public MemoryStream GenerateExcelFlowStock(string category, DateTime? dateFrom, DateTime? dateTo, int unit, int offset)
         {
             var Query = GetReportQuery(category, dateFrom, dateTo, unit, offset);
-            Query = Query.OrderByDescending(b => b.PONo);
+            //Query = Query.OrderByDescending(b => b.PONo);
 
 
 
@@ -683,7 +686,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     counter++;
                     //DateTimeOffset date = item.date ?? new DateTime(1970, 1, 1);
                     //string dateString = date == new DateTime(1970, 1, 1) ? "-" : date.ToOffset(new TimeSpan(offset, 0, 0)).ToString("dd MMM yyyy", new CultureInfo("id-ID"));
-                    result.Rows.Add(item.UnitName, item.ProductName, item.ProductCode, item.UomUnit, item.BeginingbalanceQty, item.BeginingbalancePrice, item.QuantityReceipt, item.PriceReceipt, item.QuantityUnitExpend, item.PriceUnitExpend, item.QuantitySampleExpend, item.PriceSampleExpend, item.QuantityLocalExpend, item.PriceLocalExpend, item.QuantityOtherExpend, item.PriceOtherExpend, item.EndbalanceQty, item.EndbalancePrice);
+                    result.Rows.Add(item.UnitName, item.ProductName, item.ProductCode, item.UomUnit, Math.Round(item.BeginingbalanceQty,2),Math.Round(item.BeginingbalancePrice,2),Math.Round( item.QuantityReceipt,2), Math.Round( item.PriceReceipt,2),Math.Round( item.QuantityUnitExpend,2),Math.Round( item.PriceUnitExpend,2),Math.Round( item.QuantitySampleExpend,2),Math.Round( item.PriceSampleExpend,2),Math.Round( item.QuantityLocalExpend,2),Math.Round( item.PriceLocalExpend,2),Math.Round( item.QuantityOtherExpend,2),Math.Round( item.PriceOtherExpend,2),Math.Round( item.EndbalanceQty,2),Math.Round( item.EndbalancePrice,2));
                 }
 
             }
@@ -729,7 +732,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     }
                 }
 
-
+                worksheet.Cells["E" + 3 + ":R" + (counter + 2) + ""].Style.HorizontalAlignment= ExcelHorizontalAlignment.Right;
                 foreach (var cell in worksheet.Cells["E" + 3 + ":R" + (counter + 2) + ""])
                 {
                     cell.Value = Convert.ToDecimal(cell.Value);

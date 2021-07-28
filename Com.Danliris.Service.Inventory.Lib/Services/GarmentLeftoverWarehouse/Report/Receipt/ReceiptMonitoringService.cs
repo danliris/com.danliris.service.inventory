@@ -146,8 +146,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
                 }
             }
-            
-                
+
+
             return listData;
         }
 
@@ -155,7 +155,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
         {
             var Data = GetFabricReceiptMonitoringQuery(dateFrom, dateTo, offset, page, size);
 
-            
+
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
 
             return Tuple.Create(Data, TotalCountReport);
@@ -196,31 +196,34 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     string no = "";
                     string type = "";
                     string date = "";
+                    if (item.CustomsNo != null)
+                    {
+                        foreach (var x in item.CustomsNo)
+                        {
+                            if (no != "")
+                            {
+                                no += "\n";
+                            }
+                            no += x;
+                        }
+                        foreach (var y in item.CustomsType)
+                        {
+                            if (type != "")
+                            {
+                                type += "\n";
+                            }
+                            type += y;
+                        }
+                        foreach (var z in item.CustomsDate)
+                        {
+                            if (date != "")
+                            {
+                                date += "\n";
+                            }
+                            date += z.ToString("dd MMM yyyy", new CultureInfo("id-ID"));
+                        }
+                    }
 
-                    foreach (var x in item.CustomsNo)
-                    {
-                        if (no != "")
-                        {
-                            no += "\n";
-                        }
-                        no += x;
-                    }
-                    foreach (var y in item.CustomsType)
-                    {
-                        if (type != "")
-                        {
-                            type += "\n";
-                        }
-                        type += y;
-                    }
-                    foreach (var z in item.CustomsDate)
-                    {
-                        if (date != "")
-                        {
-                            date += "\n";
-                        }
-                        date += z.ToString("dd MMM yyyy", new CultureInfo("id-ID"));
-                    }
                     result.Rows.Add(index, item.ReceiptNoteNo, item.ReceiptDate.ToString("dd MMM yyyy", new CultureInfo("id-ID")),
                         item.UENNo, item.UnitFrom.Code, item.POSerialNumber, item.Product.Name, item.Product.Code, item.Composition, item.FabricRemark, item.Quantity,
                         item.Uom.Unit, no, type, date);
@@ -350,7 +353,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
                 }
             }
-            
+
 
             return listData;
         }
@@ -426,38 +429,42 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     string type = "";
                     string date = "";
 
-                    foreach (var x in item.CustomsNo)
+                    if (item.CustomsNo != null)
                     {
-                        if (no != "")
+                        foreach (var x in item.CustomsNo)
                         {
-                            no += "\n";
+                            if (no != "")
+                            {
+                                no += "\n";
+                            }
+                            no += x;
                         }
-                        no += x;
-                    }
-                    foreach (var y in item.CustomsType)
-                    {
-                        if (type != "")
+                        foreach (var y in item.CustomsType)
                         {
-                            type += "\n";
+                            if (type != "")
+                            {
+                                type += "\n";
+                            }
+                            type += y;
                         }
-                        type += y;
-                    }
-                    foreach (var z in item.CustomsDate)
-                    {
-                        if (date != "")
+                        foreach (var z in item.CustomsDate)
                         {
-                            date += "\n";
+                            if (date != "")
+                            {
+                                date += "\n";
+                            }
+                            date += z.ToString("dd MMM yyyy", new CultureInfo("id-ID"));
                         }
-                        date += z.ToString("dd MMM yyyy", new CultureInfo("id-ID"));
                     }
+
                     result.Rows.Add(index, item.ReceiptNoteNo, item.ReceiptDate.ToString("dd MMM yyyy", new CultureInfo("id-ID")),
                         item.UENNo, item.UnitFrom.Code, item.POSerialNumber, item.Product.Name, item.Product.Code, item.ProductRemark, item.Quantity,
                         item.Uom.Unit, no, type, date);
                 }
 
                 result.Rows.Add("", "T O T A L . . . . ", "",
-                      "", "", "", "", "","", QtyTotal,
-                       "","", "", "");
+                      "", "", "", "", "", "", QtyTotal,
+                       "", "", "", "");
             }
             ExcelPackage package = new ExcelPackage();
             var sheet = package.Workbook.Worksheets.Add("Report Penerimaan Gudang Sisa");

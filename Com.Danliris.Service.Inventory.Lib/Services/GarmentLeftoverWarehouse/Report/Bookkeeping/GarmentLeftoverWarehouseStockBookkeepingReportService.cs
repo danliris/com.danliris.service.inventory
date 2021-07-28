@@ -35,7 +35,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
         public List<GarmentLeftoverWarehouseStockBookkeepingReportViewModel> GetReportQuery(DateTime? dateTo, string type, int offset)
         {
             DateTimeOffset DateTo = dateTo == null ? DateTime.Now : (DateTimeOffset)dateTo;
-            DateTimeOffset DateFrom =new DateTime(1970, 1, 1);
+            DateTimeOffset DateFrom = new DateTime(1970, 1, 1);
 
             List<GarmentLeftoverWarehouseStockBookkeepingReportViewModel> GarmentLeftoverWarehouseStockBookkeepingReportViewModel = new List<GarmentLeftoverWarehouseStockBookkeepingReportViewModel>();
             var _productF = (from a in DbContext.GarmentLeftoverWarehouseReceiptFabricItems
@@ -46,7 +46,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                              select new Products { ProductCode = a.ProductCode, ProductName = a.ProductName, PONo = a.PONo }).Distinct();
             var _productA = (from a in DbContext.GarmentLeftoverWarehouseReceiptAccessoryItems
                              where a._IsDeleted == false
-                             select new Products { ProductCode = a.ProductCode, ProductName = a.ProductName, PONo=a.POSerialNumber }).Distinct();
+                             select new Products { ProductCode = a.ProductCode, ProductName = a.ProductName, PONo = a.POSerialNumber }).Distinct();
 
             var _product = _productF.Union(_productB).Union(_productA);
             if (type == "FABRIC")
@@ -68,8 +68,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                        ProductName = b.ProductName,
                                        EndbalanceQty = 0,
                                        BasicPrice = b.BasicPrice,
-                                       PriceExpend=0,
-                                       QuantityExpend=0
+                                       PriceExpend = 0,
+                                       QuantityExpend = 0
                                    };
                 var QueryReceipt = from a in (from data in DbContext.GarmentLeftoverWarehouseReceiptFabrics
                                               where data._IsDeleted == false
@@ -107,8 +107,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                            BasicPrice = b.BasicPrice,
                                            UomUnit = b.UomUnit,
 
-                                           QuantityExpend = a.ExpenditureDate.AddHours(offset).Date >= DateFrom.Date  ? b.Quantity : 0,
-                                           PriceExpend = (a.ExpenditureDate.AddHours(offset).Date >= DateFrom.Date  ? b.Quantity : 0) * b.BasicPrice,
+                                           QuantityExpend = a.ExpenditureDate.AddHours(offset).Date >= DateFrom.Date ? b.Quantity : 0,
+                                           PriceExpend = (a.ExpenditureDate.AddHours(offset).Date >= DateFrom.Date ? b.Quantity : 0) * b.BasicPrice,
 
                                            ProductCode = (from aa in _product where aa.PONo == b.PONo select aa.ProductCode).FirstOrDefault(),
                                            ProductName = (from aa in _product where aa.PONo == b.PONo select aa.ProductName).FirstOrDefault(),
@@ -158,7 +158,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                               where data._IsDeleted == false && data.TypeOfGoods.ToString() == "BARANG JADI"
                                               select new { data._CreatedUtc, data.Id })
                                    join b in DbContext.GarmentLeftoverWarehouseBalanceStocksItems on a.Id equals b.BalanceStockId
-                                   
+
                                    select new GarmentLeftoverWarehouseStockBookkeepingReportViewModel
                                    {
                                        BeginingbalanceQty = b.Quantity,
@@ -196,7 +196,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                                         && data.ExpenditureDate.AddHours(offset).Date <= DateTo.Date
                                                   select new { data.ExpenditureDate, data.Id, data.ExpenditureTo })
                                        join b in (from expend in DbContext.GarmentLeftoverWarehouseExpenditureFinishedGoodItems
-                                                  select new { expend.BasicPrice, expend.FinishedGoodExpenditureId, expend.ExpenditureQuantity, expend.LeftoverComodityCode, expend.LeftoverComodityName}
+                                                  select new { expend.BasicPrice, expend.FinishedGoodExpenditureId, expend.ExpenditureQuantity, expend.LeftoverComodityCode, expend.LeftoverComodityName }
                                                   ) on a.Id equals b.FinishedGoodExpenditureId
                                        select new GarmentLeftoverWarehouseStockBookkeepingReportViewModel
                                        {
