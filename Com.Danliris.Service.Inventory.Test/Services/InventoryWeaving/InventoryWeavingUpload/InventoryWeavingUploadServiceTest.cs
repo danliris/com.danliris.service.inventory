@@ -52,10 +52,10 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Inventor
             return dbContext;
         }
 
-        private ReportGreigeWeavingPerGradeDataUtil _dataUtil(ReportGreigeWeavingPerGradeService service)
+        private ReportGreigeWeavingPerGradeDataUtil _dataUtil(ReportGreigeWeavingPerGradeService service, InventoryWeavingDocumentDataUtils dataDoc)
         {
             GetServiceProvider();
-            return new ReportGreigeWeavingPerGradeDataUtil(service);
+            return new ReportGreigeWeavingPerGradeDataUtil(service, dataDoc);
         }
 
         private InventoryWeavingDocumentDataUtils _dataUtilDoc(InventoryWeavingDocumentUploadService service)

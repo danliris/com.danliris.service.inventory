@@ -24,7 +24,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.InventoryWeavingDataUtil
                
                 Date = DateTimeOffset.Now,
                 BonNo = "test01",
-                BonType = "weaving",
+                BonType = "PRODUKSI",
                 StorageCode = "test01",
                 StorageId = 2,
                 StorageName = "Test",
@@ -64,7 +64,7 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.InventoryWeavingDataUtil
 
                 date = DateTimeOffset.Now,
                 bonNo = "test01",
-                bonType = "weaving",
+                bonType = "PRODUKSI",
                 storageCode = "test01",
                 storageId = 2,
                 storageName = "Test",

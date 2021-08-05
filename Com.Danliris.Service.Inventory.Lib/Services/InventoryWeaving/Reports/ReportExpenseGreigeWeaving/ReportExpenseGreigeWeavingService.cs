@@ -157,7 +157,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
             }).Where(x => x.Qty > 0 && x.QtyPiece > 0).ToList();
 
             List<ExpenseReportViewModel> reportViewModels = new List<ExpenseReportViewModel>();
-            int index = 1;
+            //int index = 1;
 
             foreach (var i in Data)
             {

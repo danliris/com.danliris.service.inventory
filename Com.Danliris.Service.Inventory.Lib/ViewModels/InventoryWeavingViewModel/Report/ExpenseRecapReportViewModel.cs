@@ -8,7 +8,6 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryWeavingViewMode
 {
     public class ExpenseRecapReportViewModel
     {
-        public string BonNo { get; set; }
         public string Construction { get; set; }
         public string Grade { get; set; }
 
