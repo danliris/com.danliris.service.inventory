@@ -85,20 +85,19 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving
                     {
                         existingStock.QuantityPiece = model.QuantityPiece;
                     }
-                    //existingStock.Quantity -= model.Quantity;
                     existingStock.FlagForUpdate(IdentityService.Username, UserAgent);
 
                     Updated = await DbContext.SaveChangesAsync();
 
 
 
-                    //transaction.Commit();
+                   
 
                     return Updated;
                 }
                 catch (Exception e)
                 {
-                    //transaction.Rollback();
+                    
                     throw e;
                 }
             

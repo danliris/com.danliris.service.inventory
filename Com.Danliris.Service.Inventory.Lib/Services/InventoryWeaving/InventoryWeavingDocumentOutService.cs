@@ -270,7 +270,6 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving
                         Construction = i.Construction,
 
                         Grade = d.Grade,
-                        //Piece = d.Piece == "BESAR" ? "1" : d.Piece == "KECIL"? "2" : "3",
                         MaterialName = d.MaterialName,
                         WovenType = d.WovenType,
                         Width = d.Width,
@@ -751,8 +750,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving
             result.Columns.Add(new DataColumn() { ColumnName = headers[7], DataType = typeof(Double) });
             result.Columns.Add(new DataColumn() { ColumnName = headers[8], DataType = typeof(Double) });
             result.Columns.Add(new DataColumn() { ColumnName = headers[9], DataType = typeof(String) });
-
-            var index = 1;
+            
             double TotalQuantity = 0;
             double TotalQuantityPiece = 0;
 

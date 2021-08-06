@@ -125,7 +125,7 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving
             //var Responses =  Utilservice.Create(data);
 
             var Service = new ReportGreigeWeavingPerGradeService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-            var Response = Utilservice.GenerateExcelExpenseRecap(null, DateTime.MinValue, DateTime.UtcNow, 7);
+            var Response = Utilservice.GenerateExcelExpenseRecap("PRODUKSI", DateTime.MinValue, DateTime.UtcNow, 7);
             Assert.IsType<System.IO.MemoryStream>(Response);
         }
     }

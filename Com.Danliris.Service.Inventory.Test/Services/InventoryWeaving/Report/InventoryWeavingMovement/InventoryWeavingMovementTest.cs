@@ -1,7 +1,7 @@
 ﻿using Com.Danliris.Service.Inventory.Lib;
 using Com.Danliris.Service.Inventory.Lib.Helpers;
 using Com.Danliris.Service.Inventory.Lib.Models.InventoryWeavingModel;
-using Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryWeavingViewModel.Report;
+using Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryWeavingViewModel;
 using Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving;
 using Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.ReportGreigeWeavingPerGrade;
 using Com.Danliris.Service.Inventory.Test.DataUtils.InventoryWeavingDataUtils.ReportGreigeWeavingPerGradeDataUtil;
@@ -162,6 +162,30 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Report.I
             var Service = new InventoryWeavingMovementService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
             var Response = Utilservice.GenerateExcelRecap("{}", DateTime.MinValue, DateTime.UtcNow, 7);
             Assert.IsType<System.IO.MemoryStream>(Response);
+        }
+
+        [Fact]
+        public async Task Update_Success()
+        {
+            ReportGreigeWeavingPerGradeService service = new ReportGreigeWeavingPerGradeService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
+            InventoryWeavingDocumentUploadService serviceDoc = new InventoryWeavingDocumentUploadService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
+            InventoryWeavingDocumentDataUtils dataDoc1 = new InventoryWeavingDocumentDataUtils(serviceDoc);
+
+            var Utilservice = new InventoryWeavingMovementService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
+            var dataDoc = _dataUtilDoc(serviceDoc).GetTestData();
+
+            var data = _dataUtil(service, dataDoc1).GetTestData();
+
+            var Service = new InventoryWeavingMovementService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
+            var Response = Utilservice.UpdateAsync(null);
+            Assert.NotNull(Response);
+        }
+
+        [Fact]
+        public async Task Update_Error()
+        {
+            InventoryWeavingMovementService service = new InventoryWeavingMovementService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
+            await Assert.ThrowsAnyAsync<Exception>(() => service.UpdateAsync(null));
         }
     }
 }
