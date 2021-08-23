@@ -369,8 +369,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     var garmentProduct = GetProductFromCore(item.Product.Id);
                     if (garmentProduct != null)
                     {
-                        item.Composition = garmentProduct["Composition"].ToString();
-                        item.Const = receiptType == "ACCESSORIES" ? "-" : garmentProduct["Const"].ToString() + "; " + garmentProduct["Yarn"].ToString() + "; " + garmentProduct["Width"].ToString();
+                        item.Composition = garmentProduct["Composition"] == null ? "-" : garmentProduct["Composition"].ToString();
+                        item.Const = receiptType == "ACCESSORIES" ? "-" : (garmentProduct["Const"] == null ? "-" : garmentProduct["Const"].ToString()) + "; " + (garmentProduct["Yarn"] == null ? "-" : garmentProduct["Yarn"].ToString()) + "; " + (garmentProduct["Width"] == null ? "-" : garmentProduct["Width"].ToString());
                     }
                     result.Rows.Add(
                         index, 
