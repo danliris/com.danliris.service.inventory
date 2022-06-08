@@ -258,23 +258,23 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             else
                 foreach(var item in Query)
                 {
-                    idx++;
-                    if (!Rowcount.ContainsKey(item.BonNo))
-                    {
-                        rCount = 0;
-                        var index1 = idx;
-                        Rowcount.Add(item.BonNo, index1.ToString());
-                    }
-                    else
-                    {
-                        rCount += 1;
-                        Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
-                        var val = Rowcount[item.BonNo].Split("-");
-                        if ((val).Length > 0)
-                        {
-                            Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
-                        }
-                    }
+                    //idx++;
+                    //if (!Rowcount.ContainsKey(item.BonNo))
+                    //{
+                    //    rCount = 0;
+                    //    var index1 = idx;
+                    //    Rowcount.Add(item.BonNo, index1.ToString());
+                    //}
+                    //else
+                    //{
+                    //    rCount += 1;
+                    //    Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
+                    //    var val = Rowcount[item.BonNo].Split("-");
+                    //    if ((val).Length > 0)
+                    //    {
+                    //        Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
+                    //    }
+                    //}
 
                     var receiptDate = item.TransactionDate.ToString("dd MMM yyyy");
                     Result.Rows.Add( item.BonNo, receiptDate, item.Keterangan, item.Product, item.Quantity, item.UomUnit);
@@ -362,23 +362,23 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             else
                 foreach (var item in Query)
                 {
-                    idx++;
-                    if (!Rowcount.ContainsKey(item.BonNo))
-                    {
-                        rCount = 0;
-                        var index1 = idx;
-                        Rowcount.Add(item.BonNo, index1.ToString());
-                    }
-                    else
-                    {
-                        rCount += 1;
-                        Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
-                        var val = Rowcount[item.BonNo].Split("-");
-                        if ((val).Length > 0)
-                        {
-                            Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
-                        }
-                    }
+                    //idx++;
+                    //if (!Rowcount.ContainsKey(item.BonNo))
+                    //{
+                    //    rCount = 0;
+                    //    var index1 = idx;
+                    //    Rowcount.Add(item.BonNo, index1.ToString());
+                    //}
+                    //else
+                    //{
+                    //    rCount += 1;
+                    //    Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
+                    //    var val = Rowcount[item.BonNo].Split("-");
+                    //    if ((val).Length > 0)
+                    //    {
+                    //        Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
+                    //    }
+                    //}
 
                     var receiptDate = item.TransactionDate.ToString("dd MMM yyyy");
                     Result.Rows.Add(item.BonNo, receiptDate, item.Keterangan, item.Product, item.Quantity, item.UomUnit);
@@ -467,23 +467,23 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             else
                 foreach (var item in Query)
                 {
-                    idx++;
-                    if (!Rowcount.ContainsKey(item.BonNo))
-                    {
-                        rCount = 0;
-                        var index1 = idx;
-                        Rowcount.Add(item.BonNo, index1.ToString());
-                    }
-                    else
-                    {
-                        rCount += 1;
-                        Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
-                        var val = Rowcount[item.BonNo].Split("-");
-                        if ((val).Length > 0)
-                        {
-                            Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
-                        }
-                    }
+                    //idx++;
+                    //if (!Rowcount.ContainsKey(item.BonNo))
+                    //{
+                    //    rCount = 0;
+                    //    var index1 = idx;
+                    //    Rowcount.Add(item.BonNo, index1.ToString());
+                    //}
+                    //else
+                    //{
+                    //    rCount += 1;
+                    //    Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
+                    //    var val = Rowcount[item.BonNo].Split("-");
+                    //    if ((val).Length > 0)
+                    //    {
+                    //        Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
+                    //    }
+                    //}
 
                     var receiptDate = item.TransactionDate.ToString("dd MMM yyyy");
                     Result.Rows.Add(item.BonNo, receiptDate, item.Keterangan, item.Product, item.Quantity, item.UomUnit);
@@ -570,23 +570,23 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             else
                 foreach (var item in Query)
                 {
-                    idx++;
-                    if (!Rowcount.ContainsKey(item.BonNo))
-                    {
-                        rCount = 0;
-                        var index1 = idx;
-                        Rowcount.Add(item.BonNo, index1.ToString());
-                    }
-                    else
-                    {
-                        rCount += 1;
-                        Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
-                        var val = Rowcount[item.BonNo].Split("-");
-                        if ((val).Length > 0)
-                        {
-                            Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
-                        }
-                    }
+                    //idx++;
+                    //if (!Rowcount.ContainsKey(item.BonNo))
+                    //{
+                    //    rCount = 0;
+                    //    var index1 = idx;
+                    //    Rowcount.Add(item.BonNo, index1.ToString());
+                    //}
+                    //else
+                    //{
+                    //    rCount += 1;
+                    //    Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
+                    //    var val = Rowcount[item.BonNo].Split("-");
+                    //    if ((val).Length > 0)
+                    //    {
+                    //        Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
+                    //    }
+                    //}
 
                     var receiptDate = item.TransactionDate.ToString("dd MMM yyyy");
                     Result.Rows.Add(item.BonNo, receiptDate, item.Keterangan, item.Product, item.Quantity, item.UomUnit);
