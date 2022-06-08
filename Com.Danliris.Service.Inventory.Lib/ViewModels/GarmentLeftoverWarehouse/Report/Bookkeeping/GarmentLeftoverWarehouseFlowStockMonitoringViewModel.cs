@@ -7,6 +7,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse
 {
     public class GarmentLeftoverWarehouseFlowStockMonitoringViewModel: BasicViewModel
     { 
+
         public string UnitName { get; set; } 
         public string PONo { get; set; }
         public string RO { get; set; }

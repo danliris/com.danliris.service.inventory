@@ -238,6 +238,75 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.InventoryWeavingDataUtil
             };
         }
 
+        public InventoryWeavingDocumentViewModel GetNewData1()
+        {
+            return new InventoryWeavingDocumentViewModel
+            {
+
+                date = DateTimeOffset.Now,
+                bonNo = "test01",
+                bonType = "weaving",
+                storageCode = "test01",
+                storageId = 2,
+                storageName = "Test",
+
+                type = "IN",
+                remark = "Remark",
+                items = new List<InventoryWeavingDocumentItemViewModel> { new InventoryWeavingDocumentItemViewModel()
+                    {
+                        productOrderNo = "product",
+                        referenceNo = "referencce",
+                        construction = "CD",
+                        grade = "A",
+                        piece = "1",
+                        materialName = "CD",
+                        wovenType = "",
+                        yarn1 = "yarn1",
+                        yarn2 = "yarn2",
+                        yarnType1 = "yt1",
+                        yarnType2 = "yt2",
+                        yarnOrigin1 = "yo1",
+                        yarnOrigin2 = "yo2",
+                        width = "1",
+                        uomUnit = "MTR",
+                        uomId = 1,
+                        quantity = 1,
+                        quantityPiece =1,
+                        productRemark = "",
+                        InventoryWeavingDocumentId = 1
+                } }
+            };
+        }
+        public InventoryWeavingDocumentCsvViewModel GetNewDataCSV()
+        {
+            return new InventoryWeavingDocumentCsvViewModel
+            {
+
+             
+                    
+                    ReferenceNo = "referencce",
+                    Construction = "CD",
+                    Grade = "A",
+                    Piece = "1",
+                    MaterialName = "CD",
+                    WovenType = "",
+                    Yarn1 = "yarn1",
+                    Yarn2 = "yarn2",
+                    YarnType1 = "yt1",
+                    YarnType2 = "yt2",
+                    YarnOrigin1 = "yo1",
+                    YarnOrigin2 = "yo2",
+                    Width = "1",
+                    Qty = 1,
+                    QtyPiece = 1,
+                    ProductionOrderNo = "a"
+                    
+             
+            };
+        }
+
+
+
         public async Task<InventoryWeavingDocument> GetTestData()
         {
             InventoryWeavingDocument invWDoc = GetNewData();

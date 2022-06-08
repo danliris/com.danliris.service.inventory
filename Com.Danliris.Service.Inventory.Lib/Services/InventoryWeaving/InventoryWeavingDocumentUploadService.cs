@@ -415,8 +415,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving
 
                     construction = constructonC,
                     grade = i.Grade,
-                    // piece = i.Piece,
 
+                   // piece = i.Piece,
                     materialName = MaterialName,
                     wovenType = WovenType,
                     width = Width,
@@ -557,8 +557,6 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving
                         Quantity = d.Quantity,
                         QuantityPiece = d.QuantityPiece,
                         ProductRemark = d.ProductRemark,
-                        Barcode = d.Barcode,
-                        ProductionOrderDate = d.ProductionOrderDate,
                         //InventoryWeavingDocumentId = d.InventoryWeavingDocumentId
                     });
 
@@ -834,7 +832,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving
                     //var dateIn = model.Date.Equals(DateTimeOffset.MinValue) ? "" : model.Date.ToOffset(new TimeSpan(offSet, 0, 0)).Date.ToString("d");
 
                     dt.Rows.Add(date, model.BonNo, model.ReferenceNo, model.Construction, model.Grade, model.Quantity.ToString("N2", CultureInfo.InvariantCulture),
-                        model.QuantityPiece.ToString("N2", CultureInfo.InvariantCulture), model.Barcode, model.ProductionOrderDate.ToString("dd MMM yyyy", new CultureInfo("id-ID")));
+                        model.QuantityPiece.ToString("N2", CultureInfo.InvariantCulture));
 
                     //foreach (var item in model.DyeingPrintingAreaInputProductionOrders.Where(d => !d.HasOutputDocument).OrderBy(s => s.ProductionOrderNo))
                     //foreach (var item in model.DyeingPrintingAreaInputProductionOrders.OrderBy(s => s.ProductionOrderNo))
@@ -899,9 +897,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving
                                  Quantity = item.Quantity,
                                  QuantityPiece = item.QuantityPiece,
                                  ProductRemark = item.ProductRemark,
-                                 InventoryWeavingDocumentId = item.InventoryWeavingDocumentId,
-                                 Barcode = item.Barcode,
-                                 ProductionOrderDate = item.ProductionOrderDate,
+                                 InventoryWeavingDocumentId = item.InventoryWeavingDocumentId
                              }).ToList()
 
                          }
