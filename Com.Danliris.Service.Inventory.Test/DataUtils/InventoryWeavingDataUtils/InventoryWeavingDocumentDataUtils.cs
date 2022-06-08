@@ -123,27 +123,27 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.InventoryWeavingDataUtil
             return new InventoryWeavingDocumentCsvViewModel
             {
 
-             
-                    
-                    ReferenceNo = "referencce",
-                    Construction = "CD",
-                    Grade = "A",
-                    Piece = "1",
-                    MaterialName = "CD",
-                    WovenType = "",
-                    Yarn1 = "yarn1",
-                    Yarn2 = "yarn2",
-                    YarnType1 = "yt1",
-                    YarnType2 = "yt2",
-                    YarnOrigin1 = "yo1",
-                    YarnOrigin2 = "yo2",
-                    Width = "1",
-                    Qty = 1,
-                    QtyPiece = 1,
-                    Barcode = "barcode",
-                    ProductionOrderDate = DateTime.Now,
-                    ProductionOrderNo = "a",
-             
+
+
+                ReferenceNo = "referencce",
+                Construction = "CD",
+                Grade = "A",
+                Piece = "1",
+                MaterialName = "CD",
+                WovenType = "",
+                Yarn1 = "yarn1",
+                Yarn2 = "yarn2",
+                YarnType1 = "yt1",
+                YarnType2 = "yt2",
+                YarnOrigin1 = "yo1",
+                YarnOrigin2 = "yo2",
+                Width = "1",
+                Qty = 1,
+                QtyPiece = 1,
+                Barcode = "barcode",
+                ProductionOrderDate = DateTime.Now,
+                ProductionOrderNo = "a",
+
             };
         }
 
