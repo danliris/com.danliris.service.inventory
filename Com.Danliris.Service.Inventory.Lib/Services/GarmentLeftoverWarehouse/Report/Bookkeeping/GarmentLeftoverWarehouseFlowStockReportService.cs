@@ -403,8 +403,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                    };
                 var QueryExpenditure = from a in (from data in DbContext.GarmentLeftoverWarehouseExpenditureAccessories
                                                   where data._IsDeleted == false
-                                             && data.ExpenditureDate.AddHours(offset).Date <= DateTo.Date
-                                              
+                                             && data.ExpenditureDate.AddHours(offset).Date <= DateTo.Date                                              
                                                   select new { data.ExpenditureDate, data.Id ,data.ExpenditureDestination})
                                        join b in (from expend in DbContext.GarmentLeftoverWarehouseExpenditureAccessoriesItems
                                                   where expend.UnitId == (UnitId == 0 ? expend.UnitId : UnitId)

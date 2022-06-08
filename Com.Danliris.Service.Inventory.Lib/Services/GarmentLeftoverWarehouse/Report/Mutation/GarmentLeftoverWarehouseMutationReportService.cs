@@ -680,11 +680,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 });
             };
 
-
-
             var mutation = SaldoAkhir.Concat(mutationScrap).ToList();
 
             return mutation.OrderBy(x => x.ClassificationCode).ToList();
+
 
         }
 
