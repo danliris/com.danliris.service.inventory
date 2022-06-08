@@ -131,6 +131,65 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             Assert.NotNull(result1);
 
         }
+        //
+        [Fact]
+        public async Task Should_Success_GetXLSReport_AvalBesarIn()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+
+            GarmentLeftoverWarehouseReceiptAvalService service = new GarmentLeftoverWarehouseReceiptAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            GarmentLeftoverWarehouseAvalMutationReportService reportService = new GarmentLeftoverWarehouseAvalMutationReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var dataAvalFabric = await _dataUtilReceiptAval(service).GetTestData();
+
+            var result1 = reportService.GenerateExcelAvalBesar(DateTime.Now, DateTime.Now);
+            Assert.NotNull(result1);
+        }
+
+        [Fact]
+        public async Task Should_Success_GetXLSReport_AvalBesarIn_Null()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+
+            GarmentLeftoverWarehouseReceiptAvalService service = new GarmentLeftoverWarehouseReceiptAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            GarmentLeftoverWarehouseAvalMutationReportService reportService = new GarmentLeftoverWarehouseAvalMutationReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var dataAvalFabric = await _dataUtilReceiptAval(service).GetTestData();
+
+            var result1 = reportService.GenerateExcelAvalBesar(DateTime.MaxValue, DateTime.MaxValue);
+            Assert.NotNull(result1);
+        }
+        //
         [Fact]
         public async Task Should_Success_GetReport_AvalBesarOut()
         {
@@ -160,5 +219,236 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             Assert.NotNull(result1);
 
         }
+        //
+        [Fact]
+        public async Task Should_Success_GetXLSReport_AvalBesarOut()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+            GarmentLeftoverWarehouseReceiptAvalService service = new GarmentLeftoverWarehouseReceiptAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            var dataAvalFabric = await _dataUtilReceiptAval(service).GetTestData();
+            GarmentLeftoverWarehouseExpenditureAvalService serviceExpend = new GarmentLeftoverWarehouseExpenditureAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            GarmentLeftoverWarehouseAvalMutationReportService reportService = new GarmentLeftoverWarehouseAvalMutationReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var dataExpendAvalFabric = await _dataUtilExpendAval(serviceExpend, GetCurrentMethod()).GetTestDataFabric();
+            var result1 = reportService.GenerateExcelAvalBesarOut(DateTime.Now, DateTime.Now);
+            Assert.NotNull(result1);
+        }
+
+        [Fact]
+        public async Task Should_Success_GetXLSReport_AvalBesarOut_Null()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+            GarmentLeftoverWarehouseReceiptAvalService service = new GarmentLeftoverWarehouseReceiptAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            var dataAvalFabric = await _dataUtilReceiptAval(service).GetTestData();
+            GarmentLeftoverWarehouseExpenditureAvalService serviceExpend = new GarmentLeftoverWarehouseExpenditureAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            GarmentLeftoverWarehouseAvalMutationReportService reportService = new GarmentLeftoverWarehouseAvalMutationReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var dataExpendAvalFabric = await _dataUtilExpendAval(serviceExpend, GetCurrentMethod()).GetTestDataFabric();
+            var result1 = reportService.GenerateExcelAvalBesarOut(DateTime.MaxValue, DateTime.MaxValue);
+            Assert.NotNull(result1);
+        }
+        //
+        [Fact]
+        public async Task Should_Success_GetReport_AvalKomponenIn()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+
+            GarmentLeftoverWarehouseReceiptAvalService service = new GarmentLeftoverWarehouseReceiptAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            GarmentLeftoverWarehouseAvalMutationReportService reportService = new GarmentLeftoverWarehouseAvalMutationReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var dataAvalFabric = await _dataUtilReceiptAval(service).GetTestData1();
+            var result1 = reportService.GetAvalKomponenIn(DateTime.Now, DateTime.Now, 1, 1);
+            Assert.NotNull(result1);
+
+        }
+        //
+        [Fact]
+        public async Task Should_Success_GetXLSReport_AvalKomponenIn()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+
+            GarmentLeftoverWarehouseReceiptAvalService service = new GarmentLeftoverWarehouseReceiptAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            GarmentLeftoverWarehouseAvalMutationReportService reportService = new GarmentLeftoverWarehouseAvalMutationReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var dataAvalFabric = await _dataUtilReceiptAval(service).GetTestData1();
+            var result1 = reportService.GenerateExcelAvalKomponenIn(DateTime.Now, DateTime.Now);
+            Assert.NotNull(result1);
+        }
+
+        [Fact]
+        public async Task Should_Success_GetXLSReport_AvalKomponenIn_Null()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+
+            GarmentLeftoverWarehouseReceiptAvalService service = new GarmentLeftoverWarehouseReceiptAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            GarmentLeftoverWarehouseAvalMutationReportService reportService = new GarmentLeftoverWarehouseAvalMutationReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var dataAvalFabric = await _dataUtilReceiptAval(service).GetTestData1();
+            var result1 = reportService.GenerateExcelAvalKomponenIn(DateTime.MaxValue, DateTime.MaxValue);
+            Assert.NotNull(result1);
+        }
+        //
+        [Fact]
+        public async Task Should_Success_GetReport_AvalKomponenOut()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+            GarmentLeftoverWarehouseReceiptAvalService service = new GarmentLeftoverWarehouseReceiptAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            var dataAvalFabric = await _dataUtilReceiptAval(service).GetTestData();
+            GarmentLeftoverWarehouseExpenditureAvalService serviceExpend = new GarmentLeftoverWarehouseExpenditureAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            GarmentLeftoverWarehouseAvalMutationReportService reportService = new GarmentLeftoverWarehouseAvalMutationReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var dataExpendAvalFabric = await _dataUtilExpendAval(serviceExpend, GetCurrentMethod()).GetTestDataFabric1();
+            var result1 = reportService.GetAvalKomponenOut(null, DateTime.Now, 1, 1);
+            Assert.NotNull(result1);
+        }
+
+        [Fact]
+        public async Task Should_Success_GetXLSReport_AvalKomponenOut()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+            GarmentLeftoverWarehouseReceiptAvalService service = new GarmentLeftoverWarehouseReceiptAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            var dataAvalFabric = await _dataUtilReceiptAval(service).GetTestData();
+            GarmentLeftoverWarehouseExpenditureAvalService serviceExpend = new GarmentLeftoverWarehouseExpenditureAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            GarmentLeftoverWarehouseAvalMutationReportService reportService = new GarmentLeftoverWarehouseAvalMutationReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var dataExpendAvalFabric = await _dataUtilExpendAval(serviceExpend, GetCurrentMethod()).GetTestDataFabric1();
+            var result1 = reportService.GenerateExcelAvalKomponenOut(DateTime.Now, DateTime.Now);
+            Assert.NotNull(result1);
+        }
+
+        [Fact]
+        public async Task Should_Success_GetXLSReport_AvalKomponenOut_Null()
+        {
+            var serviceProvider = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+            GarmentLeftoverWarehouseReceiptAvalService service = new GarmentLeftoverWarehouseReceiptAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            var dataAvalFabric = await _dataUtilReceiptAval(service).GetTestData();
+            GarmentLeftoverWarehouseExpenditureAvalService serviceExpend = new GarmentLeftoverWarehouseExpenditureAvalService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+            GarmentLeftoverWarehouseAvalMutationReportService reportService = new GarmentLeftoverWarehouseAvalMutationReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var dataExpendAvalFabric = await _dataUtilExpendAval(serviceExpend, GetCurrentMethod()).GetTestDataFabric1();
+            var result1 = reportService.GenerateExcelAvalKomponenOut(DateTime.MaxValue, DateTime.MaxValue);
+            Assert.NotNull(result1);
+        }
+        //
     }
 }
