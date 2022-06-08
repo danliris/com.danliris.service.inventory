@@ -94,7 +94,6 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Report.R
         public async Task Should_success_GetReport()
         {
             ReportGreigeWeavingPerGradeService service = new ReportGreigeWeavingPerGradeService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-
             var Utilservice = new ReportGreigeWeavingPerMonthService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
             var data = _dataUtil(service).GetTestData();
 
@@ -117,7 +116,6 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Report.R
             var data = _dataUtil(service).GetTestData();
 
             InventoryWeavingDocumentUploadService serviceDoc = new InventoryWeavingDocumentUploadService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-
             var dataDoc = _dataUtilDoc(serviceDoc).GetTestData();
             //var Responses =  Utilservice.Create(data);
 

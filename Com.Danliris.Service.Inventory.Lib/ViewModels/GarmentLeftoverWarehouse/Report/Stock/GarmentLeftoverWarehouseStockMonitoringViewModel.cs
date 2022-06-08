@@ -15,6 +15,8 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse
         public string ProductName { get; set; }
         public string ProductRemark { get; set; }
         public string FabricRemark { get; set; }
+        public string ComodityCode { get; set; }
+        public string ComodityUnitCode { get; set; }
         public string Comodity { get; set; }
         public double BeginingbalanceQty { get; set; }
         public double QuantityReceipt { get; set; }
@@ -22,5 +24,18 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse
         public double EndbalanceQty { get; set; }
         public string UomUnit { get; set; }
         public string ReferenceType { get; set; }
+    }
+
+    public class ExpendGoodViewModel
+    {
+        public string RONo { get; set; }
+        public GarmentComodity Comodity { get; set; }
+    }
+
+    public class GarmentComodity
+    {
+        public int Id { get; set; }
+        public string Code { get; set; }
+        public string Name { get; set; }
     }
 }

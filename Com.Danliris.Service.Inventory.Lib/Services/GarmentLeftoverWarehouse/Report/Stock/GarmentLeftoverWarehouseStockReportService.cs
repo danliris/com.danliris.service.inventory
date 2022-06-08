@@ -11,6 +11,8 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.Report.Stock
@@ -24,11 +26,16 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
         private readonly IServiceProvider ServiceProvider;
         private readonly IIdentityService IdentityService;
 
+        private readonly string GarmentExpenditureGoodUri;
+
         public GarmentLeftoverWarehouseStockReportService(InventoryDbContext dbContext, IServiceProvider serviceProvider)
         {
             DbContext = dbContext;
             ServiceProvider = serviceProvider;
             IdentityService = (IIdentityService)serviceProvider.GetService(typeof(IIdentityService));
+
+            //GarmentExpenditureGoodUri = APIEndpoint.GarmentProduction + "expenditure-goods/byRO";
+            GarmentExpenditureGoodUri = APIEndpoint.GarmentProduction + "expenditure-goods/traceable-by-ro";
         }
         #region REPORT
         public IQueryable<GarmentLeftoverWarehouseStockMonitoringViewModel> GetReportQuery(DateTime? dateFrom, DateTime? dateTo, int UnitId, string type, int offset, string typeAval = "")
@@ -146,16 +153,16 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     GarmentLeftoverWarehouseStockMonitoringViewModel garmentLeftover = new GarmentLeftoverWarehouseStockMonitoringViewModel
                     {
                         PONo = data.pono,
-                        BeginingbalanceQty = data.begining,
-                        QuantityReceipt = data.receipt,
-                        QuantityExpend = data.expend,
+                        BeginingbalanceQty = Math.Round(data.begining, 2, MidpointRounding.AwayFromZero),
+                        QuantityReceipt = Math.Round(data.receipt, 2, MidpointRounding.AwayFromZero),
+                        QuantityExpend = Math.Round(data.expend, 2, MidpointRounding.AwayFromZero),
                         UnitCode = data.unit,
                         UomUnit = data.uomunit,
                         ProductCode = Product.ProductCode,
                         ProductName = Product.ProductName,
-                        ProductRemark = remarkReceipt !=null ? remarkReceipt.ProductRemark : remarkBalance.ProductRemark,
-                        FabricRemark = remarkReceipt != null ? remarkReceipt.FabricRemark : remarkBalance.FabricRemark,
-                        EndbalanceQty = data.begining + data.receipt - data.expend
+                        ProductRemark = remarkReceipt !=null ? remarkReceipt.ProductRemark : remarkBalance != null ? remarkBalance.ProductRemark : "-",
+                        FabricRemark = remarkReceipt != null ? remarkReceipt.FabricRemark : remarkBalance != null ? remarkBalance.FabricRemark : "-",
+                        EndbalanceQty = Math.Round(data.begining + data.receipt - data.expend, 2, MidpointRounding.AwayFromZero)
                     };
                     garmentLeftoverWarehouseStockMonitoringViewModel.Add(garmentLeftover);
                 }
@@ -182,7 +189,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                        FabricRemark = "",
                                        EndbalanceQty = 0,
                                        index = 0,
-                                       Comodity= b.LeftoverComodityName
+                                       Comodity= b.LeftoverComodityName,
+                                       ComodityCode = b.LeftoverComodityCode
                                    };
                 var QueryReceipt = from a in (from data in DbContext.GarmentLeftoverWarehouseReceiptFinishedGoods
                                               where data._IsDeleted == false
@@ -204,7 +212,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                        FabricRemark = "",
                                        EndbalanceQty = 0,
                                        index = 0,
-                                       Comodity= b.LeftoverComodityName
+                                       Comodity= b.LeftoverComodityName,
+                                       ComodityCode = b.LeftoverComodityCode
                                    };
                 var QueryExpenditure = from a in (from data in DbContext.GarmentLeftoverWarehouseExpenditureFinishedGoods
                                                   where data._IsDeleted == false
@@ -228,11 +237,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                            FabricRemark = "",
                                            EndbalanceQty = 0,
                                            index = 0,
-                                           Comodity= b.LeftoverComodityName
+                                           Comodity= b.LeftoverComodityName,
+                                           ComodityCode = b.LeftoverComodityName
                                        };
                 var Query = QueryReceipt.Union(QueryExpenditure).Union(QueryBalance);
                 var querySum = Query.ToList()
-                    .GroupBy(x => new { x.RO, x.UnitCode, x.UomUnit, x.index, x.Comodity }, (key, group) => new
+                    .GroupBy(x => new { x.RO, x.UnitCode, x.UomUnit, x.index, x.Comodity, x.ComodityCode }, (key, group) => new
                     {
                         rono = key.RO,
                         begining = group.Sum(s => s.BeginingbalanceQty),
@@ -241,26 +251,54 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                         uomunit = key.UomUnit,
                         unit = key.UnitCode,
                         index = key.index,
-                        comodity= key.Comodity
+                        comodity= key.Comodity,
+                        comoditycode = key.ComodityCode
                     }).OrderBy(s => s.rono);
 
+                var ronos = string.Join(",", querySum.Select(x => x.rono).Distinct());
 
-                foreach (var data in querySum)
-                {
-                    GarmentLeftoverWarehouseStockMonitoringViewModel garmentLeftover = new GarmentLeftoverWarehouseStockMonitoringViewModel
-                    {
-                        RO = data.rono,
-                        BeginingbalanceQty = data.begining,
-                        QuantityReceipt = data.receipt,
-                        QuantityExpend = data.expend,
-                        UnitCode = data.unit,
-                        UomUnit = data.uomunit,
-                        ProductRemark = (from aa in DbContext.GarmentLeftoverWarehouseReceiptFinishedGoodItems where aa.RONo == data.rono select aa.LeftoverComodityName).FirstOrDefault(),
-                        EndbalanceQty = data.begining + data.receipt - data.expend,
-                        Comodity=data.comodity
-                    };
-                    garmentLeftoverWarehouseStockMonitoringViewModel.Add(garmentLeftover);
-                }
+                var comodities1 = GetComodityFromProduction(ronos);
+
+                var comodities2 = comodities1.Select(x => new { x.RONo, Comodity = x.Comodity.Code }).Distinct();
+
+                garmentLeftoverWarehouseStockMonitoringViewModel = (from a in querySum
+                                                                    join b in comodities2 on a.rono equals b.RONo into com2
+                                                                    from bb in com2.DefaultIfEmpty()
+                                                                    select new GarmentLeftoverWarehouseStockMonitoringViewModel
+                                                                    {
+                                                                        RO = a.rono,
+                                                                        BeginingbalanceQty = Math.Round(a.begining, 2, MidpointRounding.AwayFromZero),
+                                                                        QuantityReceipt = Math.Round(a.receipt, 2, MidpointRounding.AwayFromZero),
+                                                                        QuantityExpend = Math.Round(a.expend, 2, MidpointRounding.AwayFromZero),
+                                                                        UnitCode = a.unit,
+                                                                        UomUnit = a.uomunit,
+                                                                        //ProductRemark = (from aa in DbContext.GarmentLeftoverWarehouseReceiptFinishedGoodItems where aa.RONo == data.rono select aa.LeftoverComodityName).FirstOrDefault(),
+                                                                        EndbalanceQty = Math.Round(a.begining + a.receipt - a.expend, 2, MidpointRounding.AwayFromZero),
+                                                                        Comodity = a.comodity,
+                                                                        ComodityCode = a.comoditycode,
+                                                                        ComodityUnitCode = bb != null ? bb.Comodity : "-"
+                                                                    }).ToList();
+
+                //foreach (var data in querySum)
+                //{
+                //    var comodity = GetComodityFromProduction(data.rono).FirstOrDefault();
+
+                                                                   //    GarmentLeftoverWarehouseStockMonitoringViewModel garmentLeftover = new GarmentLeftoverWarehouseStockMonitoringViewModel
+                                                                   //    {
+                                                                   //        RO = data.rono,
+                                                                   //        BeginingbalanceQty = Math.Round(data.begining, 2, MidpointRounding.AwayFromZero),
+                                                                   //        QuantityReceipt = Math.Round(data.receipt, 2, MidpointRounding.AwayFromZero),
+                                                                   //        QuantityExpend = Math.Round(data.expend, 2, MidpointRounding.AwayFromZero),
+                                                                   //        UnitCode = data.unit,
+                                                                   //        UomUnit = data.uomunit,
+                                                                   //        //ProductRemark = (from aa in DbContext.GarmentLeftoverWarehouseReceiptFinishedGoodItems where aa.RONo == data.rono select aa.LeftoverComodityName).FirstOrDefault(),
+                                                                   //        EndbalanceQty = Math.Round(data.begining + data.receipt - data.expend, 2, MidpointRounding.AwayFromZero),
+                                                                   //        Comodity=data.comodity,
+                                                                   //        ComodityCode = data.comoditycode,
+                                                                   //        ComodityUnitCode = comodity != null ? comodity.Comodity.Code : "-"
+                                                                   //    };
+                                                                   //    garmentLeftoverWarehouseStockMonitoringViewModel.Add(garmentLeftover);
+                                                                   //}
             }
             else if (type == "AVAL")
             {
@@ -337,14 +375,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 {
                     GarmentLeftoverWarehouseStockMonitoringViewModel garmentLeftover = new GarmentLeftoverWarehouseStockMonitoringViewModel
                     {
-                        BeginingbalanceQty = data.begining,
-                        QuantityReceipt = data.receipt,
-                        QuantityExpend = data.expend,
+                        BeginingbalanceQty = Math.Round(data.begining, MidpointRounding.AwayFromZero),
+                        QuantityReceipt = Math.Round(data.receipt, MidpointRounding.AwayFromZero),
+                        QuantityExpend = Math.Round(data.expend, MidpointRounding.AwayFromZero),
                         UnitCode = data.unit,
                         UomUnit = data.uomunit,
                         ProductCode = typeAval == "AVAL BAHAN PENOLONG" ? (from aa in DbContext.GarmentLeftoverWarehouseStocks where aa.ReferenceType == AvalType && aa.UnitId == (UnitId == 0 ? aa.UnitId : UnitId) && aa.UomUnit == data.uomunit && aa.ProductCode == data.productCode select aa.ProductCode).FirstOrDefault() : "-",
                         ProductName = typeAval == "AVAL BAHAN PENOLONG" ? (from aa in DbContext.GarmentLeftoverWarehouseStocks where aa.ReferenceType == AvalType && aa.UnitId == (UnitId == 0 ? aa.UnitId : UnitId) && aa.UomUnit == data.uomunit && aa.ProductCode == data.productCode select aa.ProductName).FirstOrDefault() : "-",
-                        EndbalanceQty = data.begining + data.receipt - data.expend,
+                        EndbalanceQty = Math.Round(data.begining + data.receipt - data.expend, MidpointRounding.AwayFromZero),
                         ReferenceType = typeAval
                     };
                     garmentLeftoverWarehouseStockMonitoringViewModel.Add(garmentLeftover);
@@ -448,15 +486,15 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     GarmentLeftoverWarehouseStockMonitoringViewModel garmentLeftover = new GarmentLeftoverWarehouseStockMonitoringViewModel
                     {
                         PONo = data.pono,
-                        BeginingbalanceQty = data.begining,
-                        QuantityReceipt = data.receipt,
-                        QuantityExpend = data.expend,
+                        BeginingbalanceQty = Math.Round(data.begining, MidpointRounding.AwayFromZero),
+                        QuantityReceipt = Math.Round(data.receipt, MidpointRounding.AwayFromZero),
+                        QuantityExpend = Math.Round(data.expend, MidpointRounding.AwayFromZero),
                         UnitCode = data.unit,
                         UomUnit = data.uomunit,
                         ProductCode = (from aa in DbContext.GarmentLeftoverWarehouseStocks where aa.ReferenceType == accType && aa.PONo == data.pono && aa.UomUnit == data.uomunit && aa.UnitCode == data.unit select aa.ProductCode).FirstOrDefault(),
                         ProductName = (from aa in DbContext.GarmentLeftoverWarehouseStocks where aa.ReferenceType == accType && aa.PONo == data.pono && aa.UomUnit == data.uomunit && aa.UnitCode == data.unit select aa.ProductName).FirstOrDefault(),
                         ProductRemark = remarkReceipt==null ? remarkBalance.ProductRemark : remarkReceipt.ProductRemark,
-                        EndbalanceQty = data.begining + data.receipt - data.expend
+                        EndbalanceQty = Math.Round(data.begining + data.receipt - data.expend, MidpointRounding.AwayFromZero)
                     };
                     garmentLeftoverWarehouseStockMonitoringViewModel.Add(garmentLeftover);
                 }
@@ -493,12 +531,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
             });
 
-            if (page == ((TotalData / size) + 1 ) && TotalData != 0)
+            if (page == Math.Ceiling((double)TotalData / (double)size) && TotalData != 0)
             {
-                var BeginingbalanceQtyTotal = Query.Sum(x => x.BeginingbalanceQty);
-                var QuantityReceiptTotal = Query.Sum(x => x.QuantityReceipt);
-                var QuantityExpendTotal = Query.Sum(x => x.QuantityExpend);
-                var EndbalanceQtyTotal = Query.Sum(x => x.EndbalanceQty);
+                var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
+                var QuantityReceiptTotal = Math.Round(Query.Sum(x => x.QuantityReceipt), MidpointRounding.AwayFromZero);
+                var QuantityExpendTotal = Math.Round(Query.Sum(x => x.QuantityExpend), MidpointRounding.AwayFromZero);
+                var EndbalanceQtyTotal = Math.Round(Query.Sum(x => x.EndbalanceQty), MidpointRounding.AwayFromZero);
 
 
                 Data.Add(new GarmentLeftoverWarehouseStockMonitoringViewModel
@@ -527,10 +565,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var Query = GetReportQuery(dateFrom, dateTo, unitId, "FABRIC", offset);
             Query = Query.OrderByDescending(b => b.PONo);
 
-            var BeginingbalanceQtyTotal = Query.Sum(x => x.BeginingbalanceQty);
-            var QuantityReceiptTotal = Query.Sum(x => x.QuantityReceipt);
-            var QuantityExpendTotal = Query.Sum(x => x.QuantityExpend);
-            var EndbalanceQtyTotal = Query.Sum(x => x.EndbalanceQty);
+            var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
+            var QuantityReceiptTotal = Math.Round(Query.Sum(x => x.QuantityReceipt), MidpointRounding.AwayFromZero);
+            var QuantityExpendTotal = Math.Round(Query.Sum(x => x.QuantityExpend), MidpointRounding.AwayFromZero);
+            var EndbalanceQtyTotal = Math.Round(Query.Sum(x => x.EndbalanceQty), MidpointRounding.AwayFromZero);
 
             DataTable result = new DataTable();
 
@@ -571,10 +609,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var Query = GetReportQuery(dateFrom, dateTo, unitId, "ACC", offset);
             Query = Query.OrderByDescending(b => b.PONo);
 
-            var BeginingbalanceQtyTotal = Query.Sum(x => x.BeginingbalanceQty);
-            var QuantityReceiptTotal = Query.Sum(x => x.QuantityReceipt);
-            var QuantityExpendTotal = Query.Sum(x => x.QuantityExpend);
-            var EndbalanceQtyTotal = Query.Sum(x => x.EndbalanceQty);
+            var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
+            var QuantityReceiptTotal = Math.Round(Query.Sum(x => x.QuantityReceipt), MidpointRounding.AwayFromZero);
+            var QuantityExpendTotal = Math.Round(Query.Sum(x => x.QuantityExpend), MidpointRounding.AwayFromZero);
+            var EndbalanceQtyTotal = Math.Round(Query.Sum(x => x.EndbalanceQty), MidpointRounding.AwayFromZero);
 
             DataTable result = new DataTable();
 
@@ -637,12 +675,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
             });
 
-            if (page == ((TotalData / size) + 1) && TotalData != 0)
+            if (page == Math.Ceiling((double)TotalData / (double)size) && TotalData != 0)
             {
-                var BeginingbalanceQtyTotal = Query.Sum(x => x.BeginingbalanceQty);
-                var QuantityReceiptTotal = Query.Sum(x => x.QuantityReceipt);
-                var QuantityExpendTotal = Query.Sum(x => x.QuantityExpend);
-                var EndbalanceQtyTotal = Query.Sum(x => x.EndbalanceQty);
+                var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
+                var QuantityReceiptTotal = Math.Round(Query.Sum(x => x.QuantityReceipt), MidpointRounding.AwayFromZero);
+                var QuantityExpendTotal = Math.Round(Query.Sum(x => x.QuantityExpend), MidpointRounding.AwayFromZero);
+                var EndbalanceQtyTotal = Math.Round(Query.Sum(x => x.EndbalanceQty), MidpointRounding.AwayFromZero);
 
 
                 Data.Add(new GarmentLeftoverWarehouseStockMonitoringViewModel
@@ -675,16 +713,18 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var Query = GetReportQuery(dateFrom, dateTo, unitId, "Barang Jadi", offset);
             Query = Query.OrderByDescending(b => b.PONo);
 
-            var BeginingbalanceQtyTotal = Query.Sum(x => x.BeginingbalanceQty);
-            var QuantityReceiptTotal = Query.Sum(x => x.QuantityReceipt);
-            var QuantityExpendTotal = Query.Sum(x => x.QuantityExpend);
-            var EndbalanceQtyTotal = Query.Sum(x => x.EndbalanceQty);
+            var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
+            var QuantityReceiptTotal = Math.Round(Query.Sum(x => x.QuantityReceipt), MidpointRounding.AwayFromZero);
+            var QuantityExpendTotal = Math.Round(Query.Sum(x => x.QuantityExpend), MidpointRounding.AwayFromZero);
+            var EndbalanceQtyTotal = Math.Round(Query.Sum(x => x.EndbalanceQty), MidpointRounding.AwayFromZero);
 
             DataTable result = new DataTable();
 
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Unit", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Nomor RO", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Komoditi Unit", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Kode Komoditi Gudang Sisa", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Komoditi Gudang Sisa", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Saldo Awal", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Penerimaan", DataType = typeof(double) });
@@ -692,7 +732,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             result.Columns.Add(new DataColumn() { ColumnName = "Saldo Akhir", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Satuan", DataType = typeof(String) });
             if (Query.ToArray().Count() == 0)
-                result.Rows.Add("", "", "", "", 0, 0, 0, 0, 0); // to allow column name to be generated properly for empty data as template
+                result.Rows.Add("", "", "","", "", 0, 0, 0, 0, 0,""); // to allow column name to be generated properly for empty data as template
             else
             {
                 int index = 0;
@@ -701,10 +741,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     index++;
                     //DateTimeOffset date = item.date ?? new DateTime(1970, 1, 1);
                     //string dateString = date == new DateTime(1970, 1, 1) ? "-" : date.ToOffset(new TimeSpan(offset, 0, 0)).ToString("dd MMM yyyy", new CultureInfo("id-ID"));
-                    result.Rows.Add(index, item.UnitCode, item.RO, item.Comodity, item.BeginingbalanceQty, item.QuantityReceipt, item.QuantityExpend, item.EndbalanceQty, item.UomUnit);
+                    result.Rows.Add(index, item.UnitCode, item.RO, item.ComodityUnitCode, item.ComodityCode, item.Comodity, item.BeginingbalanceQty, item.QuantityReceipt, item.QuantityExpend, item.EndbalanceQty, item.UomUnit);
                 }
 
-                result.Rows.Add("", "", "T O T A L......", "", BeginingbalanceQtyTotal, QuantityReceiptTotal, QuantityExpendTotal, EndbalanceQtyTotal, "");
+                result.Rows.Add("", "", "T O T A L......", "", "", "", BeginingbalanceQtyTotal, QuantityReceiptTotal, QuantityExpendTotal, EndbalanceQtyTotal, "");
             }
 
             return Excel.CreateExcel(new List<KeyValuePair<DataTable, string>>() { new KeyValuePair<DataTable, string>(result, "Report Stock Gudang Sisa - Barang Jadi") }, true);
@@ -730,6 +770,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             Pageable<GarmentLeftoverWarehouseStockMonitoringViewModel> pageable = new Pageable<GarmentLeftoverWarehouseStockMonitoringViewModel>(Query, page - 1, size);
             List<GarmentLeftoverWarehouseStockMonitoringViewModel> Data = pageable.Data.ToList<GarmentLeftoverWarehouseStockMonitoringViewModel>();
 
+            int totalCountReport = Query.Count();
             int TotalData = pageable.TotalCount;
             int index = 0;
             Data.ForEach(c =>
@@ -739,12 +780,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
             });
 
-            if (page == ((TotalData / size) + 1) && TotalData != 0)
+            if (page == Math.Ceiling((double)totalCountReport / (double)size) && TotalData != 0)
             {
-                var BeginingbalanceQtyTotal = Query.Sum(x => x.BeginingbalanceQty);
-                var QuantityReceiptTotal = Query.Sum(x => x.QuantityReceipt);
-                var QuantityExpendTotal = Query.Sum(x => x.QuantityExpend);
-                var EndbalanceQtyTotal = Query.Sum(x => x.EndbalanceQty);
+                var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
+                var QuantityReceiptTotal = Math.Round(Query.Sum(x => x.QuantityReceipt), MidpointRounding.AwayFromZero);
+                var QuantityExpendTotal = Math.Round(Query.Sum(x => x.QuantityExpend), MidpointRounding.AwayFromZero);
+                var EndbalanceQtyTotal = Math.Round(Query.Sum(x => x.EndbalanceQty), MidpointRounding.AwayFromZero);
 
 
                 Data.Add(new GarmentLeftoverWarehouseStockMonitoringViewModel
@@ -757,6 +798,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     ProductCode = "",
                     ProductName = "",
                     ProductRemark = "",
+                    ComodityUnitCode = "",
                     QuantityExpend = QuantityExpendTotal,
                     QuantityReceipt = QuantityReceiptTotal,
                     ReferenceType = "",
@@ -797,12 +839,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
             });
 
-            if (page == ((TotalData / size) + 1) && TotalData != 0)
+            if (page == Math.Ceiling((double)TotalData / (double)size) && TotalData != 0)
             {
-                var BeginingbalanceQtyTotal = Query.Sum(x => x.BeginingbalanceQty);
-                var QuantityReceiptTotal = Query.Sum(x => x.QuantityReceipt);
-                var QuantityExpendTotal = Query.Sum(x => x.QuantityExpend);
-                var EndbalanceQtyTotal = Query.Sum(x => x.EndbalanceQty);
+                var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
+                var QuantityReceiptTotal = Math.Round(Query.Sum(x => x.QuantityReceipt), MidpointRounding.AwayFromZero);
+                var QuantityExpendTotal = Math.Round(Query.Sum(x => x.QuantityExpend), MidpointRounding.AwayFromZero);
+                var EndbalanceQtyTotal = Math.Round(Query.Sum(x => x.EndbalanceQty), MidpointRounding.AwayFromZero);
 
 
                 Data.Add(new GarmentLeftoverWarehouseStockMonitoringViewModel
@@ -832,10 +874,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var Query = GetReportQuery(dateFrom, dateTo, unitId, "AVAL", offset, typeAval);
             Query = Query.OrderByDescending(b => b.PONo);
 
-            var BeginingbalanceQtyTotal = Query.Sum(x => x.BeginingbalanceQty);
-            var QuantityReceiptTotal = Query.Sum(x => x.QuantityReceipt);
-            var QuantityExpendTotal = Query.Sum(x => x.QuantityExpend);
-            var EndbalanceQtyTotal = Query.Sum(x => x.EndbalanceQty);
+            var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
+            var QuantityReceiptTotal = Math.Round(Query.Sum(x => x.QuantityReceipt), MidpointRounding.AwayFromZero);
+            var QuantityExpendTotal = Math.Round(Query.Sum(x => x.QuantityExpend), MidpointRounding.AwayFromZero);
+            var EndbalanceQtyTotal = Math.Round(Query.Sum(x => x.EndbalanceQty), MidpointRounding.AwayFromZero);
 
             DataTable result = new DataTable();
 
@@ -868,6 +910,32 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             return Excel.CreateExcel(new List<KeyValuePair<DataTable, string>>() { new KeyValuePair<DataTable, string>(result, "Report Stock Gudang Sisa - FABRIC") }, true);
 
         }
+
+        private List<ExpendGoodViewModel> GetComodityFromProduction(string RONo)
+        {
+            var httpService = (IHttpService)ServiceProvider.GetService(typeof(IHttpService));
+
+            var httpContent = new StringContent(JsonConvert.SerializeObject(RONo), Encoding.UTF8, "application/json");
+
+            var responseLocalCoverLetter = httpService.SendAsync(HttpMethod.Get, GarmentExpenditureGoodUri, httpContent).Result;
+            if (responseLocalCoverLetter.IsSuccessStatusCode)
+            {
+                var content = responseLocalCoverLetter.Content.ReadAsStringAsync().Result;
+                Dictionary<string, object> resultGarmentProduct = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
+
+                var jsonLocalCoverLetter = resultGarmentProduct.Single(p => p.Key.Equals("data")).Value;
+                //if (a.Count > 0)
+                //{
+                var a = JsonConvert.DeserializeObject<List<ExpendGoodViewModel>>(jsonLocalCoverLetter.ToString());
+                return a;
+            }
+
+            else
+            {
+                return new List<ExpendGoodViewModel>();
+            }
+        }
+
         #endregion
     }
 }

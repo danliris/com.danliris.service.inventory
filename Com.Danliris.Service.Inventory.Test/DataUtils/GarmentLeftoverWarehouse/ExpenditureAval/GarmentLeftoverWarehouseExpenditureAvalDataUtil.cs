@@ -43,7 +43,33 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                         UnitName = "Unit",
                         AvalReceiptNo = receiptAval.AvalReceiptNo,
                         AvalReceiptId= receiptAval.Id,
-                        Quantity = receiptAval.TotalAval,
+                        Quantity = 3,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseExpenditureAvalItem
+                    {
+                        StockId = 2,
+                        UnitId = 2,
+                        UnitCode = "Unit2",
+                        UnitName = "Unit2",
+                        AvalReceiptNo = receiptAval.AvalReceiptNo,
+                        AvalReceiptId= receiptAval.Id,
+                        Quantity = 3,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseExpenditureAvalItem
+                    {
+                        StockId = 1,
+                        UnitId = 3,
+                        UnitCode = "Unit3",
+                        UnitName = "Unit3",
+                        AvalReceiptNo = receiptAval.AvalReceiptNo,
+                        AvalReceiptId= receiptAval.Id,
+                        Quantity = 4,
+                        UomId = 1,
+                        UomUnit = "Uom"
                     }
                 }
             };
@@ -70,6 +96,71 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
         public async Task<GarmentLeftoverWarehouseExpenditureAval> GetTestDataFabric()
         {
             GarmentLeftoverWarehouseExpenditureAval data = await GetNewDataFabric();
+
+            await Service.CreateAsync(data);
+
+            return data;
+        }
+
+        public async Task<GarmentLeftoverWarehouseExpenditureAval> GetNewDataFabric1()
+        {
+            var receiptAval = await Task.Run(() => ReceiptAvalDataUtil.GetTestData1());
+            var DataFabric = new GarmentLeftoverWarehouseExpenditureAval
+            {
+                ExpenditureDate = DateTimeOffset.Now,
+                ExpenditureTo = "JUAL LOKAL",
+                Description = "Remark",
+                LocalSalesNoteNo = "LocalSalesNoteNo",
+                AvalType = "AVAL KOMPONEN",
+                BuyerId = 1,
+                BuyerCode = "BuyerCode",
+                BuyerName = "BuyerName",
+                Items = new List<GarmentLeftoverWarehouseExpenditureAvalItem>
+                {
+                    new GarmentLeftoverWarehouseExpenditureAvalItem
+                    {
+                        StockId = 1,
+                        UnitId = 1,
+                        UnitCode = "Unit",
+                        UnitName = "Unit",
+                        AvalReceiptNo = receiptAval.AvalReceiptNo,
+                        AvalReceiptId= receiptAval.Id,
+                        Quantity = 3,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseExpenditureAvalItem
+                    {
+                        StockId = 2,
+                        UnitId = 2,
+                        UnitCode = "Unit2",
+                        UnitName = "Unit2",
+                        AvalReceiptNo = receiptAval.AvalReceiptNo,
+                        AvalReceiptId= receiptAval.Id,
+                        Quantity = 3,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseExpenditureAvalItem
+                    {
+                        StockId = 1,
+                        UnitId = 3,
+                        UnitCode = "Unit3",
+                        UnitName = "Unit3",
+                        AvalReceiptNo = receiptAval.AvalReceiptNo,
+                        AvalReceiptId= receiptAval.Id,
+                        Quantity = 4,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    }
+                }
+            };
+            return DataFabric;
+        }
+
+        public async Task<GarmentLeftoverWarehouseExpenditureAval> GetTestDataFabric1()
+        {
+            GarmentLeftoverWarehouseExpenditureAval data = await GetNewDataFabric1();
 
             await Service.CreateAsync(data);
 

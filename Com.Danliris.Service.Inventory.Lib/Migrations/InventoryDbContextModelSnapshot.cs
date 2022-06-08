@@ -2504,8 +2504,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Migrations
 
                     b.Property<bool>("Active");
 
+                    b.Property<string>("Barcode");
+
                     b.Property<string>("Construction")
                         .HasMaxLength(255);
+
+                    b.Property<string>("DestinationArea");
 
                     b.Property<string>("Grade")
                         .HasMaxLength(255);
@@ -2521,12 +2525,16 @@ namespace Com.Danliris.Service.Inventory.Lib.Migrations
 
                     b.Property<string>("ProductRemark");
 
+                    b.Property<DateTime>("ProductionOrderDate");
+
                     b.Property<double>("Quantity");
 
                     b.Property<double>("QuantityPiece");
 
                     b.Property<string>("ReferenceNo")
                         .HasMaxLength(255);
+
+                    b.Property<string>("Type");
 
                     b.Property<int>("UomId")
                         .HasMaxLength(255);
@@ -2597,10 +2605,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Migrations
 
                     b.Property<bool>("Active");
 
+                    b.Property<string>("Barcode");
+
                     b.Property<string>("BonNo");
 
                     b.Property<string>("Construction")
                         .HasMaxLength(255);
+
+                    b.Property<string>("DestinationArea");
 
                     b.Property<string>("Grade")
                         .HasMaxLength(255);
@@ -2618,6 +2630,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Migrations
                         .HasMaxLength(255);
 
                     b.Property<string>("ProductRemark");
+
+                    b.Property<DateTime>("ProductionOrderDate");
 
                     b.Property<double>("Quantity");
 

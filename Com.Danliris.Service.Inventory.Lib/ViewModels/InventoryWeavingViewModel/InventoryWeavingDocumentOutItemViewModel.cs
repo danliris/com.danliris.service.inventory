@@ -31,6 +31,12 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryWeavingViewMode
         public double QuantityPiece { get; set; }
         public string ProductRemark { get; set; }
 
+        public string Barcode { get; set; }
+        public DateTime ProductionOrderDate { get; set; }
+
+        public string DestinationArea { get; set; }
+        public string Type { get; set; }
+
         public bool IsSave { get; set; }
         public int InventoryWeavingDocumentId { get; set; }
     }

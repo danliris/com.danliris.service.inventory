@@ -10,6 +10,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryWeavingViewMode
         public string Grade { get; set; }
         public string Piece { get; set; }
         /*construction */
+        public string Construction { get; set; }
         public string MaterialName { get; set; }
         public string WovenType { get; set; }
         public string Yarn1 { get; set; }
@@ -27,5 +28,8 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryWeavingViewMode
         public double QtyPiece { get; set; }
         public string ProductRemark { get; set; }
         public bool IsSave { get; set; }
+
+        public string Barcode { get; set; }
+        public DateTime ProductionOrderDate { get; set; }
     }
 }

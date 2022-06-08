@@ -6,6 +6,7 @@ using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.Stock
 using Com.Danliris.Service.Inventory.Lib.ViewModels;
 using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.GarmentLeftoverWarehouseReceiptFinishedGoodViewModel;
 using Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse.GarmentLeftoverWarehouseReceiptFinishedGoodDataUtils;
+using Com.Danliris.Service.Inventory.Test.DataUtils.IntegrationDataUtil;
 using Com.Danliris.Service.Inventory.Test.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -14,6 +15,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -409,7 +412,7 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
         {
 
 
-            var serviceProvider = GetServiceProvider();
+            var serviceProvider1 = GetServiceProvider();
 
             var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
             stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
@@ -418,20 +421,60 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
               .ReturnsAsync(1);
 
-            serviceProvider
+
+
+            serviceProvider1
                 .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
                 .Returns(stockServiceMock.Object);
 
-            serviceProvider
+            serviceProvider1
                 .Setup(x => x.GetService(typeof(IHttpService)))
                 .Returns(new HttpTestService());
 
+            var serviceProvider = new Mock<IServiceProvider>();
+
+            var httpClientService = new Mock<IHttpService>();
+            HttpResponseMessage messageunitdo = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            messageunitdo.Content = new StringContent("{\"apiVersion\":\"1.0\",\"statusCode\":200,\"message\":\"Ok\",\"data\":[{\"POSerialNumber\":\"PONo\",\"ProductCode\":\"ProductCode\",\"ProductName\":\"FABRIC\",\"BeacukaiDate\":\"2018/10/20\"},{\"POSerialNumber\":\"PONo123\",\"ProductCode\":\"ProductCode\",\"ProductName\":\"FABRIC\",\"BeacukaiDate\":\"2018/10/20\"}]}}");
+
+
+            HttpResponseMessage messagebc= new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            messagebc.Content = new StringContent("{\"apiVersion\":\"1.0\",\"statusCode\":200,\"message\":\"Ok\",\"data\":[{\"POSerialNumber\":\"PONo\",\"customnos\":[{}]\"ProductCode\",\"ProductName\":\"FABRIC\",\"BeacukaiDate\":\"2018/10/20\"},{\"POSerialNumber\":\"PONo123\",\"ProductCode\":\"ProductCode\",\"ProductName\":\"FABRIC\",\"BeacukaiDate\":\"2018/10/20\"}]}}");
+
+            httpClientService
+                .Setup(x => x.SendAsync(It.IsAny<HttpMethod>(), It.Is<string>(s => s.Contains("garment-beacukai/by-poserialnumbers")), It.IsAny<StringContent>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new UnitDODataUtil().GetMultipleResultBCFormatterOkString()) });
+
+            httpClientService
+                .Setup(x => x.SendAsync(It.IsAny<HttpMethod>(), It.Is<string>(s => s.Contains("garment-unit-delivery-orders/leftoverwarehouse")), It.IsAny<StringContent>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new UnitDODataUtil().GetMultipleResultFormatterOkString()) });
+
+            httpClientService
+                .Setup(x => x.PutAsync(It.Is<string>(s => s.Contains("update-received")), It.IsAny<StringContent>()))
+                .ReturnsAsync(messageunitdo);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IIdentityService)))
+                .Returns(new IdentityService() { Token = "Token", Username = "Test" });
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(httpClientService.Object);
+
+            serviceProvider
+              .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+              .Returns(stockServiceMock.Object);
+
             GarmentLeftoverWarehouseReceiptFinishedGoodService service = new GarmentLeftoverWarehouseReceiptFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
 
-            
-            var dataFinishedGood = await _dataUtilFinishedGood(service).GetTestData(); ;
 
-            var result = service.GetMonitoring( DateTime.Now, DateTime.Now, 1, 1, "{}", 7);
+            var dataFinishedGood = _dataUtilFinishedGood(service).GetNewData();
+
+            dataFinishedGood.ReceiptDate = dataFinishedGood.ReceiptDate.AddDays(-1);
+
+            await service.CreateAsync(dataFinishedGood);
+
+            var result = service.GetMonitoring(null, DateTime.Now, 1, 25, "{}", 7);
 
 
             Assert.NotNull(result);
@@ -443,6 +486,10 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
 
             var serviceProvider = GetServiceProvider();
 
+            var httpClientService = new Mock<IHttpService>();
+            HttpResponseMessage messageunitdo = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            messageunitdo.Content = new StringContent("{\"apiVersion\":\"1.0\",\"statusCode\":200,\"message\":\"Ok\",\"data\":[{\"POSerialNumber\":\"PONo\",\"ProductCode\":\"ProductCode\",\"ProductName\":\"FABRIC\",\"BeacukaiDate\":\"2018/10/20\"},{\"POSerialNumber\":\"PONo123\",\"ProductCode\":\"ProductCode\",\"ProductName\":\"FABRIC\",\"BeacukaiDate\":\"2018/10/20\"}]}}");
+
             var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
             stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(1);
@@ -454,21 +501,118 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
                 .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
                 .Returns(stockServiceMock.Object);
 
+            httpClientService
+               .Setup(x => x.SendAsync(It.IsAny<HttpMethod>(), It.Is<string>(s => s.Contains("garment-beacukai/by-poserialnumbers")), It.IsAny<StringContent>()))
+               .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new UnitDODataUtil().GetMultipleResultBCFormatterOkString()) });
+
+            httpClientService
+                .Setup(x => x.SendAsync(It.IsAny<HttpMethod>(), It.Is<string>(s => s.Contains("garment-unit-delivery-orders/leftoverwarehouse")), It.IsAny<StringContent>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new UnitDODataUtil().GetMultipleResultFormatterOkString()) });
+
+            httpClientService
+                .Setup(x => x.PutAsync(It.Is<string>(s => s.Contains("update-received")), It.IsAny<StringContent>()))
+                .ReturnsAsync(messageunitdo);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IIdentityService)))
+                .Returns(new IdentityService() { Token = "Token", Username = "Test" });
+
             serviceProvider
                 .Setup(x => x.GetService(typeof(IHttpService)))
-                .Returns(new HttpTestService());
+                .Returns(httpClientService.Object);
 
-           
+            serviceProvider
+              .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+              .Returns(stockServiceMock.Object);
+
+
             GarmentLeftoverWarehouseReceiptFinishedGoodService service = new GarmentLeftoverWarehouseReceiptFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
 
 
-            var dataFinishedGood = await _dataUtilFinishedGood(service).GetTestData(); ;
+            var dataFinishedGood = _dataUtilFinishedGood(service).GetNewData();
 
-            var result = service.GenerateExcel(DateTime.Now, DateTime.Now, 7);
+            dataFinishedGood.ReceiptDate = dataFinishedGood.ReceiptDate.AddDays(-1);
+
+            await service.CreateAsync(dataFinishedGood);
+
+            var result = service.GenerateExcel(null, DateTime.Now, 7);
 
 
             Assert.NotNull(result);
         }
-        
+
+        [Fact]
+        public async Task Should_Success_GetReportT_InternalServerError()
+        {
+
+
+            var serviceProvider1 = GetServiceProvider();
+
+            var stockServiceMock = new Mock<IGarmentLeftoverWarehouseStockService>();
+            stockServiceMock.Setup(s => s.StockOut(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(1);
+
+            stockServiceMock.Setup(s => s.StockIn(It.IsAny<GarmentLeftoverWarehouseStock>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+              .ReturnsAsync(1);
+
+
+
+            serviceProvider1
+                .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+                .Returns(stockServiceMock.Object);
+
+            serviceProvider1
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(new HttpTestService());
+
+            var serviceProvider = new Mock<IServiceProvider>();
+
+            var httpClientService = new Mock<IHttpService>();
+            HttpResponseMessage messageunitdo = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            messageunitdo.Content = new StringContent("{\"apiVersion\":\"1.0\",\"statusCode\":200,\"message\":\"Ok\",\"data\":[{\"POSerialNumber\":\"PONo\",\"ProductCode\":\"ProductCode\",\"ProductName\":\"FABRIC\",\"BeacukaiDate\":\"2018/10/20\"},{\"POSerialNumber\":\"PONo123\",\"ProductCode\":\"ProductCode\",\"ProductName\":\"FABRIC\",\"BeacukaiDate\":\"2018/10/20\"}]}}");
+
+
+            HttpResponseMessage messagebc = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            messagebc.Content = new StringContent("{\"apiVersion\":\"1.0\",\"statusCode\":200,\"message\":\"Ok\",\"data\":[{\"POSerialNumber\":\"PONo\",\"customnos\":[{}]\"ProductCode\",\"ProductName\":\"FABRIC\",\"BeacukaiDate\":\"2018/10/20\"},{\"POSerialNumber\":\"PONo123\",\"ProductCode\":\"ProductCode\",\"ProductName\":\"FABRIC\",\"BeacukaiDate\":\"2018/10/20\"}]}}");
+
+            httpClientService
+                .Setup(x => x.SendAsync(It.IsAny<HttpMethod>(), It.Is<string>(s => s.Contains("garment-beacukai/by-poserialnumbers")), It.IsAny<StringContent>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+
+            httpClientService
+                .Setup(x => x.SendAsync(It.IsAny<HttpMethod>(), It.Is<string>(s => s.Contains("garment-unit-delivery-orders/leftoverwarehouse")), It.IsAny<StringContent>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+
+            httpClientService
+                .Setup(x => x.PutAsync(It.Is<string>(s => s.Contains("update-received")), It.IsAny<StringContent>()))
+                .ReturnsAsync(messageunitdo);
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IIdentityService)))
+                .Returns(new IdentityService() { Token = "Token", Username = "Test" });
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(httpClientService.Object);
+
+            serviceProvider
+              .Setup(x => x.GetService(typeof(IGarmentLeftoverWarehouseStockService)))
+              .Returns(stockServiceMock.Object);
+
+            GarmentLeftoverWarehouseReceiptFinishedGoodService service = new GarmentLeftoverWarehouseReceiptFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+
+            var dataFinishedGood = _dataUtilFinishedGood(service).GetNewData();
+
+            dataFinishedGood.ReceiptDate = dataFinishedGood.ReceiptDate.AddDays(-1);
+
+            await service.CreateAsync(dataFinishedGood);
+
+            var result = service.GetMonitoring(null, DateTime.Now, 1, 25, "{}", 7);
+
+
+            Assert.NotNull(result);
+        }
+
     }
 }

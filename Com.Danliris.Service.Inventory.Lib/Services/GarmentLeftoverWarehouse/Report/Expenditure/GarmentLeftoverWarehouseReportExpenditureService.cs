@@ -80,10 +80,11 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
             int TotalData = pageable.TotalCount;
             
-            if (page == ((TotalData / size) + 1) && TotalData != 0)
+            if (page == Math.Ceiling((double)TotalData / (double)size) && TotalData != 0)
             {
                 var QtyTotal = Query.Sum(x => x.Quantity);
                 var ExpendQtyTotal = Query.Sum(x => x.QtyKG);
+                var PriceTotal = Math.Round(Query.Sum(x => x.Price),2);
                 GarmentLeftoverWarehouseReportExpenditureViewModel vm = new GarmentLeftoverWarehouseReportExpenditureViewModel();
 
                 vm.ExpenditureNo = "T O T A L";
@@ -105,6 +106,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 vm.QtyKG = ExpendQtyTotal;
                 vm.Composition = "";
                 vm.Const = "";
+                vm.Price = PriceTotal;
 
                 Data.Add(vm);
 
@@ -154,7 +156,15 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                      },
                                      QtyKG = a.QtyKG,
                                      LocalSalesNoteNo = a.LocalSalesNoteNo,
-                                     _LastModifiedUtc = a._LastModifiedUtc
+                                     _LastModifiedUtc = a._LastModifiedUtc,
+                                     UnitFrom = new UnitViewModel
+                                     {
+                                         Code = b.UnitCode,
+                                         Id = b.UnitId.ToString(),
+                                         Name = b.UnitName
+                                     },
+                                     Price = Math.Round(b.BasicPrice * b.Quantity,2) 
+                                    
                                 });
                 Query = QueryFabric;
             } 
@@ -189,7 +199,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                      Unit = b.UomUnit
                                  },
                                  LocalSalesNoteNo = a.LocalSalesNoteNo,
-                                 _LastModifiedUtc = a._LastModifiedUtc
+                                 _LastModifiedUtc = a._LastModifiedUtc,
+                                 UnitFrom = new UnitViewModel
+                                 {
+                                     Code = b.UnitCode,
+                                     Id = b.UnitId.ToString(),
+                                     Name = b.UnitName
+                                 },
+                                 Price = Math.Round(b.BasicPrice * b.Quantity,2)
                              });
                 Query = QueryAcc;
             } 
@@ -222,7 +239,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                        Unit = b.UomUnit
                                    },
                                    LocalSalesNoteNo = a.LocalSalesNoteNo,
-                                   _LastModifiedUtc = a._LastModifiedUtc
+                                   _LastModifiedUtc = a._LastModifiedUtc,
+                                   UnitFrom = new UnitViewModel
+                                   {
+                                       Code = b.UnitCode,
+                                       Id = b.UnitId.ToString(),
+                                       Name = b.UnitName
+                                   },
+                                   Price = Math.Round(b.BasicPrice * b.Quantity,2)
                                });
                 QueryAcc = (from a in DbContext.GarmentLeftoverWarehouseExpenditureAccessories
                             join b in DbContext.GarmentLeftoverWarehouseExpenditureAccessoriesItems on a.Id equals b.ExpenditureId
@@ -251,7 +275,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                     Unit = b.UomUnit
                                 },
                                 LocalSalesNoteNo = a.LocalSalesNoteNo,
-                                _LastModifiedUtc = a._LastModifiedUtc
+                                _LastModifiedUtc = a._LastModifiedUtc,
+                                UnitFrom = new UnitViewModel
+                                {
+                                    Code = b.UnitCode,
+                                    Id = b.UnitId.ToString(),
+                                    Name = b.UnitName
+                                },
+                                Price = Math.Round(b.BasicPrice * b.Quantity,2)
                             });
 
                 Query = QueryFabric.Concat(QueryAcc);
@@ -284,15 +315,34 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
         private Dictionary<string, Object> GetProductFromCore(string productId)
         {
             var httpService = (IHttpService)ServiceProvider.GetService(typeof(IHttpService));
-            var responseGarmentProduct = httpService.GetAsync($"{GarmentCoreProductUri}/" + productId).Result.Content.ReadAsStringAsync();
+            var responseGarmentProduct = httpService.GetAsync($"{GarmentCoreProductUri}/" + productId).Result;//.Content.ReadAsStringAsync();
+            if (responseGarmentProduct.IsSuccessStatusCode) {
+                var content = responseGarmentProduct.Content.ReadAsStringAsync().Result;
+                Dictionary<string, object> resultGarmentProduct = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
 
-            Dictionary<string, object> resultGarmentProduct = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseGarmentProduct.Result);
-            var jsonLocalCoverLetter = resultGarmentProduct.Single(p => p.Key.Equals("data")).Value;
-            var a = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonLocalCoverLetter.ToString());
-            //if (a.Count > 0)
-            //{
+                var jsonLocalCoverLetter = resultGarmentProduct.Single(p => p.Key.Equals("data")).Value;
+
+                var a = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonLocalCoverLetter.ToString());
+                //if (a.Count > 0)
+                //{
                 Dictionary<string, object> dataLocalCoverLetter = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonLocalCoverLetter.ToString());
                 return dataLocalCoverLetter;
+            }
+            //Dictionary<string, object> resultGarmentProduct = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseGarmentProduct.Result);
+            //if (resultGarmentProduct.Single(p => p.Key.Equals("data")).Value != null)
+            //{
+            //    var jsonLocalCoverLetter = resultGarmentProduct.Single(p => p.Key.Equals("data")).Value;
+
+            //    var a = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonLocalCoverLetter.ToString());
+            //    //if (a.Count > 0)
+            //    //{
+            //    Dictionary<string, object> dataLocalCoverLetter = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonLocalCoverLetter.ToString());
+            //    return dataLocalCoverLetter;
+            //}
+            else
+            {
+                return null;
+            }
             //}
            // return null;
 
@@ -305,11 +355,13 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
             double QtyTotal = Query.Sum(x => x.Quantity);
             double ExpendQtyTotal = Query.Sum(x => x.QtyKG);
+            double PriceTotal = Math.Round(Query.Sum(x => x.Price),2);
             DataTable result = new DataTable();
 
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "No Bon Keluar", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tanggal Bon", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Asal", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tujuan", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Keterangan Tujuan", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Jumlah Keluar (KG)", DataType = typeof(double) });
@@ -320,12 +372,13 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             result.Columns.Add(new DataColumn() { ColumnName = "Kode Barang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Qty", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Satuan", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Harga", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "No Nota Penjualan", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "No Bc Keluar", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tipe Bc", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tanggal Bc", DataType = typeof(String) });
             if (Query.ToArray().Count() == 0)
-                result.Rows.Add("", "", "", "", "",0, "", "", "", "", "", 0, "", "", 0, "",""); // to allow column name to be generated properly for empty data as template
+                result.Rows.Add("", "", "", "", "", "",0, "", "", "", "", "", 0, "", 0, "", 0, "",""); // to allow column name to be generated properly for empty data as template
             else
             {
                 int index = 0;
@@ -335,13 +388,14 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     var garmentProduct = GetProductFromCore(item.Product.Id);
                     if (garmentProduct != null)
                     {
-                        item.Composition = garmentProduct["Composition"].ToString();
-                        item.Const = receiptType == "ACCESSORIES" ? "-" : garmentProduct["Const"].ToString() + "; " + garmentProduct["Yarn"].ToString() + "; " + garmentProduct["Width"].ToString();
+                        item.Composition = garmentProduct["Composition"] == null ? "-" : garmentProduct["Composition"].ToString();
+                        item.Const = receiptType == "ACCESSORIES" ? "-" : (garmentProduct["Const"] == null ? "-" : garmentProduct["Const"].ToString()) + "; " + (garmentProduct["Yarn"] == null ? "-" : garmentProduct["Yarn"].ToString()) + "; " + (garmentProduct["Width"] == null ? "-" : garmentProduct["Width"].ToString());
                     }
                     result.Rows.Add(
                         index, 
                         item.ExpenditureNo, 
                         item.ExpenditureDate.ToString("dd MMM yyyy", new CultureInfo("id-ID")), 
+                        item.UnitFrom.Name,
                         item.ExpenditureDestination, 
                         item.DescriptionOfPurpose, 
                         item.QtyKG,
@@ -351,7 +405,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                         item.Product.Name, 
                         item.Product.Code, 
                         item.Quantity, 
-                        item.Uom.Unit, 
+                        item.Uom.Unit,
+                        item.Price,
                         item.LocalSalesNoteNo, 
                         item.BCNo, 
                         item.BCType, 
@@ -359,6 +414,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 }
 
                 result.Rows.Add(
+                         "",
                          "",
                          "T O T A L .......",
                          "",
@@ -372,6 +428,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                          "",
                          QtyTotal,
                          "",
+                         PriceTotal,
                          "",
                          "",
                          "",

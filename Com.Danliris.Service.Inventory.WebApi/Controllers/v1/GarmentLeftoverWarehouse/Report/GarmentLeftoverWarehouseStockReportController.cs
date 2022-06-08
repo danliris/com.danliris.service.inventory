@@ -29,6 +29,14 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.GarmentLeftoverWa
             ValidateService = validateService;
             Service = service;
         }
+
+        protected void VerifyUser()
+        {
+            IdentityService.Username = User.Claims.ToArray().SingleOrDefault(p => p.Type.Equals("username")).Value;
+            IdentityService.Token = Request.Headers["Authorization"].FirstOrDefault().Replace("Bearer ", "");
+            IdentityService.TimezoneOffset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+        }
+
         [HttpGet("fabric")]
         public IActionResult GetReportStockFabric(DateTime? dateFrom, DateTime? dateTo, int unit, int page, int size, string Order = "{}")
         {
@@ -156,7 +164,7 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.GarmentLeftoverWa
         {
             try
             {
-
+                VerifyUser();
                 int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
                 string accept = Request.Headers["Accept"];
                 if (page == 0)
@@ -190,6 +198,7 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.GarmentLeftoverWa
 
             try
             {
+                VerifyUser();
                 byte[] xlsInBytes;
                 int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
                 DateTime DateFrom = dateFrom == null ? new DateTime(1970, 1, 1) : Convert.ToDateTime(dateFrom);

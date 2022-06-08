@@ -6,15 +6,20 @@ using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.Expen
 using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.Stock;
 using Com.Danliris.Service.Inventory.Lib.ViewModels;
 using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.ExpenditureFinishedGood;
+using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.Stock;
 using Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse.ExpenditureFinishedGood;
 using Com.Danliris.Service.Inventory.Test.Helpers;
+using Com.Danliris.Service.Inventory.WebApi.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -394,14 +399,62 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
                 .Setup(x => x.GetService(typeof(IHttpService)))
                 .Returns(new HttpTestService());
 
-            GarmentLeftoverWarehouseExpenditureFinishedGoodService utilService = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), GetServiceProvider().Object);
+            
 
             GarmentLeftoverWarehouseExpenditureFinishedGoodService service = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
 
-            
-            var dataFinishedGood = await _dataUtilFinishedGood(service).GetTestData(); ;
+            var dataFinishedGood = _dataUtilFinishedGood(service).GetNewData();
 
-            var result = utilService.GetReport( DateTime.Now, DateTime.Now, 1, 1, "{}", 7);
+            dataFinishedGood.ExpenditureDate = dataFinishedGood.ExpenditureDate.AddDays(-1);
+
+            await service.CreateAsync(dataFinishedGood);
+
+            var httpClientService = new Mock<IHttpService>();
+
+            var ExpendGood = new List<ExpendGoodViewModel> {
+                new ExpendGoodViewModel
+                {
+                    RONo = "roNo",
+                    Comodity = new GarmentComodity
+                    {
+                        Code = "Code",
+                        Id = 1,
+                        Name = "Name"
+                    }
+                }
+            };
+
+            Dictionary<string, object> result2 =
+                new ResultFormatter("1.0", WebApi.Helpers.General.OK_STATUS_CODE, WebApi.Helpers.General.OK_MESSAGE)
+                .Ok(ExpendGood);
+
+            httpClientService
+                .Setup(x => x.GetAsync(It.Is<string>(s => s.Contains("expenditure-goods/byRO"))))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(result2)) });
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(httpClientService.Object);
+
+            
+
+            GarmentLeftoverWarehouseExpenditureFinishedGoodService utilService = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var result = utilService.GetReport( null, DateTime.Now, 1, 1, "{}", 7);
+
+            var httpClientService2 = new Mock<IHttpService>();
+
+            httpClientService2
+              .Setup(x => x.GetAsync(It.Is<string>(s => s.Contains("expenditure-goods/byRO"))))
+              .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(httpClientService2.Object);
+
+            GarmentLeftoverWarehouseExpenditureFinishedGoodService utilService2 = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var result21 = utilService2.GetReport(null, DateTime.Now, 1, 1, "{}", 7);
 
 
             Assert.NotNull(result);
@@ -428,15 +481,60 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
                 .Setup(x => x.GetService(typeof(IHttpService)))
                 .Returns(new HttpTestService());
 
-            GarmentLeftoverWarehouseExpenditureFinishedGoodService utilService = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), GetServiceProvider().Object);
+           
 
             GarmentLeftoverWarehouseExpenditureFinishedGoodService service = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
 
+            var dataFinishedGood = _dataUtilFinishedGood(service).GetNewData();
 
-            var dataFinishedGood = await _dataUtilFinishedGood(service).GetTestData(); ;
+            dataFinishedGood.ExpenditureDate = dataFinishedGood.ExpenditureDate.AddDays(-1);
 
-            var result = utilService.GenerateExcel(DateTime.Now, DateTime.Now, 7);
+            await service.CreateAsync(dataFinishedGood);
 
+            var httpClientService = new Mock<IHttpService>();
+
+            var ExpendGood = new List<ExpendGoodViewModel> {
+                new ExpendGoodViewModel
+                {
+                    RONo = "roNo",
+                    Comodity = new GarmentComodity
+                    {
+                        Code = "Code",
+                        Id = 1,
+                        Name = "Name"
+                    }
+                }
+            };
+
+            Dictionary<string, object> result2 =
+                new ResultFormatter("1.0", WebApi.Helpers.General.OK_STATUS_CODE, WebApi.Helpers.General.OK_MESSAGE)
+                .Ok(ExpendGood);
+
+            httpClientService
+                .Setup(x => x.GetAsync(It.Is<string>(s => s.Contains("expenditure-goods/byRO"))))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(result2)) });
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(httpClientService.Object);
+
+            GarmentLeftoverWarehouseExpenditureFinishedGoodService utilService = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var result = utilService.GenerateExcel(null, DateTime.Now, 7);
+
+            var httpClientService2 = new Mock<IHttpService>();
+
+            httpClientService2
+              .Setup(x => x.GetAsync(It.Is<string>(s => s.Contains("expenditure-goods/byRO"))))
+              .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IHttpService)))
+                .Returns(httpClientService2.Object);
+
+            GarmentLeftoverWarehouseExpenditureFinishedGoodService utilService2 = new GarmentLeftoverWarehouseExpenditureFinishedGoodService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
+
+            var result21 = utilService2.GenerateExcel(null, DateTime.Now, 7);
 
             Assert.NotNull(result);
         }

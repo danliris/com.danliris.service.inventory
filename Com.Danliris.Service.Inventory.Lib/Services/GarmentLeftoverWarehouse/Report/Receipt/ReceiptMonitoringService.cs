@@ -69,7 +69,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var fabricIds = queryResult.Select(s => s.fabricId).Distinct().ToList();
             var fabrics = DbContext.GarmentLeftoverWarehouseReceiptFabrics.Where(w => fabricIds.Contains(w.Id)).Select(s => new { s.Id, s.ReceiptNoteNo, s.ReceiptDate, s.UnitFromCode, s.UENNo }).ToList();
             var itemIds = queryResult.Select(s => s.itemId).Distinct().ToList();
-            var items = DbContext.GarmentLeftoverWarehouseReceiptFabricItems.Where(w => itemIds.Contains(w.Id)).Select(s => new { s.Id, s.POSerialNumber, s.ProductCode, s.ProductName, s.Quantity, s.UomUnit, s.ProductRemark, s.FabricRemark, s.Composition }).ToList();
+            var items = DbContext.GarmentLeftoverWarehouseReceiptFabricItems.Where(w => itemIds.Contains(w.Id)).Select(s => new { s.Id, s.POSerialNumber, s.ProductCode, s.ProductName, s.Quantity, s.UomUnit, s.ProductRemark, s.FabricRemark, s.Composition, s.BasicPrice }).ToList();
 
             int i = ((page - 1) * size) + 1;
             foreach (var item in queryResult)
@@ -91,6 +91,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 vm.UENNo = fabric.UENNo;
                 vm.FabricRemark = fabricItem.FabricRemark;
                 vm.Composition = fabricItem.Composition;
+                vm.Price = Math.Round(fabricItem.BasicPrice * fabricItem.Quantity,2);
 
                 listData.Add(vm);
                 i++;
@@ -124,9 +125,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             });
             if (size != 0)
             {
-                if (page == ((TotalCountReport / size) + 1) && TotalCountReport != 0)
+                if (page == Math.Ceiling((double)TotalCountReport / (double)size) && TotalCountReport != 0)
                 {
                     var QtyTotal = items.Sum(x => x.Quantity);
+                    var PriceTotal = Math.Round(items.Sum(x => x.BasicPrice * x.Quantity), 2);
                     ReceiptMonitoringViewModel vm = new ReceiptMonitoringViewModel();
 
                     vm.ProductRemark = "";
@@ -141,6 +143,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     vm.UENNo = "";
                     vm.FabricRemark = "";
                     vm.Composition = "";
+                    vm.Price = PriceTotal;
 
                     listData.Add(vm);
 
@@ -167,6 +170,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var Query = GetFabricReceiptMonitoringQuery(dateFrom, dateTo, offset, 0, 0);
 
             var QtyTotal = Query.Sum(x => x.Quantity);
+            var PriceTotal = Math.Round(Query.Sum(x => x.Price),2);
 
             DataTable result = new DataTable();
 
@@ -182,11 +186,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             result.Columns.Add(new DataColumn() { ColumnName = "Konstruksi", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Qty", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Satuan", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Harga", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Asal BC Masuk", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tipe Bc", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tanggal Bc", DataType = typeof(String) });
             if (Query.ToArray().Count() == 0)
-                result.Rows.Add("", "", "", "", "", "", "", "", "", "", 0, "", "", "", ""); // to allow column name to be generated properly for empty data as template
+                result.Rows.Add("", "", "", "", "", "", "", "", "", "", 0, "", 0, "", "", ""); // to allow column name to be generated properly for empty data as template
             else
             {
                 int index = 0;
@@ -226,12 +231,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
                     result.Rows.Add(index, item.ReceiptNoteNo, item.ReceiptDate.ToString("dd MMM yyyy", new CultureInfo("id-ID")),
                         item.UENNo, item.UnitFrom.Code, item.POSerialNumber, item.Product.Name, item.Product.Code, item.Composition, item.FabricRemark, item.Quantity,
-                        item.Uom.Unit, no, type, date);
+                        item.Uom.Unit, item.Price, no, type, date);
                 }
 
                 result.Rows.Add("", "T O T A L . . . . ", "",
                      "", "", "", "", "", "", "", QtyTotal,
-                      "", "", "", "");
+                      "", PriceTotal, "", "", "");
             }
             ExcelPackage package = new ExcelPackage();
             var sheet = package.Workbook.Worksheets.Add("Report Penerimaan Gudang Sisa");
@@ -278,7 +283,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var accIds = queryResult.Select(s => s.accId).Distinct().ToList();
             var accs = DbContext.GarmentLeftoverWarehouseReceiptAccessories.Where(w => accIds.Contains(w.Id)).Select(s => new { s.Id, s.InvoiceNoReceive, s.StorageReceiveDate, s.RequestUnitCode, s.UENNo }).ToList();
             var itemIds = queryResult.Select(s => s.itemId).Distinct().ToList();
-            var items = DbContext.GarmentLeftoverWarehouseReceiptAccessoryItems.Where(w => itemIds.Contains(w.Id)).Select(s => new { s.Id, s.POSerialNumber, s.ProductCode, s.ProductName, s.Quantity, s.UomUnit, s.ProductRemark }).ToList();
+            var items = DbContext.GarmentLeftoverWarehouseReceiptAccessoryItems.Where(w => itemIds.Contains(w.Id)).Select(s => new { s.Id, s.POSerialNumber, s.ProductCode, s.ProductName, s.Quantity, s.UomUnit, s.ProductRemark, s.BasicPrice }).ToList();
 
             int i = ((page - 1) * size) + 1;
             foreach (var item in queryResult)
@@ -298,6 +303,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 vm.POSerialNumber = accItem.POSerialNumber;
                 vm.index = i;
                 vm.UENNo = acc.UENNo;
+                vm.Price = Math.Round(accItem.BasicPrice * accItem.Quantity,2);
 
                 listData.Add(vm);
                 i++;
@@ -331,9 +337,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             });
             if (size != 0)
             {
-                if (page == ((listData.Count() / size) + 1) && listData.Count() != 0)
+                if (page == Math.Ceiling((double)TotalCountReport / (double)size) && listData.Count() != 0)
                 {
                     var QtyTotal = listData.Sum(x => x.Quantity);
+                    var PriceTotal = Math.Round(listData.Sum(x => x.Price),2);
                     ReceiptMonitoringViewModel vm = new ReceiptMonitoringViewModel();
 
                     vm.ProductRemark = "";
@@ -348,6 +355,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     vm.UENNo = "";
                     vm.FabricRemark = "";
                     vm.Composition = "";
+                    vm.Price = PriceTotal;
 
                     listData.Add(vm);
 
@@ -400,6 +408,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var Query = GetAccessoriesReceiptMonitoringQuery(dateFrom, dateTo, offset, 0, 0);
 
             var QtyTotal = Query.Sum(x => x.Quantity);
+            var PriceTotal = Math.Round(Query.Sum(x => x.Price),2);
 
             DataTable result = new DataTable();
 
@@ -414,11 +423,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             result.Columns.Add(new DataColumn() { ColumnName = "Keterangan Barang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Qty", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Satuan", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Harga", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Asal BC Masuk", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tipe Bc", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tanggal Bc", DataType = typeof(String) });
             if (Query.ToArray().Count() == 0)
-                result.Rows.Add("", "", "", "", "", "", "", "", "", 0, "", "", "", ""); // to allow column name to be generated properly for empty data as template
+                result.Rows.Add("", "", "", "", "", "", "", "", "", 0, "", 0, "", "", ""); // to allow column name to be generated properly for empty data as template
             else
             {
                 int index = 0;
@@ -459,12 +469,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
                     result.Rows.Add(index, item.ReceiptNoteNo, item.ReceiptDate.ToString("dd MMM yyyy", new CultureInfo("id-ID")),
                         item.UENNo, item.UnitFrom.Code, item.POSerialNumber, item.Product.Name, item.Product.Code, item.ProductRemark, item.Quantity,
-                        item.Uom.Unit, no, type, date);
+                        item.Uom.Unit, item.Price, no, type, date);
                 }
 
                 result.Rows.Add("", "T O T A L . . . . ", "",
                       "", "", "", "", "", "", QtyTotal,
-                       "", "", "", "");
+                       "", PriceTotal, "", "", "");
             }
             ExcelPackage package = new ExcelPackage();
             var sheet = package.Workbook.Worksheets.Add("Report Penerimaan Gudang Sisa");

@@ -115,7 +115,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.Reports.R
                                  YarnOrigin2 = a.YarnOrigin2,
                                  YarnType1 = a.YarnType1,
                                  YarnType2 = a.YarnType2,
-                                 Area = b.BonType != null? b.BonType : "-",
+                                 Area = a.DestinationArea,
                                  Quantity = a.Quantity, //!= null ? a.Quantity: 0,
                                  Type = a.Type
                                  

@@ -112,8 +112,13 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             ReceiptMonitoringService Reportservice = new ReceiptMonitoringService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
 
 
-            var dataFabric = await _dataUtilFabric(service).GetTestData(); ;
-            var result1 = Reportservice.GetFabricReceiptMonitoring(DateTime.Now, DateTime.Now, 1, 1, "{}", 7);
+            var dataFabric = _dataUtilFabric(service).GetNewData();
+
+            dataFabric.ReceiptDate = dataFabric.ReceiptDate.AddDays(-1);
+
+            await service.CreateAsync(dataFabric);
+
+            var result1 = Reportservice.GetFabricReceiptMonitoring(null, DateTime.Now, 1, 1, "{}", 7);
             Assert.NotNull(result1);
 
 
@@ -212,8 +217,13 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             ReceiptMonitoringService Reportservice = new ReceiptMonitoringService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
 
 
-            var dataFabric = await _dataUtilFabric(service).GetTestData(); ;
-            var result1 = Reportservice.GenerateExcelFabric(DateTime.Now, DateTime.Now, 7);
+            var dataFabric = _dataUtilFabric(service).GetNewData();
+
+            dataFabric.ReceiptDate = dataFabric.ReceiptDate.AddDays(-1);
+
+            await service.CreateAsync(dataFabric); dataFabric = await _dataUtilFabric(service).GetTestData();
+
+            var result1 = Reportservice.GenerateExcelFabric(null, DateTime.Now, 7);
             Assert.NotNull(result1);
 
         }
@@ -308,8 +318,12 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             ReceiptMonitoringService Reportservice = new ReceiptMonitoringService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
 
 
-            var dataAcc = await _dataUtilAcc(service).GetTestData();
-            var result1 = Reportservice.GetAccessoriesReceiptMonitoring(DateTime.Now, DateTime.Now, 1, 1, "{}", 7);
+            var datAcc = _dataUtilAcc(service).GetNewData();
+
+            datAcc.StorageReceiveDate = datAcc.StorageReceiveDate.AddDays(-1);
+
+            await service.CreateAsync(datAcc);
+            var result1 = Reportservice.GetAccessoriesReceiptMonitoring(null, DateTime.Now, 1, 1, "{}", 7);
 
             Assert.NotNull(result1);
 

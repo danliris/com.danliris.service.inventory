@@ -29,5 +29,10 @@ namespace Com.Danliris.Service.Inventory.Test.Helpers
         {
             return Task.Run(() => new HttpResponseMessage());
         }
+
+        public Task<HttpResponseMessage> SendAsync(HttpMethod method, string url, HttpContent content)
+        {
+            return Task.Run(() => new HttpResponseMessage());
+        }
     }
 }

@@ -15,6 +15,7 @@ using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.Stock
 using Com.Danliris.Service.Inventory.Lib.ViewModels;
 using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.ExpenditureFinishedGood;
 using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.Report;
+using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.Stock;
 using Com.Moonlay.Models;
 using Com.Moonlay.NetCore.Lib;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.E
 
         private readonly IGarmentLeftoverWarehouseStockService StockService;
 
+        private readonly string GarmentExpenditureGoodUri;
+
         public GarmentLeftoverWarehouseExpenditureFinishedGoodService(InventoryDbContext dbContext, IServiceProvider serviceProvider)
         {
             DbContext = dbContext;
@@ -43,7 +46,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.E
             IdentityService = (IIdentityService)serviceProvider.GetService(typeof(IIdentityService));
 
             StockService = (IGarmentLeftoverWarehouseStockService)serviceProvider.GetService(typeof(IGarmentLeftoverWarehouseStockService));
-            
+
+            GarmentExpenditureGoodUri = APIEndpoint.GarmentProduction + "expenditure-goods/byRO";
+
         }
         public async Task<int> CreateAsync(GarmentLeftoverWarehouseExpenditureFinishedGood model)
         {
@@ -409,9 +414,11 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.E
                                         Code= b.UnitCode,
                                         Name=b.UnitName },
                             RONo = b.RONo,
+                            LeftoverComodityCode = b.LeftoverComodityCode,
                             LeftoverComodityName = b.LeftoverComodityName,
                             ExpenditureQuantity = b.ExpenditureQuantity,
-                            Uom ="PCS"
+                            Uom ="PCS",
+                            Price = Math.Round(b.BasicPrice * b.ExpenditureQuantity, 2)
                         };
             return Query;
         }
@@ -438,14 +445,17 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.E
             int TotalData = pageable.TotalCount;
             int index = 0;
             Data.ForEach(c => {
+                var comodity = GetComodityFromProduction(c.RONo);
+                c.UnitComodityCode = (comodity.Count() > 0) ? comodity.FirstOrDefault().Comodity.Code : "-";
                 index += 1;
                 c.index = index;
 
             });
 
-            if (page == ((TotalData / size) + 1) && TotalData != 0)
+            if (TotalData == page * size && TotalData != 0)
             {
                 var QtyTotal = Query.Sum(x => x.ExpenditureQuantity);
+                var PriceTotal = Math.Round(Query.Sum(x => x.Price),2);
                 //var WeightTotal = Query.Sum(x => x.Weight);
                 ExpenditureFInishedGoodReportViewModel vm = new ExpenditureFInishedGoodReportViewModel();
 
@@ -457,9 +467,11 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.E
                 vm.ExpenditureDestinationDesc = "";
                 vm.UnitFrom = new UnitViewModel();
                 vm.RONo = "";
+                vm.LeftoverComodityCode = "";
                 vm.LeftoverComodityName = "";
                 vm.ExpenditureQuantity = QtyTotal;
                 vm.Uom = "";
+                vm.Price = PriceTotal;
 
                 Data.Add(vm);
 
@@ -473,6 +485,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.E
             Query = Query.OrderByDescending(b => b.ExpenditureDate);
 
             var QtyTotal = Query.Sum(x => x.ExpenditureQuantity);
+            var PriceTotal = Math.Round(Query.Sum(x => x.Price),2);
 
             DataTable result = new DataTable();
 
@@ -483,30 +496,62 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.E
             result.Columns.Add(new DataColumn() { ColumnName = "Keterangan Tujuan", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Unit Asal", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "RO", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Kode Komoditi Unit", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Kode Komoditi", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Komoditi", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Qty", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Satuan", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Harga", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Titip Jual", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "No Nota Penjualan", DataType = typeof(String) });
 
             if (Query.ToArray().Count() == 0)
-                result.Rows.Add("", "", "", "", "", "", "", "", 0, "", "",""); // to allow column name to be generated properly for empty data as template
+                result.Rows.Add("", "", "", "", "", "", "", "", "", "", 0, "", 0, "", ""); // to allow column name to be generated properly for empty data as template
             else
             {
                 int index = 0;
                 foreach (var item in Query)
                 {
+                    var comodity = GetComodityFromProduction(item.RONo);
+                    //c.UnitComodityCode = comodity != null ? comodity.Comodity.Code : "-";
+
                     index++;
                     //DateTimeOffset date = item.date ?? new DateTime(1970, 1, 1);
                     //string dateString = date == new DateTime(1970, 1, 1) ? "-" : date.ToOffset(new TimeSpan(offset, 0, 0)).ToString("dd MMM yyyy", new CultureInfo("id-ID"));
-                    result.Rows.Add(index, item.FinishedGoodExpenditureNo,item.ExpenditureDate.AddHours(offset).ToString("dd MMM yyyy", new CultureInfo("id-ID")), item.ExpenditureTo,item.ExpenditureDestinationDesc,item.UnitFrom.Code,item.RONo,item.LeftoverComodityName, item.ExpenditureQuantity,item.Uom,item.Consignment,item.LocalSalesNoteNo);
+                    result.Rows.Add(index, item.FinishedGoodExpenditureNo, item.ExpenditureDate.AddHours(offset).ToString("dd MMM yyyy", new CultureInfo("id-ID")), item.ExpenditureTo, item.ExpenditureDestinationDesc, item.UnitFrom.Code, item.RONo, (comodity.Count() > 0 ? comodity.FirstOrDefault().Comodity.Code : "-"), item.LeftoverComodityCode, item.LeftoverComodityName, item.ExpenditureQuantity, item.Uom, item.Price, item.Consignment, item.LocalSalesNoteNo);
                 }
 
-                result.Rows.Add("", "T O T A L ..........", "", "", "", "", "", "", QtyTotal, "", "", "");
+                result.Rows.Add("", "T O T A L ..........", "", "", "", "", "", "", "", "", QtyTotal, "", PriceTotal, "", "");
             }
 
             return Excel.CreateExcel(new List<KeyValuePair<DataTable, string>>() { new KeyValuePair<DataTable, string>(result, "Report Pengeluaran Gudang Sisa Barang Jadi") }, true);
 
+        }
+
+        private List<ExpendGoodViewModel> GetComodityFromProduction(string RONo)
+        {
+            var httpService = (IHttpService)ServiceProvider.GetService(typeof(IHttpService));
+
+            //Dictionary<string, object> filterLocalCoverLetter = new Dictionary<string, object> { { "POSerialNumber", POSerialNumber } };
+            //var filter = JsonConvert.SerializeObject(filterLocalCoverLetter);
+            var responseLocalCoverLetter = httpService.GetAsync($"{GarmentExpenditureGoodUri}?RONo=" + RONo).Result;
+
+            if (responseLocalCoverLetter.IsSuccessStatusCode)
+            {
+                var content = responseLocalCoverLetter.Content.ReadAsStringAsync().Result;
+                Dictionary<string, object> resultGarmentProduct = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
+
+                var jsonLocalCoverLetter = resultGarmentProduct.Single(p => p.Key.Equals("data")).Value;
+                //if (a.Count > 0)
+                //{
+                var a = JsonConvert.DeserializeObject<List<ExpendGoodViewModel>>(jsonLocalCoverLetter.ToString());
+                return a;
+            }
+
+            else
+            {
+                return new List<ExpendGoodViewModel>();
+            }
         }
 
     }

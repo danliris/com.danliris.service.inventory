@@ -19,6 +19,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse
         public string ProductRemark { get; set; }
         public double Quantity { get; set; }
         public UomViewModel Uom { get; set; }
+        public UnitViewModel UnitFrom { get; set; }
         public string LocalSalesNoteNo { get; set; }
         public string BCNo { get; set; }
         public string BCType { get; set; }
@@ -26,7 +27,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse
         public double QtyKG { get; set; }
         public string Composition { get; set; }
         public string Const { get; set; }
-
+        public double Price { get; set; }
 
     }
 }

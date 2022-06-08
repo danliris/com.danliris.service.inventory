@@ -140,7 +140,6 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Inventor
             Assert.NotNull(Response);
         }
 
-
         [Fact]
         public async Task Should_Success_MapToViewModel()
         {
@@ -183,7 +182,6 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Inventor
             var Response = await service.MapToModel(data);
             Assert.NotNull(Response);
         }
-
 
         [Fact]
         public async Task Should_Success_ReadById()

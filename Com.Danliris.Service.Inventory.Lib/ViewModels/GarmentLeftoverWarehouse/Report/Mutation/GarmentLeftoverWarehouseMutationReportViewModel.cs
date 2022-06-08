@@ -9,6 +9,7 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse
         public string ClassificationCode { get; set; }
         public string ClassificationName { get; set; }
         public string UnitQtyName { get; set; }
+        public string Productname { get; set; }
         public double SaldoAwal { get; set; }
         public double Pemasukan { get; set; }
         public double Pengeluaran { get; set; }

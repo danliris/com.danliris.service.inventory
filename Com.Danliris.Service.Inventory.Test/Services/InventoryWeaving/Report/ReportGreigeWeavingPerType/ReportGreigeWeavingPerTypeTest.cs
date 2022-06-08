@@ -99,7 +99,6 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Report.R
             var data = _dataUtil(service).GetTestData();
 
             InventoryWeavingDocumentUploadService serviceDoc = new InventoryWeavingDocumentUploadService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-
             var dataDoc = _dataUtilDoc(serviceDoc).GetTestData();
             //var Responses =  Utilservice.Create(data);
 
@@ -112,12 +111,10 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Report.R
         public void Should_success_GenerateExcel()
         {
             ReportGreigeWeavingPerGradeService service = new ReportGreigeWeavingPerGradeService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-
             var Utilservice = new ReportGreigeWeavingPerTypeService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
             var data = _dataUtil(service).GetTestData();
 
             InventoryWeavingDocumentUploadService serviceDoc = new InventoryWeavingDocumentUploadService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-
             var dataDoc = _dataUtilDoc(serviceDoc).GetTestData();
             //var Responses =  Utilservice.Create(data);
 

@@ -78,7 +78,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Migrations
                     ProductRemark = table.Column<string>(nullable: true),
                     InventoryWeavingDocumentId = table.Column<int>(nullable: false),
                     InventoryWeavingDocumentItemId = table.Column<int>(nullable: false),
-                    Type = table.Column<string>(nullable: true)
+                    Type = table.Column<string>(nullable: true),
+                    
                 },
                 constraints: table =>
                 {
@@ -121,7 +122,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Migrations
                     Quantity = table.Column<double>(nullable: false),
                     QuantityPiece = table.Column<double>(nullable: false),
                     ProductRemark = table.Column<string>(nullable: true),
-                    InventoryWeavingDocumentId = table.Column<int>(nullable: false)
+                    InventoryWeavingDocumentId = table.Column<int>(nullable: false),
+                   
                 },
                 constraints: table =>
                 {

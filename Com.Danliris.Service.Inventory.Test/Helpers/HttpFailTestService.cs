@@ -33,5 +33,17 @@ namespace Com.Danliris.Service.Inventory.Test.Helpers
                 }))
             });
         }
+
+        public Task<HttpResponseMessage> SendAsync(HttpMethod method, string url, HttpContent content)
+        {
+            return Task.Run(() => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(new
+                {
+                    error = "error",
+                    message = "message"
+                }))
+            });
+        }
     }
 }

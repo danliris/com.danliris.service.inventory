@@ -15,9 +15,10 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.InventoryWeavingDataUtil
         private readonly ReportGreigeWeavingPerGradeService Service;
         private readonly InventoryWeavingDocumentDataUtils dataDoc;
 
-        public ReportGreigeWeavingPerGradeDataUtil(ReportGreigeWeavingPerGradeService service)
+        public ReportGreigeWeavingPerGradeDataUtil(ReportGreigeWeavingPerGradeService service, InventoryWeavingDocumentDataUtils dataDoc)
         {
             Service = service;
+            this.dataDoc = dataDoc;
         }
 
         public InventoryWeavingMovement GetNewData()

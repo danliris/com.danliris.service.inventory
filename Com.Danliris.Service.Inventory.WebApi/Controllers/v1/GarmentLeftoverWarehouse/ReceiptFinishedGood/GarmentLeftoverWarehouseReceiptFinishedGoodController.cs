@@ -61,6 +61,7 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.GarmentLeftoverWa
 
             try
             {
+                VerifyUser();
                 byte[] xlsInBytes;
                 int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
                 DateTime DateFrom = dateFrom == null ? new DateTime(1970, 1, 1) : Convert.ToDateTime(dateFrom);

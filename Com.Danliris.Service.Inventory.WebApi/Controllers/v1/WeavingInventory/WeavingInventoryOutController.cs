@@ -1,16 +1,20 @@
-﻿using Com.Danliris.Service.Inventory.Lib.Models.InventoryWeavingModel;
+﻿using AutoMapper;
+using Com.Danliris.Service.Inventory.Lib.Models.InventoryWeavingModel;
 using Com.Danliris.Service.Inventory.Lib.Services;
 using Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving;
 using Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryWeavingViewModel;
 using Com.Danliris.Service.Inventory.WebApi.Helpers;
 using Com.Moonlay.NetCore.Lib.Service;
+using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using static Com.Danliris.Service.Inventory.Lib.Services.InventoryWeaving.InventoryWeavingDocumentOutService;
 
 namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.WeavingInventory
 {
@@ -21,12 +25,16 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.WeavingInventory
     public class WeavingInventoryOutController : Controller
     {
         protected IIdentityService IdentityService;
+        protected readonly IMapper Mapper;
         protected readonly IValidateService ValidateService;
         protected readonly IInventoryWeavingDocumentOutService Service;
         protected readonly string ApiVersion;
+        private readonly string ContentType = "application/vnd.openxmlformats";
+        private readonly string FileName = string.Concat("Error Log - ", typeof(InventoryWeavingDocument).Name, " ", DateTime.Now.ToString("dd MMM yyyy"), ".csv");
 
-        public WeavingInventoryOutController(IIdentityService identityService, IValidateService validateService, IInventoryWeavingDocumentOutService service)
+        public WeavingInventoryOutController(IIdentityService identityService, IValidateService validateService, IInventoryWeavingDocumentOutService service, IMapper mapper)
         {
+            Mapper = mapper;
             IdentityService = identityService;
             ValidateService = validateService;
             Service = service;
@@ -225,6 +233,111 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.WeavingInventory
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        
+        [HttpPost("upload-output")]
+        public async Task<IActionResult> postCsvFileAsync(DateTime date)
+        {
+            //public async Task<IActionResult> postCsvFileAsync (string destination, DateTime date)
+
+            try
+            {
+                //VerifyUser();
+                IdentityService.Username = User.Claims.Single(p => p.Type.Equals("username")).Value;
+                IdentityService.Token = Request.Headers["Authorization"].FirstOrDefault().Replace("Bearer ", "");
+                IdentityService.TimezoneOffset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+                if (Request.Form.Files.Count > 0)
+                {
+                    var UploadedFiles = Request.Form.Files[0];
+                    StreamReader Reader = new StreamReader(UploadedFiles.OpenReadStream());
+                    List<string> FileHeader = new List<string>(Reader.ReadLine().Split(","));
+                    var validHeader = Service.CsvHeaderUpload.SequenceEqual(FileHeader, StringComparer.OrdinalIgnoreCase);
+
+                    if (validHeader)
+                    {
+                        Reader.DiscardBufferedData();
+                        Reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                        Reader.BaseStream.Position = 0;
+                        CsvReader Csv = new CsvReader(Reader);
+                        Csv.Configuration.IgnoreBlankLines = false;
+                        Csv.Configuration.Delimiter = ",";
+                        Csv.Configuration.RegisterClassMap<WeavingInventoryOutMap>();
+                        Csv.Configuration.HeaderValidated = null;
+
+                        List<InventoryWeavingUploadCsvOutViewModel> Data = Csv.GetRecords<InventoryWeavingUploadCsvOutViewModel>().ToList();
+                        InventoryWeavingDocumentOutUploadViewModel Data1 = await Service.MapToViewModel(Data, date);
+
+
+                        ValidateService.Validate(Data1);
+
+                        Tuple<bool, List<object>> Validated = Service.UploadValidate(ref Data, Request.Form.ToList());
+
+                        Reader.Close();
+
+                        if (Validated.Item1)
+                        {
+
+                            List<InventoryWeavingDocumentOutItemViewModel> DataCheck = Data1.itemsOut.ToList();
+                            var CheckCsv = Service.checkCsv(DataCheck);
+
+
+                            if (CheckCsv == 0)
+                            {
+                                InventoryWeavingDocument data = await Service.MapToModelUpload(Data1);
+
+                                await Service.UploadData(data, IdentityService.Username);
+
+                                Dictionary<string, object> Result =
+                                    new ResultFormatter(ApiVersion, General.CREATED_STATUS_CODE, General.OK_MESSAGE)
+                                    .Ok();
+                                return Created(HttpContext.Request.Path, Result);
+                            }
+                            else
+                            {
+                                Dictionary<string, object> Result = new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, "Barcode Belum ada di penyimpanan!").Fail();
+
+                                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+                            }
+                        }
+                        else
+                        {
+                            using (MemoryStream memoryStream = new MemoryStream())
+                            {
+                                using (StreamWriter streamWriter = new StreamWriter(memoryStream))
+                                using (CsvWriter csvWriter = new CsvWriter(streamWriter))
+                                {
+                                    csvWriter.WriteRecords(Validated.Item2);
+                                }
+
+                                return File(memoryStream.ToArray(), ContentType, FileName);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Dictionary<string, object> Result =
+                           new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, General.CSV_ERROR_MESSAGE)
+                           .Fail();
+
+                        return NotFound(Result);
+                    }
+                }
+                else
+                {
+                    Dictionary<string, object> Result =
+                        new ResultFormatter(ApiVersion, General.BAD_REQUEST_STATUS_CODE, General.NO_FILE_ERROR_MESSAGE)
+                            .Fail();
+                    return BadRequest(Result);
+                }
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                   new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                   .Fail();
+
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
             }
         }
 

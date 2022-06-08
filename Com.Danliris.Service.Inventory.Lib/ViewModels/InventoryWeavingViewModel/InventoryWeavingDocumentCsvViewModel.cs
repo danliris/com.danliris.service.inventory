@@ -24,8 +24,8 @@ namespace Com.Danliris.Service.Inventory.Lib.ViewModels.InventoryWeavingViewMode
         public dynamic Qty { get; set; }
         public dynamic QtyPiece { get; set; }
         public string Construction { get; set; }
-
-
+        public string Barcode { get; set; }
+        public DateTime ProductionOrderDate { get; set; }
 
     }
 }
