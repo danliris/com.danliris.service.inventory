@@ -25,7 +25,15 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.IntegrationDataUtil
 
         public Dictionary<string, object> GetMultipleResultFormatterOk()
         {
-            var data = new List<UnitDoViewModel> { GetNewDataUNitDo() };
+
+            var data = new List<UnitDoViewModel>();
+
+            var data1 = GetNewDataUNitDo();
+            var data2 = GetNewDataUNitDo();
+
+            data2.POSerialNumber = "POSerialNumber1234";
+            data.Add(data1);
+            data.Add(data2);
 
             Dictionary<string, object> result =
                 new ResultFormatter("1.0", General.OK_STATUS_CODE, General.OK_MESSAGE)

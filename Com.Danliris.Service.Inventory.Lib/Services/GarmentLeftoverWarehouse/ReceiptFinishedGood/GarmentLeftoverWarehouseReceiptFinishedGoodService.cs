@@ -497,12 +497,12 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.G
 
             var pos = getPOfromUnitdo(ros);
 
-           
+
 
             var data2 = (from a in querySum
                        join b in pos on a.RONo equals b.Rono
                        where b.ProductName == "FABRIC"
-                       select new ReceiptFinishedGoodMonitoringViewModel
+                       select new
                        {
                            ReceiptNoteNo = a.ReceiptNoteNo,
                            ReceiptDate = a.ReceiptDate,
@@ -515,8 +515,11 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.G
                            RONo = a.RONo,
                            UomUnit = a.UomUnit,
                            Price = a.Price,
-                           PoSerialNumber = b.POSerialNumber
-                       }).GroupBy(x=> new { x.ReceiptNoteNo, x.ReceiptDate, x.UnitFromCode, x.ExpenditureGoodNo, x.ComodityCode, x.ComodityName, x.UnitComodityCode, x.Quantity, x.RONo, x.UomUnit, x.Price, x.PoSerialNumber }, (key, group) => new ReceiptFinishedGoodMonitoringViewModel {
+                           PoSerialNumber = b.POSerialNumber,
+                           CustomsNo = b.BeacukaiNo,
+                           CustomsType = b.CustomsType,
+                           CustomsDate = b.BeacukaiDate
+                       }).GroupBy(x=> new { x.ReceiptNoteNo, x.ReceiptDate, x.UnitFromCode, x.ExpenditureGoodNo, x.ComodityCode, x.ComodityName, x.UnitComodityCode, x.Quantity, x.RONo, x.UomUnit, x.Price }, (key, group) => new ReceiptFinishedGoodMonitoringViewModel {
                            ReceiptNoteNo = key.ReceiptNoteNo,
                            ReceiptDate = key.ReceiptDate,
                            UnitFromCode = key.UnitFromCode,
@@ -528,69 +531,67 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.G
                            RONo = key.RONo,
                            UomUnit = key.UomUnit,
                            Price = key.Price,
-                           PoSerialNumber = key.PoSerialNumber
-
+                           PoSerialNumbers = group.Select(x=>x.PoSerialNumber).ToList(),
+                           CustomsNo = group.Select(x=>x.CustomsNo).ToList(),
+                           CustomsDate = group.Select(x=>x.CustomsDate).ToList(),
+                           CustomsType = group.Select(x => x.CustomsType).ToList()
                        });
 
-            var bcpos = string.Join(",", data2.Select(x => x.PoSerialNumber).Distinct().ToList());
+            //var bcpos = string.Join(",", data2.Select(x => x.PoSerialNumber).Distinct().ToList());
 
-            var bcs = GetBCfromPO(bcpos).GroupBy(x=>x.POSerialNumber).Select(x=> new BCViewModels {
-                POSerialNumber = x.Key,
-                customdates = x.FirstOrDefault().customdates,
-                customnos = x.FirstOrDefault().customnos,
-                customtypes = x.FirstOrDefault().customtypes
-            }).ToList();
+            //var bcs = GetBCfromPO(bcpos).GroupBy(x=>x.POSerialNumber).Select(x=> new BCViewModels {
+            //    POSerialNumber = x.Key,
+            //    customdates = x.FirstOrDefault().customdates,
+            //    customnos = x.FirstOrDefault().customnos,
+            //    customtypes = x.FirstOrDefault().customtypes
+            //}).ToList();
 
-            var dataexpenditure = from a in data2
-                                  join b in bcs on a.PoSerialNumber equals b.POSerialNumber
-                                  select new ReceiptFinishedGoodMonitoringViewModel
-                                  {
-                                      ReceiptNoteNo = a.ReceiptNoteNo,
-                                      ReceiptDate = a.ReceiptDate,
-                                      UnitFromCode = a.UnitFromCode,
-                                      ExpenditureGoodNo = a.ExpenditureGoodNo,
-                                      ComodityCode = a.ComodityCode,
-                                      ComodityName = a.ComodityName,
-                                      UnitComodityCode = a.UnitComodityCode,
-                                      Quantity = a.Quantity,
-                                      RONo = a.RONo,
-                                      UomUnit = a.UomUnit,
-                                      Price = a.Price,
-                                      PoSerialNumber = a.PoSerialNumber,
-                                      CustomsDate = b.customdates,
-                                      CustomsNo = b.customnos,
-                                      CustomsType = b.customtypes,
+            //var dataexpenditure = from a in data2
+            //                      join b in bcs on a.PoSerialNumber equals b.POSerialNumber into bcfrompos
+            //                      from bb in bcfrompos.DefaultIfEmpty()
+            //                      select new ReceiptFinishedGoodMonitoringViewModel
+            //                      {
+            //                          ReceiptNoteNo = a.ReceiptNoteNo,
+            //                          ReceiptDate = a.ReceiptDate,
+            //                          UnitFromCode = a.UnitFromCode,
+            //                          ExpenditureGoodNo = a.ExpenditureGoodNo,
+            //                          ComodityCode = a.ComodityCode,
+            //                          ComodityName = a.ComodityName,
+            //                          UnitComodityCode = a.UnitComodityCode,
+            //                          Quantity = a.Quantity,
+            //                          RONo = a.RONo,
+            //                          UomUnit = a.UomUnit,
+            //                          Price = a.Price,
+            //                          PoSerialNumber = a.PoSerialNumber,
+            //                          CustomsDate = bb != null ? bb.customdates : new List<DateTimeOffset>(),
+            //                          CustomsNo = bb != null ? bb.customnos : new List<string>(),
+            //                          CustomsType = bb != null ? bb.customtypes : new List<string>(),
 
-                                  };
+            //                      };
 
-            //foreach (var c in data2)
+            //dataexpenditure = dataexpenditure.GroupBy(x => new { x.ReceiptNoteNo, x.ReceiptDate, x.UnitFromCode, x.ExpenditureGoodNo, x.ComodityCode, x.ComodityName, x.UnitComodityCode, x.Quantity, x.RONo, x.UomUnit, x.Price }, (key, group) => new ReceiptFinishedGoodMonitoringViewModel
             //{
-            //    if (!String.IsNullOrEmpty(c.PoSerialNumber))
-            //    {
-            //        var bc = GetBcFromBC(c.PoSerialNumber);
-            //        if (bc != null)
-            //        {
+            //    ReceiptNoteNo = key.ReceiptNoteNo,
+            //    ReceiptDate = key.ReceiptDate,
+            //    UnitFromCode = key.UnitFromCode,
+            //    ExpenditureGoodNo = key.ExpenditureGoodNo,
+            //    ComodityCode = key.ComodityCode,
+            //    ComodityName = key.ComodityName,
+            //    UnitComodityCode = key.UnitComodityCode,
+            //    Quantity = key.Quantity,
+            //    RONo = key.RONo,
+            //    UomUnit = key.UomUnit,
+            //    Price = key.Price,
+            //    PoSerialNumbers = group.Select(x => x.PoSerialNumber).ToList(),
+            //    CustomsDate = group.FirstOrDefault().CustomsDate,
+            //    CustomsNo = group.FirstOrDefault().CustomsNo,
+            //    CustomsType = group.FirstOrDefault().CustomsType,
 
-                                  //            List<string> no = new List<string>();
-                                  //            List<string> type = new List<string>();
-                                  //            List<DateTimeOffset> date = new List<DateTimeOffset>();
-                                  //            foreach (var item in bc)
-                                  //            {
-                                  //                if (item["POSerialNumber"].ToString() == c.PoSerialNumber)
-                                  //                {
-                                  //                    no.Add(item["BeacukaiNo"].ToString());
-                                  //                    date.Add(DateTimeOffset.Parse(item["BeacukaiDate"].ToString()));
-                                  //                    type.Add(item["CustomsType"].ToString());
-                                  //                }
-                                  //            }
-                                  //            c.CustomsNo = no;
-                                  //            c.CustomsDate = date;
-                                  //            c.CustomsType = type;
-                                  //        }
-                                  //    }
-                                  //}
+            //});
 
-            return dataexpenditure.Distinct().AsQueryable();
+            
+
+            return data2.Distinct().AsQueryable();
         }
 
         public Tuple<List<ReceiptFinishedGoodMonitoringViewModel>, int> GetMonitoring(DateTime? dateFrom, DateTime? dateTo, int page, int size, string order, int offset)
@@ -684,6 +685,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.G
                     string no = "";
                     string type = "";
                     string date = "";
+                    string pos = "";
 
                     if (item.CustomsNo != null)
                     {
@@ -711,11 +713,20 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.G
                             }
                             date += z.ToString("dd MMM yyyy", new CultureInfo("id-ID"));
                         }
+
+                        foreach (var z in item.PoSerialNumbers)
+                        {
+                            if (pos != "")
+                            {
+                                pos += "\n";
+                            }
+                            pos += z;
+                        }
                     }
 
                     //DateTimeOffset date = item.date ?? new DateTime(1970, 1, 1);
                     //string dateString = date == new DateTime(1970, 1, 1) ? "-" : date.ToOffset(new TimeSpan(offset, 0, 0)).ToString("dd MMM yyyy", new CultureInfo("id-ID"));
-                    result.Rows.Add(index, item.ReceiptNoteNo, item.ReceiptDate.AddHours(offset).ToString("dd MMM yyyy", new CultureInfo("id-ID")), item.UnitFromCode, item.ExpenditureGoodNo, item.RONo, item.UnitComodityCode, item.ComodityCode, item.ComodityName, item.Quantity, item.UomUnit, item.Price, item.PoSerialNumber, no, date, type);
+                    result.Rows.Add(index, item.ReceiptNoteNo, item.ReceiptDate.AddHours(offset).ToString("dd MMM yyyy", new CultureInfo("id-ID")), item.UnitFromCode, item.ExpenditureGoodNo, item.RONo, item.UnitComodityCode, item.ComodityCode, item.ComodityName, item.Quantity, item.UomUnit, item.Price, pos, no, date, type);
                 }
 
                 result.Rows.Add("" , "T O T A L .......", "", "", "", "", "", "", "", QtyTotal, "", PriceTotal, "", "", "" , "");
@@ -765,30 +776,30 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.G
             }
         }
 
-        private List<BCViewModels> GetBCfromPO(string po)
-        {
-            var httpService = (IHttpService)ServiceProvider.GetService(typeof(IHttpService));
+        //private List<BCViewModels> GetBCfromPO(string po)
+        //{
+        //    var httpService = (IHttpService)ServiceProvider.GetService(typeof(IHttpService));
 
-            var httpContent = new StringContent(JsonConvert.SerializeObject(po), Encoding.UTF8, "application/json");
+        //    var httpContent = new StringContent(JsonConvert.SerializeObject(po), Encoding.UTF8, "application/json");
 
-            //var garmentProductionUri = APIEndpoint.Core + $"master/garmentProducts/byCode";
-            var httpResponse = httpService.SendAsync(HttpMethod.Get, GarmentCustomsUri, httpContent).Result;
+        //    //var garmentProductionUri = APIEndpoint.Core + $"master/garmentProducts/byCode";
+        //    var httpResponse = httpService.SendAsync(HttpMethod.Get, GarmentCustomsUri, httpContent).Result;
 
-            if (httpResponse.IsSuccessStatusCode)
-            {
-                var content = httpResponse.Content.ReadAsStringAsync().Result;
-                Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
+        //    if (httpResponse.IsSuccessStatusCode)
+        //    {
+        //        var content = httpResponse.Content.ReadAsStringAsync().Result;
+        //        Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
 
-                List<BCViewModels> viewModel;
+        //        List<BCViewModels> viewModel;
 
-                viewModel = JsonConvert.DeserializeObject<List<BCViewModels>>(result.GetValueOrDefault("data").ToString());
-                return viewModel;
-            }
-            else
-            {
-                List<BCViewModels> viewModel = new List<BCViewModels>();
-                return viewModel;
-            }
-        }
+        //        viewModel = JsonConvert.DeserializeObject<List<BCViewModels>>(result.GetValueOrDefault("data").ToString());
+        //        return viewModel;
+        //    }
+        //    else
+        //    {
+        //        List<BCViewModels> viewModel = new List<BCViewModels>();
+        //        return viewModel;
+        //    }
+        //}
     }
 }

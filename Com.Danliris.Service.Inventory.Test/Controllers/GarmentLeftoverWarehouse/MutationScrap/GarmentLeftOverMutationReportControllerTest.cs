@@ -1,4 +1,5 @@
 ﻿using Com.Danliris.Service.Inventory.Lib.Services;
+using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.Report.AvalMutation;
 using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.Report.Mutation;
 using Com.Danliris.Service.Inventory.Lib.ViewModels.GarmentLeftoverWarehouse.Report.Mutation;
 using Com.Danliris.Service.Inventory.WebApi.Controllers.v1.GarmentLeftoverWarehouse.Report;
@@ -17,12 +18,12 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.GarmentLeftoverWarehou
 {
     public class GarmentLeftOverMutationReportControllerTest
     {
-        protected (Mock<IIdentityService> IdentityService, Mock<IValidateService> ValidateService, Mock<IGarmentLeftoverWarehouseMutationReportService> Service) GetMocks()
+        protected (Mock<IIdentityService> IdentityService, Mock<IValidateService> ValidateService, Mock<IGarmentLeftoverWarehouseMutationReportService> Service, Mock<IGarmentLeftoverWarehouseAvalMutationReportService>Service2) GetMocks()
         {
-            return (IdentityService: new Mock<IIdentityService>(), ValidateService: new Mock<IValidateService>(), Service: new Mock<IGarmentLeftoverWarehouseMutationReportService>());
+            return (IdentityService: new Mock<IIdentityService>(), ValidateService: new Mock<IValidateService>(), Service: new Mock<IGarmentLeftoverWarehouseMutationReportService>(), Service2: new Mock<IGarmentLeftoverWarehouseAvalMutationReportService>());
         }
 
-        protected GarmentLeftOverMutationReportController GetController((Mock<IIdentityService> IdentityService, Mock<IValidateService> ValidateService, Mock<IGarmentLeftoverWarehouseMutationReportService> Service) mocks)
+        protected GarmentLeftOverMutationReportController GetController((Mock<IIdentityService> IdentityService, Mock<IValidateService> ValidateService, Mock<IGarmentLeftoverWarehouseMutationReportService> Service,Mock<IGarmentLeftoverWarehouseAvalMutationReportService> Service2) mocks)
         {
             var user = new Mock<ClaimsPrincipal>();
             var claims = new Claim[]
@@ -30,7 +31,7 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.GarmentLeftoverWarehou
                 new Claim("username", "unittestusername")
             };
             user.Setup(u => u.Claims).Returns(claims);
-            GarmentLeftOverMutationReportController controller = new GarmentLeftOverMutationReportController(mocks.IdentityService.Object, mocks.ValidateService.Object, mocks.Service.Object);
+            GarmentLeftOverMutationReportController controller = new GarmentLeftOverMutationReportController(mocks.IdentityService.Object, mocks.ValidateService.Object, mocks.Service.Object, mocks.Service2.Object);
             controller.ControllerContext = new ControllerContext()
             {
                 HttpContext = new DefaultHttpContext()
