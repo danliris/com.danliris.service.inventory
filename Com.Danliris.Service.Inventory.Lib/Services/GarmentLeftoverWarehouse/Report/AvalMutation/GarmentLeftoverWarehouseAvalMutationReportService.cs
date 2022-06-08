@@ -86,8 +86,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var Query = (from a in DbContext.GarmentLeftoverWarehouseReceiptAvals
                          join b in DbContext.GarmentLeftoverWarehouseReceiptAvalItems on a.Id equals b.AvalReceiptId
                          where a._IsDeleted == false && b._IsDeleted == false
-                         && a.ReceiptDate >= dateFrom
-                         && a.ReceiptDate <= dateTo
+                         && a.ReceiptDate.AddHours(7).Date >= DateFrom.Date
+                         && a.ReceiptDate.AddHours(7).Date <= DateTo.Date
                          && a.AvalType == "AVAL FABRIC"
                          select new GarmentLeftoverWarehouseAval
                          {
@@ -124,10 +124,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var BalanceDate = DbContext.GarmentLeftoverWarehouseBalanceStocks.OrderByDescending(x => x.BalanceStockDate).Select(x => x.BalanceStockDate).FirstOrDefault();
 
             var Query = (from a in DbContext.GarmentLeftoverWarehouseReceiptAvals
-                         //join b in DbContext.GarmentLeftoverWarehouseReceiptAvalItems on a.Id equals b.AvalReceiptId
+                         join b in DbContext.GarmentLeftoverWarehouseReceiptAvalItems on a.Id equals b.AvalReceiptId
                          where a._IsDeleted == false 
-                         && a.ReceiptDate >= dateFrom
-                         && a.ReceiptDate <= dateTo
+                         && a.ReceiptDate.AddHours(7).Date >= DateFrom.Date
+                         && a.ReceiptDate.AddHours(7).Date <= DateTo.Date
                          && a.AvalType == "AVAL KOMPONEN"
                          select new GarmentLeftoverWarehouseAval
                          {
@@ -166,8 +166,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var Query = (from a in DbContext.GarmentLeftoverWarehouseExpenditureAvals
                          join b in DbContext.GarmentLeftoverWarehouseExpenditureAvalItems on a.Id equals b.AvalExpenditureId
                          where a._IsDeleted == false && b._IsDeleted == false
-                         && a.ExpenditureDate >= dateFrom
-                         && a.ExpenditureDate <= dateTo
+                         && a.ExpenditureDate.AddHours(7).Date >= DateFrom.Date
+                         && a.ExpenditureDate.AddHours(7).Date <= DateTo.Date
                          && a.AvalType == "AVAL FABRIC"
                          select new GarmentLeftoverWarehouseAval
                          {
@@ -206,8 +206,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             var Query = (from a in DbContext.GarmentLeftoverWarehouseExpenditureAvals
                          join b in DbContext.GarmentLeftoverWarehouseExpenditureAvalItems on a.Id equals b.AvalExpenditureId
                          where a._IsDeleted == false && b._IsDeleted == false
-                         && a.ExpenditureDate >= DateFrom
-                         && a.ExpenditureDate <= DateTo
+                         && a.ExpenditureDate.AddHours(7).Date >= DateFrom.Date
+                         && a.ExpenditureDate.AddHours(7).Date <= DateTo.Date
                         && a.AvalType == "AVAL KOMPONEN"
                          select new GarmentLeftoverWarehouseAval
                          {
@@ -291,15 +291,19 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             sheet.Cells["A" + 1 + ":F" + 1 + ""].Merge = true;
             sheet.Cells["A" + 2 + ":F" + 2 + ""].Merge = true;
             sheet.Cells["A" + 1 + ":F" + 4 + ""].Style.Font.Bold = true;
-            sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Merge = true;
-            sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
 
-            sheet.Cells[$"A{(5 + countdata)}:D{(5 + countdata)}"].Merge = true;
-            sheet.Cells[$"A{(5 + countdata)}:F{(5 + countdata)}"].Style.Font.Bold = true;
-            //ADD SUMMARY OF QUANTITY
-            sheet.Cells[$"A{(5 + countdata)}"].Value = "TOTAL";
-            sheet.Cells[$"E{(5 + countdata)}"].Formula = "SUM(" + sheet.Cells["E" + 5 + ":E" + (4 + countdata) + ""].Address + ")";
-            sheet.Calculate();
+            if (countdata > 0)
+            {
+                sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Merge = true;
+                sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+
+                sheet.Cells[$"A{(5 + countdata)}:D{(5 + countdata)}"].Merge = true;
+                sheet.Cells[$"A{(5 + countdata)}:F{(5 + countdata)}"].Style.Font.Bold = true;
+                //ADD SUMMARY OF QUANTITY
+                sheet.Cells[$"A{(5 + countdata)}"].Value = "TOTAL";
+                sheet.Cells[$"E{(5 + countdata)}"].Formula = "SUM(" + sheet.Cells["E" + 5 + ":E" + (4 + countdata) + ""].Address + ")";
+                sheet.Calculate();
+            }
 
             sheet.Cells.AutoFitColumns();
             sheet.Cells["A4"].LoadFromDataTable(Result, true);
@@ -391,15 +395,19 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             sheet.Cells["A" + 1 + ":F" + 1 + ""].Merge = true;
             sheet.Cells["A" + 2 + ":F" + 2 + ""].Merge = true;
             sheet.Cells["A" + 1 + ":F" + 4 + ""].Style.Font.Bold = true;
-            sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Merge = true;
-            sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
 
-            sheet.Cells[$"A{(5 + countdata)}:D{(5 + countdata)}"].Merge = true;
-            sheet.Cells[$"A{(5 + countdata)}:F{(5 + countdata)}"].Style.Font.Bold = true;
-            //ADD SUMMARY OF QUANTITY
-            sheet.Cells[$"A{(5 + countdata)}"].Value = "TOTAL";
-            sheet.Cells[$"E{(5 + countdata)}"].Formula = "SUM(" + sheet.Cells["E" + 5 + ":E" + (4 + countdata) + ""].Address + ")";
-            sheet.Calculate();
+            if (countdata > 0)
+            {
+                sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Merge = true;
+                sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+
+                sheet.Cells[$"A{(5 + countdata)}:D{(5 + countdata)}"].Merge = true;
+                sheet.Cells[$"A{(5 + countdata)}:F{(5 + countdata)}"].Style.Font.Bold = true;
+                //ADD SUMMARY OF QUANTITY
+                sheet.Cells[$"A{(5 + countdata)}"].Value = "TOTAL";
+                sheet.Cells[$"E{(5 + countdata)}"].Formula = "SUM(" + sheet.Cells["E" + 5 + ":E" + (4 + countdata) + ""].Address + ")";
+                sheet.Calculate();
+            }
 
             sheet.Cells.AutoFitColumns();
             sheet.Cells["A4"].LoadFromDataTable(Result, true);
@@ -492,15 +500,19 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             sheet.Cells["A" + 1 + ":F" + 1 + ""].Merge = true;
             sheet.Cells["A" + 2 + ":F" + 2 + ""].Merge = true;
             sheet.Cells["A" + 1 + ":F" + 4 + ""].Style.Font.Bold = true;
-            sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Merge = true;
-            sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
 
-            sheet.Cells[$"A{(5 + countdata)}:D{(5 + countdata)}"].Merge = true;
-            sheet.Cells[$"A{(5 + countdata)}:F{(5 + countdata)}"].Style.Font.Bold = true;
-            //ADD SUMMARY OF QUANTITY
-            sheet.Cells[$"A{(5 + countdata)}"].Value = "TOTAL";
-            sheet.Cells[$"E{(5 + countdata)}"].Formula = "SUM(" + sheet.Cells["E" + 5 + ":E" + (4 + countdata) + ""].Address + ")";
-            sheet.Calculate();
+            if (countdata > 0)
+            {
+                sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Merge = true;
+                sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+
+                sheet.Cells[$"A{(5 + countdata)}:D{(5 + countdata)}"].Merge = true;
+                sheet.Cells[$"A{(5 + countdata)}:F{(5 + countdata)}"].Style.Font.Bold = true;
+                //ADD SUMMARY OF QUANTITY
+                sheet.Cells[$"A{(5 + countdata)}"].Value = "TOTAL";
+                sheet.Cells[$"E{(5 + countdata)}"].Formula = "SUM(" + sheet.Cells["E" + 5 + ":E" + (4 + countdata) + ""].Address + ")";
+                sheet.Calculate();
+            }
 
             sheet.Cells.AutoFitColumns();
             sheet.Cells["A4"].LoadFromDataTable(Result, true);
