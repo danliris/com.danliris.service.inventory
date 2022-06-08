@@ -48,7 +48,6 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
             var BalanceDate = DbContext.GarmentLeftoverWarehouseBalanceStocks.OrderByDescending(x => x.BalanceStockDate).Select(x => x.BalanceStockDate).FirstOrDefault();
 
-
             var BalanceStock = (from a in DbContext.GarmentLeftoverWarehouseBalanceStocks
                                 join b in DbContext.GarmentLeftoverWarehouseBalanceStocksItems on a.Id equals b.BalanceStockId
                                 where a._IsDeleted == false && b._IsDeleted == false && a.TypeOfGoods == "BARANG JADI"
@@ -680,11 +679,10 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 });
             };
 
-
-
             var mutation = SaldoAkhir.Concat(mutationScrap).ToList();
 
             return mutation.OrderBy(x => x.ClassificationCode).ToList();
+
 
         }
 

@@ -51,10 +51,10 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Report.R
             return dbContext;
         }
 
-        private ReportGreigeWeavingPerGradeDataUtil _dataUtil(ReportGreigeWeavingPerGradeService service, InventoryWeavingDocumentDataUtils dataDoc)
+        private ReportGreigeWeavingPerGradeDataUtil _dataUtil(ReportGreigeWeavingPerGradeService service)
         {
             GetServiceProvider();
-            return new ReportGreigeWeavingPerGradeDataUtil(service, dataDoc);
+            return new ReportGreigeWeavingPerGradeDataUtil(service);
         }
 
         private InventoryWeavingDocumentDataUtils _dataUtilDoc(InventoryWeavingDocumentUploadService service)
@@ -94,12 +94,10 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Report.R
         public async Task Should_success_GetReport()
         {
             ReportGreigeWeavingPerGradeService service = new ReportGreigeWeavingPerGradeService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-            InventoryWeavingDocumentUploadService serviceDoc = new InventoryWeavingDocumentUploadService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-            InventoryWeavingDocumentDataUtils dataDoc1 = new InventoryWeavingDocumentDataUtils(serviceDoc);
-
             var Utilservice = new ReportGreigeWeavingPerMonthService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-            var data = _dataUtil(service, dataDoc1).GetTestData();
-            
+            var data = _dataUtil(service).GetTestData();
+
+            InventoryWeavingDocumentUploadService serviceDoc = new InventoryWeavingDocumentUploadService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
             var dataDoc = _dataUtilDoc(serviceDoc).GetTestData();
             //var Responses =  Utilservice.Create(data);
 
@@ -112,12 +110,11 @@ namespace Com.Danliris.Service.Inventory.Test.Services.InventoryWeaving.Report.R
         public void Should_success_GenerateExcel()
         {
             ReportGreigeWeavingPerGradeService service = new ReportGreigeWeavingPerGradeService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-            InventoryWeavingDocumentUploadService serviceDoc = new InventoryWeavingDocumentUploadService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-            InventoryWeavingDocumentDataUtils dataDoc1 = new InventoryWeavingDocumentDataUtils(serviceDoc);
 
             var Utilservice = new ReportGreigeWeavingPerMonthService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
-            var data = _dataUtil(service, dataDoc1).GetTestData();
-            
+            var data = _dataUtil(service).GetTestData();
+
+            InventoryWeavingDocumentUploadService serviceDoc = new InventoryWeavingDocumentUploadService(GetServiceProvider().Object, _dbContext(GetCurrentMethod()));
             var dataDoc = _dataUtilDoc(serviceDoc).GetTestData();
             //var Responses =  Utilservice.Create(data);
 
