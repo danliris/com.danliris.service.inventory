@@ -501,8 +501,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             sheet.Cells["A" + 2 + ":F" + 2 + ""].Merge = true;
             sheet.Cells["A" + 1 + ":F" + 4 + ""].Style.Font.Bold = true;
 
-            //if (countdata > 0)
-            //{
+            if (countdata > 0)
+            {
             //    sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Merge = true;
             //    sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
 
@@ -512,7 +512,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                 sheet.Cells[$"A{(5 + countdata)}"].Value = "TOTAL";
                 sheet.Cells[$"E{(5 + countdata)}"].Formula = "SUM(" + sheet.Cells["E" + 5 + ":E" + (4 + countdata) + ""].Address + ")";
                 sheet.Calculate();
-            //}
+            }
 
             sheet.Cells.AutoFitColumns();
             sheet.Cells["A4"].LoadFromDataTable(Result, true);
