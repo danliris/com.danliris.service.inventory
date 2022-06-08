@@ -40,6 +40,28 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                         Quantity = 1,
                         UomId = 1,
                         UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseReceiptAvalItem
+                    {
+                        RONo = "ro1",
+                        ProductId = 2,
+                        ProductCode = "Product1",
+                        ProductName = "Product1",
+                        ProductRemark = "Remark",
+                        Quantity = 2,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseReceiptAvalItem
+                    {
+                        RONo = "ro2",
+                        ProductId = 3,
+                        ProductCode = "Product2",
+                        ProductName = "Product2",
+                        ProductRemark = "Remark",
+                        Quantity = 3,
+                        UomId = 1,
+                        UomUnit = "Uom"
                     }
                 }
             };
@@ -77,7 +99,29 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                         Quantity = 1,
                         UomId = 1,
                         UomUnit = "Uom"
-                    }
+                    },
+                    new GarmentLeftoverWarehouseReceiptAvalItem
+                    {
+                        RONo = "ro1",
+                        ProductId = 2,
+                        ProductCode = "Product1",
+                        ProductName = "Product1",
+                        ProductRemark = "Remark",
+                        Quantity = 2,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseReceiptAvalItem
+                    {
+                        RONo = "ro2",
+                        ProductId = 3,
+                        ProductCode = "Product2",
+                        ProductName = "Product2",
+                        ProductRemark = "Remark",
+                        Quantity = 3,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
                 }
             };
         }

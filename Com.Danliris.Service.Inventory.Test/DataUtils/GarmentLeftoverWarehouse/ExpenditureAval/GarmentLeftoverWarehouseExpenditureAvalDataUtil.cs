@@ -43,7 +43,33 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                         UnitName = "Unit",
                         AvalReceiptNo = receiptAval.AvalReceiptNo,
                         AvalReceiptId= receiptAval.Id,
-                        Quantity = receiptAval.TotalAval,
+                        Quantity = 3,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseExpenditureAvalItem
+                    {
+                        StockId = 2,
+                        UnitId = 2,
+                        UnitCode = "Unit2",
+                        UnitName = "Unit2",
+                        AvalReceiptNo = receiptAval.AvalReceiptNo,
+                        AvalReceiptId= receiptAval.Id,
+                        Quantity = 3,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseExpenditureAvalItem
+                    {
+                        StockId = 1,
+                        UnitId = 3,
+                        UnitCode = "Unit3",
+                        UnitName = "Unit3",
+                        AvalReceiptNo = receiptAval.AvalReceiptNo,
+                        AvalReceiptId= receiptAval.Id,
+                        Quantity = 4,
+                        UomId = 1,
+                        UomUnit = "Uom"
                     }
                 }
             };
@@ -99,7 +125,33 @@ namespace Com.Danliris.Service.Inventory.Test.DataUtils.GarmentLeftoverWarehouse
                         UnitName = "Unit",
                         AvalReceiptNo = receiptAval.AvalReceiptNo,
                         AvalReceiptId= receiptAval.Id,
-                        Quantity = receiptAval.TotalAval,
+                        Quantity = 3,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseExpenditureAvalItem
+                    {
+                        StockId = 2,
+                        UnitId = 2,
+                        UnitCode = "Unit2",
+                        UnitName = "Unit2",
+                        AvalReceiptNo = receiptAval.AvalReceiptNo,
+                        AvalReceiptId= receiptAval.Id,
+                        Quantity = 3,
+                        UomId = 1,
+                        UomUnit = "Uom"
+                    },
+                    new GarmentLeftoverWarehouseExpenditureAvalItem
+                    {
+                        StockId = 1,
+                        UnitId = 3,
+                        UnitCode = "Unit3",
+                        UnitName = "Unit3",
+                        AvalReceiptNo = receiptAval.AvalReceiptNo,
+                        AvalReceiptId= receiptAval.Id,
+                        Quantity = 4,
+                        UomId = 1,
+                        UomUnit = "Uom"
                     }
                 }
             };

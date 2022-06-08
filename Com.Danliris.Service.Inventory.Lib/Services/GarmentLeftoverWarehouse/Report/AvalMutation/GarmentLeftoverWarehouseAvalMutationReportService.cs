@@ -134,7 +134,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                              BonNo = a.AvalReceiptNo,
                              TransactionDate = a.ReceiptDate,
                              Keterangan = a.UnitFromName,
-                             Product = "",
+                             Product = a.UnitFromCode,
                              Quantity = a.TotalAval,
                              UomUnit = "KG"
 
@@ -144,7 +144,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                              TransactionDate = key.TransactionDate,
                              Keterangan = key.Keterangan,
                              Product = key.Product,
-                             Quantity = group.Sum(x => x.Quantity),
+                              Quantity = group.Sum(x => x.Quantity),
                              UomUnit = key.UomUnit,
 
                          }).ToList();
@@ -208,7 +208,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                          where a._IsDeleted == false && b._IsDeleted == false
                          && a.ExpenditureDate.AddHours(7).Date >= DateFrom.Date
                          && a.ExpenditureDate.AddHours(7).Date <= DateTo.Date
-                        && a.AvalType == "AVAL KOMPONEN"
+                         && a.AvalType == "AVAL KOMPONEN"
                          select new GarmentLeftoverWarehouseAval
                          {
                              BonNo = a.AvalExpenditureNo,
@@ -258,23 +258,23 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             else
                 foreach(var item in Query)
                 {
-                    //idx++;
-                    //if (!Rowcount.ContainsKey(item.BonNo))
-                    //{
-                    //    rCount = 0;
-                    //    var index1 = idx;
-                    //    Rowcount.Add(item.BonNo, index1.ToString());
-                    //}
-                    //else
-                    //{
-                    //    rCount += 1;
-                    //    Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
-                    //    var val = Rowcount[item.BonNo].Split("-");
-                    //    if ((val).Length > 0)
-                    //    {
-                    //        Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
-                    //    }
-                    //}
+                    idx++;
+                    if (!Rowcount.ContainsKey(item.BonNo))
+                    {
+                        rCount = 0;
+                        var index1 = idx;
+                        Rowcount.Add(item.BonNo, index1.ToString());
+                    }
+                    else
+                    {
+                        rCount += 1;
+                        Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
+                        var val = Rowcount[item.BonNo].Split("-");
+                        if ((val).Length > 0)
+                        {
+                            Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
+                        }
+                    }
 
                     var receiptDate = item.TransactionDate.ToString("dd MMM yyyy");
                     Result.Rows.Add( item.BonNo, receiptDate, item.Keterangan, item.Product, item.Quantity, item.UomUnit);
@@ -362,23 +362,23 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             else
                 foreach (var item in Query)
                 {
-                    //idx++;
-                    //if (!Rowcount.ContainsKey(item.BonNo))
-                    //{
-                    //    rCount = 0;
-                    //    var index1 = idx;
-                    //    Rowcount.Add(item.BonNo, index1.ToString());
-                    //}
-                    //else
-                    //{
-                    //    rCount += 1;
-                    //    Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
-                    //    var val = Rowcount[item.BonNo].Split("-");
-                    //    if ((val).Length > 0)
-                    //    {
-                    //        Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
-                    //    }
-                    //}
+                    idx++;
+                    if (!Rowcount.ContainsKey(item.BonNo))
+                    {
+                        rCount = 0;
+                        var index1 = idx;
+                        Rowcount.Add(item.BonNo, index1.ToString());
+                    }
+                    else
+                    {
+                        rCount += 1;
+                        Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
+                        var val = Rowcount[item.BonNo].Split("-");
+                        if ((val).Length > 0)
+                        {
+                            Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
+                        }
+                    }
 
                     var receiptDate = item.TransactionDate.ToString("dd MMM yyyy");
                     Result.Rows.Add(item.BonNo, receiptDate, item.Keterangan, item.Product, item.Quantity, item.UomUnit);
@@ -452,8 +452,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             //Result.Columns.Add(new DataColumn() { ColumnName = "NO", DataType = typeof(int) });
             Result.Columns.Add(new DataColumn() { ColumnName = "NOMOR BON MASUK", DataType = typeof(String) });
             Result.Columns.Add(new DataColumn() { ColumnName = "TANGGAL PEMASUKAN", DataType = typeof(String) });
+            Result.Columns.Add(new DataColumn() { ColumnName = "KODE ASAL", DataType = typeof(String) });
             Result.Columns.Add(new DataColumn() { ColumnName = "ASAL TERIMA", DataType = typeof(String) });
-            Result.Columns.Add(new DataColumn() { ColumnName = "KODE BARANG", DataType = typeof(String) });
             Result.Columns.Add(new DataColumn() { ColumnName = "QUANTITY", DataType = typeof(Double) });
             Result.Columns.Add(new DataColumn() { ColumnName = "SATUAN", DataType = typeof(String) });
 
@@ -486,7 +486,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                     //}
 
                     var receiptDate = item.TransactionDate.ToString("dd MMM yyyy");
-                    Result.Rows.Add(item.BonNo, receiptDate, item.Keterangan, item.Product, item.Quantity, item.UomUnit);
+                    Result.Rows.Add(item.BonNo, receiptDate, item.Product, item.Keterangan, item.Quantity, item.UomUnit);
                 }
 
             ExcelPackage package = new ExcelPackage();
@@ -501,48 +501,48 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             sheet.Cells["A" + 2 + ":F" + 2 + ""].Merge = true;
             sheet.Cells["A" + 1 + ":F" + 4 + ""].Style.Font.Bold = true;
 
-            if (countdata > 0)
-            {
-                sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Merge = true;
-                sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            //if (countdata > 0)
+            //{
+            //    sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Merge = true;
+            //    sheet.Cells["F" + 5 + ":F" + (4 + countdata) + ""].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
 
-                sheet.Cells[$"A{(5 + countdata)}:D{(5 + countdata)}"].Merge = true;
-                sheet.Cells[$"A{(5 + countdata)}:F{(5 + countdata)}"].Style.Font.Bold = true;
+            //    sheet.Cells[$"A{(5 + countdata)}:D{(5 + countdata)}"].Merge = true;
+            //    sheet.Cells[$"A{(5 + countdata)}:F{(5 + countdata)}"].Style.Font.Bold = true;
                 //ADD SUMMARY OF QUANTITY
                 sheet.Cells[$"A{(5 + countdata)}"].Value = "TOTAL";
                 sheet.Cells[$"E{(5 + countdata)}"].Formula = "SUM(" + sheet.Cells["E" + 5 + ":E" + (4 + countdata) + ""].Address + ")";
                 sheet.Calculate();
-            }
+            //}
 
             sheet.Cells.AutoFitColumns();
             sheet.Cells["A4"].LoadFromDataTable(Result, true);
 
-            foreach (var a in Rowcount)
-            {
-                var UnitrowNum = a.Value.Split("-");
-                int rowNum2 = 1;
-                int rowNum1 = Convert.ToInt32(UnitrowNum[0]);
-                if (UnitrowNum.Length > 1)
-                {
-                    rowNum2 = Convert.ToInt32(rowNum1) + Convert.ToInt32(UnitrowNum[1]);
-                }
-                else
-                {
-                    rowNum2 = Convert.ToInt32(rowNum1);
-                }
+            //foreach (var a in Rowcount)
+            //{
+            //    var UnitrowNum = a.Value.Split("-");
+            //    int rowNum2 = 1;
+            //    int rowNum1 = Convert.ToInt32(UnitrowNum[0]);
+            //    if (UnitrowNum.Length > 1)
+            //    {
+            //        rowNum2 = Convert.ToInt32(rowNum1) + Convert.ToInt32(UnitrowNum[1]);
+            //    }
+            //    else
+            //    {
+            //        rowNum2 = Convert.ToInt32(rowNum1);
+            //    }
 
-                sheet.Cells[$"A{(rowNum1 + 3)}:A{(rowNum2) + 3}"].Merge = true;
-                sheet.Cells[$"A{(rowNum1 + 3)}:A{(rowNum2) + 3}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                sheet.Cells[$"A{(rowNum1 + 3)}:A{(rowNum2) + 3}"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            //    sheet.Cells[$"A{(rowNum1 + 3)}:A{(rowNum2) + 3}"].Merge = true;
+            //    sheet.Cells[$"A{(rowNum1 + 3)}:A{(rowNum2) + 3}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            //    sheet.Cells[$"A{(rowNum1 + 3)}:A{(rowNum2) + 3}"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
 
-                sheet.Cells[$"B{(rowNum1 + 3)}:B{(rowNum2) + 3}"].Merge = true;
-                sheet.Cells[$"B{(rowNum1 + 3)}:B{(rowNum2) + 3}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                sheet.Cells[$"B{(rowNum1 + 3)}:B{(rowNum2) + 3}"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            //    sheet.Cells[$"B{(rowNum1 + 3)}:B{(rowNum2) + 3}"].Merge = true;
+            //    sheet.Cells[$"B{(rowNum1 + 3)}:B{(rowNum2) + 3}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            //    sheet.Cells[$"B{(rowNum1 + 3)}:B{(rowNum2) + 3}"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
 
-                sheet.Cells[$"C{(rowNum1 + 3)}:C{(rowNum2) + 3}"].Merge = true;
-                sheet.Cells[$"C{(rowNum1 + 3)}:C{(rowNum2) + 3}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                sheet.Cells[$"C{(rowNum1 + 3)}:C{(rowNum2) + 3}"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            }
+            //    sheet.Cells[$"C{(rowNum1 + 3)}:C{(rowNum2) + 3}"].Merge = true;
+            //    sheet.Cells[$"C{(rowNum1 + 3)}:C{(rowNum2) + 3}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            //    sheet.Cells[$"C{(rowNum1 + 3)}:C{(rowNum2) + 3}"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            //}
 
             var stream = new MemoryStream();
             package.SaveAs(stream);
@@ -570,23 +570,23 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
             else
                 foreach (var item in Query)
                 {
-                    //idx++;
-                    //if (!Rowcount.ContainsKey(item.BonNo))
-                    //{
-                    //    rCount = 0;
-                    //    var index1 = idx;
-                    //    Rowcount.Add(item.BonNo, index1.ToString());
-                    //}
-                    //else
-                    //{
-                    //    rCount += 1;
-                    //    Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
-                    //    var val = Rowcount[item.BonNo].Split("-");
-                    //    if ((val).Length > 0)
-                    //    {
-                    //        Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
-                    //    }
-                    //}
+                    idx++;
+                    if (!Rowcount.ContainsKey(item.BonNo))
+                    {
+                        rCount = 0;
+                        var index1 = idx;
+                        Rowcount.Add(item.BonNo, index1.ToString());
+                    }
+                    else
+                    {
+                        rCount += 1;
+                        Rowcount[item.BonNo] = Rowcount[item.BonNo] + "-" + rCount.ToString();
+                        var val = Rowcount[item.BonNo].Split("-");
+                        if ((val).Length > 0)
+                        {
+                            Rowcount[item.BonNo] = val[0] + "-" + rCount.ToString();
+                        }
+                    }
 
                     var receiptDate = item.TransactionDate.ToString("dd MMM yyyy");
                     Result.Rows.Add(item.BonNo, receiptDate, item.Keterangan, item.Product, item.Quantity, item.UomUnit);
