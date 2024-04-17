@@ -309,7 +309,7 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
 
             GarmentLeftoverWarehouseStockReportService utilService = new GarmentLeftoverWarehouseStockReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
 
-            var result = utilService.GetMonitoringFinishedGood(DateTime.Now, DateTime.Now, 1, 1, 25, "{}", 7);
+            var result = utilService.GetMonitoringFinishedGood(DateTime.Now, DateTime.Now, 1, 1, 25, "{}", 7,"","");
 
             var httpClientService2 = new Mock<IHttpService>();
 
@@ -323,7 +323,7 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
 
             GarmentLeftoverWarehouseStockReportService utilService2 = new GarmentLeftoverWarehouseStockReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
 
-            var resultinternalserver = utilService.GetMonitoringFinishedGood(DateTime.Now, DateTime.Now, 1, 1, 25, "{}", 7);
+            var resultinternalserver = utilService.GetMonitoringFinishedGood(DateTime.Now, DateTime.Now, 1, 1, 25, "{}", 7,"","");
 
 
             Assert.NotNull(result);
@@ -392,7 +392,7 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             var dataFinishedGood = await _dataUtilFinishedGood(service).GetTestData();
 
             GarmentLeftoverWarehouseStockReportService utilService = new GarmentLeftoverWarehouseStockReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
-            var result = utilService.GenerateExcelFinishedGood(DateTime.Now, DateTime.Now, 1, 7);
+            var result = utilService.GenerateExcelFinishedGood(DateTime.Now, DateTime.Now, 1, 7,"","");
 
 
             Assert.NotNull(result);
@@ -462,7 +462,7 @@ namespace Com.Danliris.Service.Inventory.Test.Services.GarmentLeftoverWarehouse.
             var dataFinishedGood = await _dataUtilFinishedGood(service).GetTestData();
 
             GarmentLeftoverWarehouseStockReportService utilService = new GarmentLeftoverWarehouseStockReportService(_dbContext(GetCurrentMethod()), serviceProvider.Object);
-            var result = utilService.GenerateExcelFinishedGood(DateTime.Now, DateTime.Now, 10, 7);
+            var result = utilService.GenerateExcelFinishedGood(DateTime.Now, DateTime.Now, 10, 7,"","");
 
 
             Assert.NotNull(result);
