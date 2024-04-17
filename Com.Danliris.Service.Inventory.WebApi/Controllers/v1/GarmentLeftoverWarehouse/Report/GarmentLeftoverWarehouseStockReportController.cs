@@ -193,7 +193,7 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.GarmentLeftoverWa
             }
         }
         [HttpGet("finishedgood")]
-        public IActionResult GetReportStockFinishedGood(DateTime? dateFrom, DateTime? dateTo, int unit, int page, int size, string Order = "{}")
+        public IActionResult GetReportStockFinishedGood(DateTime? dateFrom, DateTime? dateTo, int unit, int page, int size, string ro,string comodityCode, string Order = "{}")
         {
             try
             {
@@ -205,7 +205,7 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.GarmentLeftoverWa
                     page = 1;
                     size = 25;
                 }
-                var data = Service.GetMonitoringFinishedGood(dateFrom, dateTo, unit, page, size, Order, offset);
+                var data = Service.GetMonitoringFinishedGood(dateFrom, dateTo, unit, page, size, Order, offset, ro, comodityCode);
 
                 return Ok(new
                 {
@@ -226,7 +226,7 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.GarmentLeftoverWa
         }
 
         [HttpGet("download-finishedgood")]
-        public IActionResult GetXlsStockFinishedGood(DateTime? dateFrom, DateTime? dateTo, int unit, string receiptType)
+        public IActionResult GetXlsStockFinishedGood(DateTime? dateFrom, DateTime? dateTo, int unit, string receiptType, string ro, string comodityCode)
         {
 
             try
@@ -237,7 +237,7 @@ namespace Com.Danliris.Service.Inventory.WebApi.Controllers.v1.GarmentLeftoverWa
                 DateTime DateFrom = dateFrom == null ? new DateTime(1970, 1, 1) : Convert.ToDateTime(dateFrom);
                 DateTime DateTo = dateTo == null ? DateTime.Now : Convert.ToDateTime(dateTo);
 
-                var xls = Service.GenerateExcelFinishedGood(dateFrom, dateTo, unit, offset);
+                var xls = Service.GenerateExcelFinishedGood(dateFrom, dateTo, unit, offset,ro,comodityCode);
 
                 string filename = String.Format("Report Stock Gudang Sisa - Barang Jadi {0}.xlsx", DateTime.UtcNow.ToString("ddMMyyyy"));
 

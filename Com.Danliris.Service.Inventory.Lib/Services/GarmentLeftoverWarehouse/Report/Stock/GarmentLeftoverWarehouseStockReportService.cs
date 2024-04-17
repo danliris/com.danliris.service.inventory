@@ -165,7 +165,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
         }
         #region REPORT
-        public IQueryable<GarmentLeftoverWarehouseStockMonitoringViewModel> GetReportQuery(DateTime? dateFrom, DateTime? dateTo, int UnitId, string type, int offset, string typeAval = "")
+        public IQueryable<GarmentLeftoverWarehouseStockMonitoringViewModel> GetReportQuery(DateTime? dateFrom, DateTime? dateTo, int UnitId, string ro,string comodityCode, string type, int offset, string typeAval = "")
         {
 
             DateTimeOffset DateFrom = dateFrom == null ? new DateTime(1970, 1, 1) : (DateTimeOffset)dateFrom;
@@ -304,7 +304,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                               where data._IsDeleted == false && data.TypeOfGoods.ToString() == "BARANG JADI"
                                               select new { data._CreatedUtc, data.Id })
                                    join b in DbContext.GarmentLeftoverWarehouseBalanceStocksItems on a.Id equals b.BalanceStockId
-                                   where b.UnitId == (UnitId == 0 ? b.UnitId : UnitId) 
+                                   where b.UnitId == (UnitId == 0 ? b.UnitId : UnitId) && b.RONo == (string.IsNullOrWhiteSpace(ro) ? b.RONo : ro)
+                                   && b.LeftoverComodityCode == (string.IsNullOrWhiteSpace(comodityCode) ? b.LeftoverComodityCode : comodityCode)
                                    select new GarmentLeftoverWarehouseStockMonitoringViewModel
                                    {
                                        RO = b.RONo,
@@ -328,6 +329,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                          && data.UnitFromId == (UnitId == 0 ? data.UnitFromId : UnitId)
                                               select new { data.UnitFromCode, data.ReceiptDate, data.Id })
                                    join b in DbContext.GarmentLeftoverWarehouseReceiptFinishedGoodItems on a.Id equals b.FinishedGoodReceiptId
+                                   where b.RONo == (string.IsNullOrWhiteSpace(ro) ? b.RONo : ro)
+                                   && b.LeftoverComodityCode == (string.IsNullOrWhiteSpace(comodityCode) ? b.LeftoverComodityCode : comodityCode)
                                    select new GarmentLeftoverWarehouseStockMonitoringViewModel
                                    {
                                        RO = b.RONo,
@@ -351,6 +354,8 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
                                                   select new { data.ExpenditureDate, data.Id })
                                        join b in (from expend in DbContext.GarmentLeftoverWarehouseExpenditureFinishedGoodItems
                                                   where expend.UnitId == (UnitId == 0 ? expend.UnitId : UnitId)
+                                                  && expend.RONo == (string.IsNullOrWhiteSpace(ro) ? expend.RONo : ro)
+                                                  && expend.LeftoverComodityCode == (string.IsNullOrWhiteSpace(comodityCode) ? expend.LeftoverComodityCode : comodityCode)
                                                   select new { expend.FinishedGoodExpenditureId, expend.UnitCode, expend.ExpenditureQuantity, expend.RONo, expend.LeftoverComodityName,expend.LeftoverComodityCode }
                                                   ) on a.Id equals b.FinishedGoodExpenditureId
                                        select new GarmentLeftoverWarehouseStockMonitoringViewModel
@@ -635,7 +640,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
         public Tuple<List<GarmentLeftoverWarehouseStockMonitoringViewModel>, int> GetMonitoringFabric(DateTime? dateFrom, DateTime? dateTo, int unitId, int page, int size, string order, int offset)
         {
-            var Query = GetReportQuery(dateFrom, dateTo, unitId, "FABRIC", offset);
+            var Query = GetReportQuery(dateFrom, dateTo, unitId,"", "", "FABRIC", offset);
 
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(order);
             if (OrderDictionary.Count.Equals(0))
@@ -692,7 +697,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
         public MemoryStream GenerateExcelFabric(DateTime? dateFrom, DateTime? dateTo, int unitId, int offset)
         {
-            var Query = GetReportQuery(dateFrom, dateTo, unitId, "FABRIC", offset);
+            var Query = GetReportQuery(dateFrom, dateTo, unitId, "", "", "FABRIC", offset);
             Query = Query.OrderByDescending(b => b.PONo);
 
             var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
@@ -736,7 +741,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
         public MemoryStream GenerateExcelAcc(DateTime? dateFrom, DateTime? dateTo, int unitId, int offset)
         {
-            var Query = GetReportQuery(dateFrom, dateTo, unitId, "ACC", offset);
+            var Query = GetReportQuery(dateFrom, dateTo, unitId, "", "", "ACC", offset);
             Query = Query.OrderByDescending(b => b.PONo);
 
             var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
@@ -779,7 +784,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
         public Tuple<List<GarmentLeftoverWarehouseStockMonitoringViewModel>, int> GetMonitoringAcc(DateTime? dateFrom, DateTime? dateTo, int unitId, int page, int size, string order, int offset)
         {
-            var Query = GetReportQuery(dateFrom, dateTo, unitId, "ACC", offset);
+            var Query = GetReportQuery(dateFrom, dateTo, unitId, "", "", "ACC", offset);
 
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(order);
             if (OrderDictionary.Count.Equals(0))
@@ -838,9 +843,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
 
 
-        public MemoryStream GenerateExcelFinishedGood(DateTime? dateFrom, DateTime? dateTo, int unitId, int offset)
+        public MemoryStream GenerateExcelFinishedGood(DateTime? dateFrom, DateTime? dateTo, int unitId, int offset,string ro,string comodityCode)
         {
-            var Query = GetReportQuery(dateFrom, dateTo, unitId, "Barang Jadi", offset);
+            var Query = GetReportQuery(dateFrom, dateTo, unitId,ro, comodityCode, "Barang Jadi", offset);
             Query = Query.OrderByDescending(b => b.PONo);
 
             var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);
@@ -881,9 +886,9 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
         }
 
-        public Tuple<List<GarmentLeftoverWarehouseStockMonitoringViewModel>, int> GetMonitoringFinishedGood(DateTime? dateFrom, DateTime? dateTo, int unitId, int page, int size, string order, int offset)
+        public Tuple<List<GarmentLeftoverWarehouseStockMonitoringViewModel>, int> GetMonitoringFinishedGood(DateTime? dateFrom, DateTime? dateTo, int unitId, int page, int size, string order, int offset,string ro,string comodityCode)
         {
-            var Query = GetReportQuery(dateFrom, dateTo, unitId, "Barang Jadi", offset);
+            var Query = GetReportQuery(dateFrom, dateTo, unitId,ro, comodityCode, "Barang Jadi", offset);
 
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(order);
             if (OrderDictionary.Count.Equals(0))
@@ -943,7 +948,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
         public Tuple<List<GarmentLeftoverWarehouseStockMonitoringViewModel>, int> GetMonitoringAval(DateTime? dateFrom, DateTime? dateTo, int unitId, int page, int size, string order, int offset, string typeAval)
         {
-            var Query = GetReportQuery(dateFrom, dateTo, unitId, "AVAL", offset, typeAval);
+            var Query = GetReportQuery(dateFrom, dateTo, unitId, "", "", "AVAL", offset, typeAval);
 
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(order);
             if (OrderDictionary.Count.Equals(0))
@@ -1001,7 +1006,7 @@ namespace Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.R
 
         public MemoryStream GenerateExcelAval(DateTime? dateFrom, DateTime? dateTo, int unitId, int offset, string typeAval)
         {
-            var Query = GetReportQuery(dateFrom, dateTo, unitId, "AVAL", offset, typeAval);
+            var Query = GetReportQuery(dateFrom, dateTo, unitId, "", "", "AVAL", offset, typeAval);
             Query = Query.OrderByDescending(b => b.PONo);
 
             var BeginingbalanceQtyTotal = Math.Round(Query.Sum(x => x.BeginingbalanceQty), MidpointRounding.AwayFromZero);

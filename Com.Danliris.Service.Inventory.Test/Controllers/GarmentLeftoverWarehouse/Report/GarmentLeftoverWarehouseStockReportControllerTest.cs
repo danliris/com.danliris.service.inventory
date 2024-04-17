@@ -149,11 +149,11 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.GarmentLeftoverWarehou
         {
             var mocks = GetMocks();
 
-            mocks.Service.Setup(f => f.GetMonitoringFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()))
+            mocks.Service.Setup(f => f.GetMonitoringFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new Tuple<List<GarmentLeftoverWarehouseStockMonitoringViewModel>, int>(new List<GarmentLeftoverWarehouseStockMonitoringViewModel>(), 1));
 
 
-            var response = GetController(mocks).GetReportStockFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), "");
+            var response = GetController(mocks).GetReportStockFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), "","","");
             Assert.Equal((int)HttpStatusCode.OK, GetStatusCode(response));
 
         }
@@ -161,11 +161,11 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.GarmentLeftoverWarehou
         public void Should_Error_GetFInishedGoodReport()
         {
             var mocks = GetMocks();
-            mocks.Service.Setup(f => f.GetMonitoringFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()))
+            mocks.Service.Setup(f => f.GetMonitoringFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new Exception());
             var controller = GetController(mocks);
             controller.ControllerContext.HttpContext.Request.Headers["Accept"] = "application/json";
-            var response = GetController(mocks).GetReportStockFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), "");
+            var response = GetController(mocks).GetReportStockFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), "","","");
             Assert.Equal((int)HttpStatusCode.InternalServerError, GetStatusCode(response));
         }
 
@@ -174,9 +174,9 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.GarmentLeftoverWarehou
         {
             var mocks = GetMocks();
 
-            mocks.Service.Setup(f => f.GenerateExcelFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>())
+            mocks.Service.Setup(f => f.GenerateExcelFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>())
                ).Returns(new MemoryStream());
-            var response = GetController(mocks).GetXlsStockFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), "");
+            var response = GetController(mocks).GetXlsStockFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), "","","");
             Assert.NotNull(response);
 
         }
@@ -185,11 +185,11 @@ namespace Com.Danliris.Service.Inventory.Test.Controllers.GarmentLeftoverWarehou
         public void Should_Error_GetXlsFinishedGoodReport()
         {
             var mocks = GetMocks();
-            mocks.Service.Setup(f => f.GenerateExcelFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>())
+            mocks.Service.Setup(f => f.GenerateExcelFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>())
             ).Throws(new Exception());
             var controller = GetController(mocks);
             controller.ControllerContext.HttpContext.Request.Headers["Accept"] = "application/json";
-            var response = GetController(mocks).GetXlsStockFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), "");
+            var response = GetController(mocks).GetXlsStockFinishedGood(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), "","","");
             Assert.Equal((int)HttpStatusCode.InternalServerError, GetStatusCode(response));
         }
 
