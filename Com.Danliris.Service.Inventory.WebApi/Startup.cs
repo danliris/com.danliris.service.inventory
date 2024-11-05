@@ -56,6 +56,8 @@ using Com.Danliris.Service.Inventory.Lib.Services.GarmentLeftoverWarehouse.Repor
 using Com.Danliris.Service.Inventory.Lib.Services.GarmentWasteProduction;
 using Com.Danliris.Service.Inventory.Lib.Services.LogHistories;
 using Com.Danliris.Service.Inventory.Lib.Services.GarmentReceiptSubconWasteProduction;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 
 namespace Com.Danliris.Service.Inventory.WebApi
 {
@@ -162,10 +164,16 @@ namespace Com.Danliris.Service.Inventory.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string connectionString = Configuration.GetConnectionString("DefaultConnection") ?? Configuration["DefaultConnection"];
+            //string connectionString = Configuration.GetConnectionString("DefaultConnection") ?? Configuration["DefaultConnection"];
+            var keyVaultEnpoint = new Uri(Configuration["VaultKey"]);
+            var secretClient = new SecretClient(keyVaultEnpoint, new DefaultAzureCredential());
+
+            KeyVaultSecret kvsDB = secretClient.GetSecret(Configuration["VaultKeyDbSecret"]);
+            KeyVaultSecret kvsServer = secretClient.GetSecret(Configuration["VaultKeyServerSecret"]);
 
             services
-                .AddDbContext<InventoryDbContext>(options => options.UseSqlServer(connectionString))
+                .AddDbContext<InventoryDbContext>(option => option.UseSqlServer(string.Concat(kvsDB.Value, kvsServer.Value)))
+                //.AddDbContext<InventoryDbContext>(options => options.UseSqlServer(connectionString))
                 .AddApiVersioning(options =>
                 {
                     options.ReportApiVersions = true;
